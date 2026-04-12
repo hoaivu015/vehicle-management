@@ -1,0 +1,83 @@
+# Kế hoạch & Standard Operating Procedure (SOP) dành cho Gemini Flash
+
+tất cả các trả lời, báo cáo hoàn thành đều tiếng việt
+
+Mục tiêu của tài liệu này là cung cấp một bản kế hoạch và quy trình thực chuẩn (SOP) để làm "kim chỉ nam" cho model **Gemini Flash**. Khi giao một task mới cho Gemini Flash, nó có thể đọc và thi hành chính xác 100% ngay từ lần tiên dựa trên các bộ Skills của hệ thống.
+
+## User Review Required
+
+> [!IMPORTANT]
+> Đây là bản thiết kế quy trình để bạn (hoặc một prompt tự động) sử dụng khi giao việc cho Gemini Flash. Vui lòng xác nhận xem thứ tự các bước và các ràng buộc mình đề xuất đã đúng với ý định quản lý source code của bạn chưa. Cảm thấy thiếu phần nào (ví dụ: cần thêm bước test), hãy nhắc mình bổ sung nhé!
+
+---
+
+## The Workflow Plan (Quy trình 4 Bước chuẩn chỉnh)
+
+Để Gemini Flash luôn code đúng kiến trúc trong lần đầu, mỗi khi giao việc, chúng ta yêu cầu Flash phải thực hiện tuần tự qua 4 Giai đoạn sau (P-A-I-V):
+
+### Phase 1: Phân tích và Ràng buộc Kiến trúc (Domain-Driven Hexagon)
+Trước khi viết mã giao diện hay database, Gemini Flash phải luôn phải xuất ra thiết kế kiến trúc.
+
+*   **Ràng buộc ngặt nghèo (Strict Rule)**: Không bao giờ viết Controller/UI gọi trực tiếp tầng Database.
+*   **Hành động của Flash**:
+    1.  Định nghĩa **Domain / Entities** trước (`src/modules/[module]/domain/entities`).
+    2.  Thiết lập các **Use-Case / Services** (`application/use-cases`).
+    3.  Tạo **Ports (Interfaces)** chứ không viết implementation ngay.
+    4.  *(Ví dụ: Tạo tính năng xoá xe: Flash phải viết `DeleteVehicleService` trước, thay vì sửa thẳng vào file `VehicleDetailModal.tsx`).*
+
+### Phase 2: Triển khai Hạ tầng cấu hình (Supabase Postgres Base)
+Sau khi có Port, mới tiến hành viết Adapter.
+
+*   **Ràng buộc ngặt nghèo (Strict Rule)**: Phải áp dụng `Supabase Postgres Best Practices`.
+*   **Hành động của Flash**:
+    1.  Viết mã thao tác ở `infrastructure/database/...repository.impl.ts`.
+    2.  Check Row-Level Security (RLS) để xem Database có cho phép không (phân quyền Role: Admin vs Member).
+    3.  Thực hiện Handle Error ở tầng kết nối một cách an toàn (tránh làm crash UI).
+
+### Phase 3: Xây dựng Giao diện & Hiệu ứng (UI/UX Pro Max)
+Áp dụng UI và móc nối dữ liệu vào tầng Presentation.
+
+*   **Ràng buộc ngặt nghèo (Strict Rule)**: Phải dùng TailwindCSS đúng chuẩn, có Loading Skeletons, Hover states, trỏ chuột luôn ở trạng thái `cursor-pointer` đối với các nút bấm.
+*   **Hành động của Flash**:
+    1.  Sửa hoặc tạo Web Components ở `presentation/components/`.
+    2.  Giữ nguyên kích thước chuẩn đã chốt (Liquid Skeleton, Fixed layout).
+    3.  Luôn sử dụng SVG Lucide/Heroicons thay vì Emoji, kiểm tra Contrast giữa nền Sáng/Tối.
+    4.  Móc nối Data từ Use-Cases hoặc custom Hooks vào UI Component này.
+
+### Phase 4: Self-Review (Tiêu chuẩn Senior Fullstack)
+Trước khi kết thúc câu trả lời, Gemini Flash phải thực hiện một checklist.
+
+*   **Hành động của Flash**: Tự liệt kê pre-delivery checklist dựa trên `Senior Fullstack` skill:
+    1. Dependency Inversion đã đúng chưa? (Tầng Domain sạch sẽ không?).
+    2. Accessibility (Mới thêm một input, input đó đã có label hay chưa?).
+    3. File imports đã sử dụng Absolute Path / Relative path đúng chuẩn chưa?
+
+---
+
+## 💻 Mẫu Prompt "Sát thủ" để dán cho Gemini Flash
+
+Khi bạn muốn Flash code một tính năng bất kì, hãy copy paste đoạn Prompt sau đi kèm với mô tả công việc của bạn. Đảm bảo Flash sẽ làm chuẩn chỉnh:
+
+> [!TIP]
+> **Prompt Template dành cho Gemini Flash:**
+> 
+> *"Bạn là một AI với kỹ năng của một Senior Fullstack Engineer. Hãy thực hiện tính năng sau: **[Mô tả tính năng, ví dụ: Nút xoá xe hơi trong VehicleDetailModal]** dựa trên mã nguồn hiện tại.*
+>
+> *BẮT BUỘC TIẾP CẬN THEO QUY TRÌNH 4 BƯỚC SAU:*
+> 
+> *1. **DOMAIN-DRIVEN**: Phân tích logic của tính năng này. Hãy viết/sửa logic ở tầng Application (Services) và Domain trước nếu cần thiết.*
+> *2. **INFRASTRUCTURE**: Viết Implement của Database Repository dựa theo chuẩn Supabase Best Practices (Chú trọng Error Handling và kiểm tra quyền RLS).*
+> *3. **UI/UX PRO MAX**: Triển khai hoặc sửa các component ở thư mục Presentation/Components (Sử dụng Tailwind. Bắt buộc xử lý các trạng thái: Loading Skeletons, Error Feedback, Hover/Touch Size, không làm vỡ layout Fixed hiện tại).*
+> *4. **SENIOR REVIEW**: Không output bừa phứa code nếu không chắc chắn. Hãy thay đổi chính xác, trích xuất mã cẩn thận và trả về theo dạng checklist.*
+>
+> *Tuyệt đối KHÔNG viết logic gọi trực tiếp database API từ trong layer Presentation (React Component)."*
+
+## Open Questions
+
+1. Bạn có muốn mình áp dụng ngay luôn bản kế hoạch / Master Prompt này để trực tiếp sửa `VehicleDetailModal.tsx` tính năng "Admin-only vehicle deletion" trong Session này không?
+2. Có thiết kế mẫu nào về mã mầu/icon riêng biệt cho các action "Danger" (như Xoá) mà bạn đang hướng tới không?
+
+## Verification Plan
+
+- Đóng / mở các branch thử nghiệm (sandbox) và cho Gemini Flash đọc Master Prompt kết hợp yêu cầu tính năng thực tế. 
+- Review lại Diff changes xem Flash có vi phạm "Luật Thép" (sửa DB trong UI chẳng hạn) hay không.

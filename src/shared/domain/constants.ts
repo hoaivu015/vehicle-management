@@ -1,0 +1,76 @@
+export enum VehicleStatus {
+  DEPOSIT_BUY = 'DEPOSIT_BUY',
+  SPA = 'SPA',
+  IN_STOCK = 'IN_STOCK',
+  DEPOSIT_SALE = 'DEPOSIT_SALE',
+  BANK_DEPOSIT = 'BANK_DEPOSIT',
+  BANK_CONFIRMED = 'BANK_CONFIRMED',
+  SOLD = 'SOLD',
+}
+
+export const VEHICLE_STATUS_LABELS: Record<VehicleStatus, string> = {
+  [VehicleStatus.DEPOSIT_BUY]: 'Cọc mua',
+  [VehicleStatus.SPA]: 'Spa',
+  [VehicleStatus.IN_STOCK]: 'Trong kho',
+  [VehicleStatus.DEPOSIT_SALE]: 'Cọc bán',
+  [VehicleStatus.BANK_DEPOSIT]: 'Cọc Bank',
+  [VehicleStatus.BANK_CONFIRMED]: 'Thông báo cho vay',
+  [VehicleStatus.SOLD]: 'Đã bán',
+};
+
+export const VEHICLE_STATUS_CONFIG: Record<VehicleStatus, { label: string; badgeClass: string }> = {
+  [VehicleStatus.DEPOSIT_BUY]:    { label: 'Cọc mua',           badgeClass: 'bg-amber-500/90 text-white border-amber-400/50' },
+  [VehicleStatus.SPA]:            { label: 'Spa',               badgeClass: 'bg-sky-500/90 text-white border-sky-400/50' },
+  [VehicleStatus.IN_STOCK]:       { label: 'Trong kho',         badgeClass: 'bg-emerald-500/90 text-white border-emerald-400/50' },
+  [VehicleStatus.DEPOSIT_SALE]:   { label: 'Cọc bán',           badgeClass: 'bg-violet-500/90 text-white border-violet-400/50' },
+  [VehicleStatus.BANK_DEPOSIT]:   { label: 'Cọc Bank',          badgeClass: 'bg-orange-500/90 text-white border-orange-400/50' },
+  [VehicleStatus.BANK_CONFIRMED]: { label: 'Thông báo cho vay', badgeClass: 'bg-teal-500/90 text-white border-teal-400/50' },
+  [VehicleStatus.SOLD]:           { label: 'Đã bán',            badgeClass: 'bg-red-500/90 text-white border-red-400/50' },
+};
+
+export const ADMIN_EMAILS = [
+  "thuongpth24mba@uef.edu.vn",
+  "admin@email.com",
+  "abc@email.com",
+  "hoaivu015@gmail.com",
+  "admin@auto28.com"
+];
+
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  ACCOUNTANT = 'ACCOUNTANT',
+  STAFF = 'STAFF',
+  MANAGER = 'MANAGER',
+  SALES_LEADER = 'SALES_LEADER',
+  SALES_STAFF = 'SALES_STAFF',
+}
+
+export const USER_ROLE_LABELS: Record<UserRole, string> = {
+  [UserRole.ADMIN]: 'Quản trị viên',
+  [UserRole.ACCOUNTANT]: 'Kế toán',
+  [UserRole.STAFF]: 'Nhân viên kinh doanh',
+  [UserRole.MANAGER]: 'Quản lý showroom',
+  [UserRole.SALES_LEADER]: 'Trưởng nhóm sale',
+  [UserRole.SALES_STAFF]: 'Nhân viên sale',
+};
+
+export enum Permission {
+  VIEW_STAFF = 'view_staff',
+  EDIT_STAFF = 'edit_staff',
+  VIEW_FINANCE = 'view_finance',
+  EDIT_CASHFLOW = 'edit_cashflow',
+  VIEW_INVENTORY = 'view_inventory',
+  EDIT_INVENTORY = 'edit_inventory',
+}
+
+export const STAFF_CONSTANTS = {
+  BONUS_THRESHOLD_PERCENT: 100,
+  BONUS_MULTIPLIER_FULL: 1.0,
+  BONUS_MULTIPLIER_REDUCED: 0.7,
+  DEFAULT_BUYING_COMMISSION: 3000000,
+  DEFAULT_SALE_COMMISSION: 5000000,
+};
+
+export const INVENTORY_CONSTANTS = {
+  AGING_THRESHOLD_DAYS: 30,
+};
