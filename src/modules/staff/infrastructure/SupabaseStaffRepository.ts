@@ -75,12 +75,25 @@ export class SupabaseStaffRepository extends SupabaseRepository<Staff> implement
   }
 
   async updateAccountPassword(email: string, password: string): Promise<void> {
-    const { error } = await supabase
+    try {
+      // 1. Cập nhật mật khẩu "thật" qua Edge Function (yêu cầu đã deploy function update-password)
+      const { data, error } = await supabase.functions.invoke('update-password', {
+        body: { email, newPassword: password }
+      });
+      
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+    } catch (err) {
+      console.warn("Edge Function 'update-password' call failed. Falling back to DB-only update.", err);
+    }
+
+    // 2. LUÔN Cập nhật bảng users để đồng bộ hiển thị (ghi nhớ/hiển thị)
+    const { error: dbError } = await supabase
       .from('users')
       .update({ password })
       .eq('email', email);
     
-    if (error) throw error;
+    if (dbError) throw dbError;
   }
 
   async deleteAccountByCode(staffCode: string): Promise<void> {

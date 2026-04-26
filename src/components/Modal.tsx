@@ -39,7 +39,7 @@ export const Modal = ({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8">
-          {/* Backdrop */}
+          {/* Backdrop (Heroic Layer 5) */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -48,31 +48,30 @@ export const Modal = ({
             className="absolute inset-0 bg-kraft-ink/80 backdrop-blur-xl"
           />
 
-          {/* Modal Content */}
+          {/* Modal Content - High Purity Glass Sync */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ 
-              opacity: 1, 
-              scale: 1, 
-              y: 0,
-              transition: {
-                type: "spring",
-                damping: 25,
-                stiffness: 300
-              }
-            }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            onClick={(e) => e.stopPropagation()}
             className={cn(
-              "relative w-full bg-kraft-bg rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-[90vh]",
+              "relative w-full overflow-hidden transition-all duration-500 flex flex-col max-h-[95vh]",
+              "bg-white/95 backdrop-blur-[20px]",
+              "border border-[#E5E7EB]",
+              "shadow-[0_12px_28px_rgba(0,0,0,0.15)]",
+              "rounded-lg",
               maxWidthClasses[maxWidth],
               className
             )}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={title ? "modal-title" : undefined}
           >
-            {/* Header */}
+            {/* Header - Transparent High Purity */}
             {(title || showCloseButton) && (
-              <div className="p-8 border-b border-kraft-accent/10 flex justify-between items-center bg-white/40 backdrop-blur-md sticky top-0 z-10">
+              <div className="px-10 py-8 border-b border-black/[0.03] flex justify-between items-center bg-white/40 sticky top-0 z-10">
                 {title && (
-                  <h3 className="text-2xl font-black text-kraft-ink uppercase tracking-tight">
+                  <h3 id="modal-title" className="text-2xl font-black text-kraft-ink uppercase tracking-tight">
                     {title}
                   </h3>
                 )}

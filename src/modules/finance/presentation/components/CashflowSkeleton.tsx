@@ -4,36 +4,42 @@ import { cn } from '../../../../utils/cn';
 
 export const CashflowSkeleton: React.FC = () => {
   return (
-    <div className="space-y-8 py-6 px-8 max-w-full mx-auto pb-12 overflow-y-auto h-full scrollbar-hidden animate-in fade-in duration-700">
+    <div className="space-y-10 md:space-y-14 py-6 md:py-10 px-6 md:px-12 max-w-[1700px] mx-auto pb-24 h-full overflow-y-auto scrollbar-hidden animate-in fade-in duration-700">
       {/* Header Skeleton */}
-      <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
-        <div className="space-y-3">
-          <Skeleton variant="text" width={200} height={40} />
-          <Skeleton variant="text" width={300} height={12} />
+      <div className="flex flex-col lg:flex-row justify-between items-center gap-8 border-b border-black/5 pb-10">
+        <div className="text-center lg:text-left">
+          <div className="flex items-center gap-6 justify-center lg:justify-start">
+            <Skeleton variant="rectangle" width={64} height={64} className="rounded-[2rem]" />
+            <Skeleton variant="text" width={300} height={60} />
+          </div>
+          <div className="flex items-center gap-3 justify-center lg:justify-start mt-4">
+            <Skeleton variant="circle" width={8} height={8} />
+            <Skeleton variant="text" width={400} height={12} />
+          </div>
         </div>
         
-        <div className="flex gap-4">
-          <Skeleton variant="rectangle" width={140} height={48} className="rounded-xl" />
-          <div className="flex gap-2">
-            <Skeleton variant="rectangle" width={100} height={48} className="rounded-xl" />
-            <Skeleton variant="rectangle" width={120} height={48} className="rounded-xl" />
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+          <Skeleton variant="rectangle" width={240} height={64} className="rounded-[1.5rem]" />
+          <div className="flex gap-4 w-full sm:w-auto">
+            <Skeleton variant="rectangle" width={140} height={64} className="rounded-[1.5rem]" />
+            <Skeleton variant="rectangle" width={160} height={64} className="rounded-[1.5rem]" />
           </div>
         </div>
       </div>
 
       {/* KPI Cards Skeleton */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-white/40 backdrop-blur-md p-8 rounded-[2rem] border border-white/60 flex flex-col items-center">
-            <Skeleton variant="circle" width={56} height={56} className="rounded-2xl mb-6" />
-            <Skeleton variant="text" width="40%" height={10} className="mb-2" />
-            <Skeleton variant="text" width="60%" height={24} />
+          <div key={i} className="bg-white/40 backdrop-blur-md p-10 rounded-[2rem] border border-white/60 flex flex-col items-center">
+            <Skeleton variant="circle" width={80} height={80} className="rounded-[2.5rem] mb-8" />
+            <Skeleton variant="text" width="40%" height={10} className="mb-4" />
+            <Skeleton variant="text" width="60%" height={32} />
           </div>
         ))}
       </div>
 
       {/* Main Content Grid Skeleton */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2 space-y-10">
           <div className="bg-white/40 backdrop-blur-md p-8 rounded-[2.5rem] border border-white/60">
             <div className="flex items-center gap-3 mb-8">

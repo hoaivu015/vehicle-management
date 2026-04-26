@@ -23,6 +23,11 @@ export class AddVehicle {
   constructor(private readonly repository: VehicleRepository) {}
 
   async execute(request: AddVehicleRequest): Promise<Vehicle> {
+    // Validation
+    if (request.is_coinvested && (request.coinvest_amount || 0) > request.purchase_price) {
+      throw new Error('Số tiền góp vốn không được lớn hơn giá mua xe.');
+    }
+
     let code: string | undefined = undefined;
 
     // 1. Tạo mã xe tự động nếu chưa có (Định dạng VH-YYMM-NN)

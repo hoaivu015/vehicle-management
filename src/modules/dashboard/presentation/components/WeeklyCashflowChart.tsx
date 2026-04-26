@@ -53,11 +53,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export const WeeklyCashflowChart: React.FC<WeeklyCashflowChartProps> = ({ data }) => {
   return (
-    <div className="w-full h-[400px] mt-8">
+    <div className="w-full h-[250px] md:h-[400px] mt-6 md:mt-8">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={data}
-          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
         >
           <defs>
             <linearGradient id="colorThu" x1="0" y1="0" x2="0" y2="1">
@@ -84,12 +84,6 @@ export const WeeklyCashflowChart: React.FC<WeeklyCashflowChartProps> = ({ data }
             tickFormatter={(value) => `${(value / 1000000).toFixed(0)}tr`}
           />
           <Tooltip content={<CustomTooltip />} />
-          <Legend 
-            verticalAlign="top" 
-            align="right" 
-            iconType="circle"
-            formatter={(value) => <span className="text-[10px] font-black uppercase tracking-widest text-kraft-ink/60 ml-2">{value === 'thu' ? 'Tiền thu' : 'Tiền chi'}</span>}
-          />
           <Area 
             type="monotone" 
             dataKey="thu" 

@@ -134,15 +134,15 @@ export const SmartAmountInput: React.FC<SmartAmountInputProps> = ({
   }
 
   return (
-    <div className={cn("space-y-2.5", className)}>
+    <div className={cn("space-y-3", className)}>
       {label && (
-        <label htmlFor={id} className="block text-[9px] font-black uppercase tracking-widest px-2 opacity-40">
+        <label htmlFor={id} className="block text-[9px] font-black uppercase tracking-widest px-3 opacity-40">
           {label}
         </label>
       )}
       <div className="relative group/smart">
-        <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-kraft-accent group-focus-within/smart:text-kraft-accent transition-colors opacity-40 group-focus-within/smart:opacity-100">
-          <Icon size={18} />
+        <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none text-kraft-accent group-focus-within/smart:text-kraft-accent transition-colors opacity-40 group-focus-within/smart:opacity-100">
+          <Icon size={18} strokeWidth={2.5} />
         </div>
         <input
           id={id}
@@ -155,10 +155,10 @@ export const SmartAmountInput: React.FC<SmartAmountInputProps> = ({
           placeholder={placeholder}
           required={required}
           className={cn(
-            "liquid-input pl-14 pr-12 h-16 bg-white/40 backdrop-blur-sm border-white/40 text-kraft-ink",
+            "liquid-input pl-14 pr-12 h-16 bg-black/[0.03] border-transparent text-kraft-ink",
             "text-base font-black placeholder:font-bold placeholder:text-kraft-ink/20",
-            isFocused && "border-kraft-accent shadow-kraft bg-white/60",
-            error && "border-red-500/50 bg-red-50/10"
+            isFocused && "bg-white border-kraft-accent/30 shadow-kraft-deep/10",
+            error && "bg-red-50/50 border-red-500/20"
           )}
         />
         
@@ -166,18 +166,18 @@ export const SmartAmountInput: React.FC<SmartAmountInputProps> = ({
           <button 
             type="button"
             onClick={clearInput}
-            className="absolute inset-y-0 right-0 pr-4 flex items-center text-kraft-ink/20 hover:text-kraft-accent transition-colors"
+            className="absolute inset-y-0 right-0 pr-4 flex items-center text-kraft-ink/20 hover:text-red-500 transition-all active:scale-90"
           >
-            <div className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-kraft-accent/10">
-              <span className="text-lg leading-none">×</span>
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center hover:bg-red-50">
+              <span className="text-xl leading-none">×</span>
             </div>
           </button>
         )}
       </div>
 
       {error && (
-        <p className="text-[9px] font-bold text-red-500 uppercase tracking-wider px-2">
-          {error}
+        <p className="text-[9px] font-bold text-red-500 uppercase tracking-wider px-3 flex items-center gap-1.5">
+          <span className="w-1 h-1 rounded-full bg-red-500" /> {error}
         </p>
       )}
       
@@ -187,24 +187,35 @@ export const SmartAmountInput: React.FC<SmartAmountInputProps> = ({
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 5, scale: 0.98 }}
-            className="absolute z-[110] left-0 right-0 md:left-auto md:w-[360px] top-full mt-3 flex flex-col p-5 bg-white/95 backdrop-blur-3xl rounded-[2.5rem] border border-white/60 shadow-kraft-deep origin-top"
+            className={cn(
+              "absolute z-[10001] left-0 right-0 md:left-auto md:w-[380px] top-full mt-4",
+              "bg-white/95 backdrop-blur-[20px] p-4 rounded-lg",
+              "border border-[#E5E7EB]",
+              "shadow-[0_12px_28px_rgba(0,0,0,0.15)]",
+              "flex flex-col gap-3 min-w-[240px] z-[9999]"
+            )}
           >
-            <div className="flex items-start gap-4">
-              <div className="bg-kraft-accent/10 p-3 rounded-[1.25rem] border border-kraft-accent/20">
-                <Icon size={20} className="text-kraft-accent shrink-0" />
+            <div className="flex items-start gap-5">
+              <div className="bg-kraft-accent/10 p-4 rounded-2xl border border-kraft-accent/10 shadow-inner">
+                <Icon size={24} className="text-kraft-accent shrink-0" strokeWidth={2.5} />
               </div>
-              <div className="space-y-1">
-                <p className="text-xl font-black text-kraft-ink tracking-tight flex items-baseline gap-1.5 leading-none">
+              <div className="space-y-1.5 py-1">
+                <p className="text-2xl font-black text-kraft-ink tracking-tight flex items-baseline gap-2 leading-none">
                   {previewValue.toLocaleString('vi-VN')}
-                  <span className="text-[10px] uppercase opacity-40 font-black">{suffix.trim()}</span>
+                  <span className="text-[11px] uppercase opacity-40 font-black tracking-widest">{suffix.trim()}</span>
                 </p>
                 {showTextPreview && previewValue >= 1000 && (
-                  <p className="text-[9px] font-black uppercase tracking-widest text-kraft-accent italic leading-tight pt-1">
-                    {numberToVietnameseText(previewValue)}
-                  </p>
+                  <div className="flex items-center gap-2 pt-1">
+                     <div className="w-1 h-1 rounded-full bg-kraft-accent animate-pulse" />
+                     <p className="text-[10px] font-black uppercase tracking-widest text-kraft-accent italic leading-tight">
+                        {numberToVietnameseText(previewValue)}
+                     </p>
+                  </div>
                 )}
               </div>
             </div>
+            
+            <div className="absolute -top-2 left-8 w-4 h-4 bg-white/95 rotate-45 border-l border-t border-white/60" />
           </motion.div>
         )}
       </AnimatePresence>

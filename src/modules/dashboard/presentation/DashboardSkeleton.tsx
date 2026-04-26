@@ -5,7 +5,7 @@ import { cn } from '../../../utils/cn';
 export const DashboardSkeleton: React.FC<{ hideHeader?: boolean }> = ({ hideHeader = false }) => {
   return (
     <div className={cn(
-      "space-y-12 py-8 px-6 md:px-12 max-w-[1600px] mx-auto animate-in fade-in duration-700 h-full overflow-hidden",
+      "space-y-12 py-8 px-4 md:px-12 max-w-[1700px] mx-auto animate-in fade-in duration-700 h-full overflow-hidden",
       hideHeader && "p-0 max-w-none space-y-10"
     )}>
       {!hideHeader && (
@@ -25,9 +25,9 @@ export const DashboardSkeleton: React.FC<{ hideHeader?: boolean }> = ({ hideHead
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
         {[...Array(8)].map((_, i) => (
-          <div key={i} className="p-8 rounded-[2.5rem] border border-white/60 bg-white/40 space-y-4 shadow-sm">
+          <div key={i} className="p-5 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-white/60 bg-white/40 space-y-4 shadow-sm">
             <Skeleton variant="circle" width={56} height={56} className="rounded-2xl" />
             <div className="space-y-2">
               <Skeleton variant="text" width="40%" height={12} />

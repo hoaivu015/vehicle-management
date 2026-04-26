@@ -1,9 +1,11 @@
 export interface UserProfile {
   id: string;
+  docId?: string;
   name: string;
   email: string;
   role: string;
   code: string;
+  password?: string;
   phone?: string;
   join_date?: string;
   department?: string;

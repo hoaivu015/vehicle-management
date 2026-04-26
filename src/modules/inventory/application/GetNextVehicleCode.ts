@@ -29,6 +29,11 @@ export class GetNextVehicleCode {
       }
     }
     
+    /**
+     * NOTE: This logic is prone to race conditions if multiple users add vehicles simultaneously.
+     * Recommendation: Implement a UNIQUE constraint on the 'code' column in Supabase
+     * and consider using a database function or sequence for generation.
+     */
     return `${prefix}${nextNN.toString().padStart(2, '0')}`;
   }
 }

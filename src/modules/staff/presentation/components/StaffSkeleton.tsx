@@ -33,7 +33,7 @@ export const StaffSkeleton: React.FC<StaffSkeletonProps> = ({ hideHeader = false
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 md:gap-12 pb-20 justify-items-center">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="w-full max-w-[360px] p-8 rounded-[2.5rem] border border-white/60 bg-white/40 shadow-sm space-y-8">
+          <div key={i} className="w-full max-w-[380px] p-8 rounded-[2.5rem] border border-white/60 bg-white/40 shadow-sm space-y-8">
             <div className="flex items-center gap-5">
               <Skeleton variant="circle" width={64} height={64} className="rounded-[1.25rem]" />
               <div className="space-y-3 flex-1">

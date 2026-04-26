@@ -45,7 +45,7 @@ export const Login = ({ onLogin }: LoginProps) => {
           .maybeSingle();
 
         if (employeeError || !employeeData) {
-          setError('Email này chưa được cấp phép truy cập hệ thống. Vui lòng liên hệ Quản trị viên.');
+          setError('Email hoặc mật khẩu không chính xác.');
           return;
         }
 
@@ -70,19 +70,6 @@ export const Login = ({ onLogin }: LoginProps) => {
           return;
         }
 
-        // Re-fetch full profile now that they are authed
-        const { data: finalData } = await supabase
-          .from('employees')
-          .select('*')
-          .eq('email', email)
-          .single();
-
-        if (!finalData) {
-          await supabase.auth.signOut();
-          setError('Lỗi đồng bộ hồ sơ nhân sự. Vui lòng thử lại.');
-          return;
-        }
-
         return;
       }
       
@@ -102,7 +89,7 @@ export const Login = ({ onLogin }: LoginProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-kraft-bg flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-ambient-gradient flex items-center justify-center p-4 relative overflow-hidden">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}

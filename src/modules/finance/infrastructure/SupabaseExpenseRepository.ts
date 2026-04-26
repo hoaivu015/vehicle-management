@@ -56,10 +56,20 @@ export class SupabaseExpenseRepository implements ExpenseRepository {
   }
 
   async updateCapital(amount: number): Promise<void> {
+    // 1. Fetch current settings to get the actual ID
+    const { data: settings } = await supabase
+      .from('company_settings')
+      .select('id')
+      .limit(1)
+      .single();
+
+    const settingsId = settings?.id || 1;
+
+    // 2. Perform update
     const { error } = await supabase
       .from('company_settings')
       .update({ total_capital: amount })
-      .eq('id', 1); // Giả định id=1 cho settings duy nhất
+      .eq('id', settingsId);
 
     if (error) throw error;
   }

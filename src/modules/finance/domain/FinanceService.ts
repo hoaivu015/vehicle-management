@@ -1,6 +1,7 @@
 import { VehicleStatus } from '../../../shared/domain/constants';
 import { Vehicle } from '../../../shared/domain/types';
 import { StaffSalaryService } from '../../staff/domain/StaffSalaryService';
+import { calculateVehicleFinancials } from '../../../shared/utils/vehicle_calculations';
 
 export interface Expense {
   id: string | number;
@@ -67,7 +68,7 @@ export class FinanceService {
   static calculateMonthlySalesProfit(vehicles: Vehicle[], month: string): number {
     return vehicles
       .filter(v => v.status === VehicleStatus.SOLD && v.sale_date?.startsWith(month))
-      .reduce((acc, v) => acc + (v.profit || 0), 0);
+      .reduce((acc, v) => acc + (calculateVehicleFinancials(v).showroomProfitShare || 0), 0);
   }
 
   /**
@@ -189,9 +190,11 @@ export class FinanceService {
     const totalPurchaseOutflow = vehicles.reduce((acc, v) => {
       let outflow = 0;
       if (v.purchase_payment_history && v.purchase_payment_history.length > 0) {
+        // Assume purchase_payment_history records only showroom payments
         outflow = v.purchase_payment_history.reduce((sum, p) => sum + (p.amount || 0), 0);
       } else {
-        outflow = (v.purchase_price || 0);
+        // Fallback: Showroom only paid the part it owns
+        outflow = Math.max(0, (v.purchase_price || 0) - (v.coinvest_amount || 0));
       }
       return acc + outflow;
     }, 0);
@@ -207,13 +210,20 @@ export class FinanceService {
 
     // 5. All-time Commissions (Actually paid)
     const totalCommissions = vehicles.reduce((acc, v) => {
-      // Buying commission paid at purchase
       const buyingComm = v.buying_commission || 0;
-      // Sale commission paid ONLY if sold
       const sellingComm = v.status === VehicleStatus.SOLD ? (v.commission || 0) : 0;
       return acc + buyingComm + sellingComm;
     }, 0);
+
+    // 6. All-time Partner ROI Payouts (Investment + Profit Share)
+    // Only occurs for SOLD vehicles where partner paid directly
+    const totalPartnerPayouts = vehicles
+      .filter(v => v.status === VehicleStatus.SOLD && v.is_coinvested)
+      .reduce((acc, v) => {
+        const fin = calculateVehicleFinancials(v);
+        return acc + fin.coinvestAmount + fin.partnerProfitShare;
+      }, 0);
     
-    return totalCapital + totalIncomes - totalPurchaseOutflow - totalCarCosts - totalOpExpenses - totalCommissions;
+    return totalCapital + totalIncomes - totalPurchaseOutflow - totalCarCosts - totalOpExpenses - totalCommissions - totalPartnerPayouts;
   }
 }

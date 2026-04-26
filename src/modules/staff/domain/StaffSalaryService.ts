@@ -1,5 +1,12 @@
 import { Staff, Vehicle } from '../../../shared/domain/types';
 import { STAFF_CONSTANTS, VehicleStatus } from '../../../shared/domain/constants';
+import { calculateVehicleFinancials } from '../../../shared/utils/vehicle_calculations';
+import { 
+  calcKPICompletion, 
+  calcKPIMultiplier, 
+  calcTotalSalary, 
+  calcStaffTotalCommissions 
+} from '../../../shared/utils/financial_formulas';
 
 export interface SalaryDetails {
   base: number;
@@ -27,56 +34,70 @@ export class StaffSalaryService {
       return this.getEmptySalaryDetails();
     }
 
+    // ✅ Rule #3: Identity Hardening - No Email Fallback
+    const compareCode = (vehicleId: string | undefined, staff: Staff) => {
+      if (!vehicleId) return false;
+      return vehicleId.toLowerCase() === staff.code.toLowerCase();
+    };
+
     const soldCars = cars.filter(c => 
       c && c.status === VehicleStatus.SOLD && 
       c.sale_date?.startsWith(monthStr) && 
-      (c.seller === member.code)
+      compareCode(c.seller, member)
     );
 
     const boughtCars = cars.filter(c => 
       c && c.purchase_date?.startsWith(monthStr) && 
-      (c.buyer === member.code)
+      compareCode(c.buyer, member)
     );
 
     const salesCommission = soldCars.reduce((acc, c) => {
-      const comm = (c.commission !== undefined && c.commission !== null) 
-        ? c.commission 
-        : (member.commission_per_car || STAFF_CONSTANTS.DEFAULT_SALE_COMMISSION);
+      // ✅ Rule R3 & R5: No "Ghost Commissions". Must use data from the vehicle record.
+      // If commission is null/undefined in DB, it is 0. 
+      // Do NOT fallback to member.commission_per_car here, as it causes profit share desync.
+      const comm = c.commission || 0;
       return acc + comm;
     }, 0);
 
     const buyingCommission = boughtCars.reduce((acc, c) => {
       const comm = (c.buying_commission !== undefined && c.buying_commission !== null) 
         ? c.buying_commission 
-        : STAFF_CONSTANTS.DEFAULT_BUYING_COMMISSION;
+        : 0;
       return acc + comm;
     }, 0);
 
-    const completionRate = (member.target || 0) > 0 ? (soldCars.length / member.target) * 100 : 0;
-    const kpiBonusMultiplier = completionRate >= STAFF_CONSTANTS.BONUS_THRESHOLD_PERCENT 
-      ? STAFF_CONSTANTS.BONUS_MULTIPLIER_FULL 
-      : STAFF_CONSTANTS.BONUS_MULTIPLIER_REDUCED;
+    const completionRate = calcKPICompletion(soldCars.length, member.target);
+    const kpiBonusMultiplier = calcKPIMultiplier(completionRate);
 
     // Co-investment profit share
     const coinvestedCars = cars.filter(c => 
       c && c.status === VehicleStatus.SOLD && 
       c.sale_date?.startsWith(monthStr) && 
       c.is_coinvested && 
-      c.coinvestor_code === member.code
+      compareCode(c.coinvestor_code, member)
     );
 
     const coinvestProfitShare = coinvestedCars.reduce((acc, c) => {
-      // Use standard calculation utility for consistency
-      const purchasePrice = c.purchase_price || 0;
-      if (purchasePrice <= 0) return acc;
-      
-      const profit = (c.sale_price || 0) - purchasePrice - (c.total_cost || 0);
-      const share = (c.coinvest_amount / purchasePrice) * profit;
-      return acc + (share > 0 ? share : 0);
+      // ✅ Rule R2: UI/Service must only read results from calculateVehicleFinancials coordinator.
+      const fin = calculateVehicleFinancials(c);
+      // We allow the actual share value (even if negative/loss) to ensure sync with Vehicle Tab.
+      return acc + (fin.partnerProfitShare || 0);
     }, 0);
 
-    const totalCommission = (salesCommission * kpiBonusMultiplier) + buyingCommission + coinvestProfitShare;
-    const totalSalary = (member.base_salary || 0) + totalCommission;
+    // ✅ Rule R1: Use atomic formulas for summation
+    const totalCommission = calcStaffTotalCommissions(
+      salesCommission, 
+      kpiBonusMultiplier, 
+      buyingCommission, 
+      coinvestProfitShare
+    );
+
+    const totalSalary = calcTotalSalary(
+      member.base_salary || 0, 
+      salesCommission, 
+      kpiBonusMultiplier, 
+      buyingCommission + coinvestProfitShare
+    );
 
     return {
       base: member.base_salary || 0,

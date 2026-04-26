@@ -32,14 +32,14 @@ export const InventorySkeleton: React.FC<InventorySkeletonProps> = ({ hideHeader
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 pb-20 justify-items-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-10 pb-20 justify-items-center">
         {[...Array(12)].map((_, i) => (
           <div 
             key={i} 
-            className="w-full max-w-[380px] h-[415px] bg-white/40 backdrop-blur-md rounded-[2rem] border border-white/60 shadow-xl overflow-hidden flex flex-col"
+            className="w-full max-w-[380px] h-[450px] bg-white/40 backdrop-blur-md rounded-[2rem] border border-white/60 shadow-xl overflow-hidden flex flex-col"
           >
             {/* Image Area placeholder */}
-            <div className="aspect-[16/9] bg-kraft-accent/5 overflow-hidden relative">
+            <div className="aspect-[2/1] bg-kraft-accent/5 overflow-hidden relative">
                <Skeleton height="100%" className="rounded-none" />
                
                {/* Position Placeholder for Price Badge */}

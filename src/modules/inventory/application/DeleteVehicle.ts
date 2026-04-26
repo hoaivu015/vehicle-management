@@ -12,6 +12,10 @@ export class DeleteVehicle {
     const car = await this.repository.getById(id.toString());
     if (!car) throw new Error('Không tìm thấy xe để xóa');
 
+    if (car.status === 'SOLD') {
+      throw new Error('Không thể xóa xe đã bán. Vui lòng hủy trạng thái Đã bán trước khi thực hiện xóa xe.');
+    }
+
     // 2. Xóa ảnh nếu có
     if (car.image_url) {
       try {

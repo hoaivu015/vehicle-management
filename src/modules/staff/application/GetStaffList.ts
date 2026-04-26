@@ -23,9 +23,21 @@ export class GetStaffList {
       this.vehicleRepository.getAll()
     ]);
     
-    return staff.map(member => ({
-      ...member,
-      salaryDetails: StaffSalaryService.calculateMonthlySalary(member, cars, monthStr)
-    }));
+    return staff.map(member => {
+      // Auto-sync missing vehicle_codes for display
+      const fixedExpenses = (member.expenses || []).map(exp => {
+        if (exp.type === 'vehicle' && !exp.vehicle_code && exp.vehicle_id) {
+          const car = cars.find(c => c.id === exp.vehicle_id);
+          if (car) return { ...exp, vehicle_code: car.code };
+        }
+        return exp;
+      });
+
+      return {
+        ...member,
+        expenses: fixedExpenses,
+        salaryDetails: StaffSalaryService.calculateMonthlySalary({ ...member, expenses: fixedExpenses }, cars, monthStr)
+      };
+    });
   }
 }

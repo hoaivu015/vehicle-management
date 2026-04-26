@@ -9,6 +9,18 @@ export interface User {
   linkedStaffCode?: string;
 }
 
+export interface StaffExpense {
+  id: string;
+  amount: number;
+  note: string;
+  date: string;
+  type: 'vehicle' | 'operating';
+  vehicle_id?: number;
+  vehicle_code?: string;
+  category?: string;
+  is_reimbursed: boolean;
+}
+
 export interface Staff {
   id: string;
   code: string;
@@ -21,6 +33,7 @@ export interface Staff {
   status?: string;
   department?: string;
   tracked_cars?: string[];
+  expenses?: StaffExpense[];
 }
 
 export interface CostItem {
@@ -38,6 +51,17 @@ export interface VehicleHistoryEntry {
   status: VehicleStatus;
   user: string;
   note?: string;
+}
+
+export interface VehicleFinancialSnapshot {
+  grossProfit: number;
+  netProfit: number;
+  showroomProfitShare: number;
+  partnerProfitShare: number;
+  buyingCommission: number;
+  sellingCommission: number;
+  totalInvestment: number;
+  lockedAt: string;
 }
 
 export interface Vehicle {
@@ -88,6 +112,7 @@ export interface Vehicle {
   profit?: number;
   days?: number;
   is_pinned?: boolean;
+  final_financials?: VehicleFinancialSnapshot;
 }
 
 export interface OperatingExpense {

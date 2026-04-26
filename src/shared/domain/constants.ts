@@ -19,13 +19,13 @@ export const VEHICLE_STATUS_LABELS: Record<VehicleStatus, string> = {
 };
 
 export const VEHICLE_STATUS_CONFIG: Record<VehicleStatus, { label: string; badgeClass: string }> = {
-  [VehicleStatus.DEPOSIT_BUY]:    { label: 'Cọc mua',           badgeClass: 'bg-amber-500/90 text-white border-amber-400/50' },
-  [VehicleStatus.SPA]:            { label: 'Spa',               badgeClass: 'bg-sky-500/90 text-white border-sky-400/50' },
-  [VehicleStatus.IN_STOCK]:       { label: 'Trong kho',         badgeClass: 'bg-emerald-500/90 text-white border-emerald-400/50' },
-  [VehicleStatus.DEPOSIT_SALE]:   { label: 'Cọc bán',           badgeClass: 'bg-violet-500/90 text-white border-violet-400/50' },
-  [VehicleStatus.BANK_DEPOSIT]:   { label: 'Cọc Bank',          badgeClass: 'bg-orange-500/90 text-white border-orange-400/50' },
-  [VehicleStatus.BANK_CONFIRMED]: { label: 'Thông báo cho vay', badgeClass: 'bg-teal-500/90 text-white border-teal-400/50' },
-  [VehicleStatus.SOLD]:           { label: 'Đã bán',            badgeClass: 'bg-red-500/90 text-white border-red-400/50' },
+  [VehicleStatus.DEPOSIT_BUY]:    { label: 'Cọc mua',           badgeClass: 'glass-badge-orange' },
+  [VehicleStatus.SPA]:            { label: 'Spa',               badgeClass: 'glass-badge-sky' },
+  [VehicleStatus.IN_STOCK]:       { label: 'Trong kho',         badgeClass: 'glass-badge-emerald' },
+  [VehicleStatus.DEPOSIT_SALE]:   { label: 'Cọc bán',           badgeClass: 'glass-badge-purple' },
+  [VehicleStatus.BANK_DEPOSIT]:   { label: 'Cọc Bank',          badgeClass: 'glass-badge-orange' },
+  [VehicleStatus.BANK_CONFIRMED]: { label: 'Thông báo cho vay', badgeClass: 'glass-badge-blue' },
+  [VehicleStatus.SOLD]:           { label: 'Đã bán',            badgeClass: 'glass-badge-red' },
 };
 
 export const ADMIN_EMAILS = [
@@ -67,8 +67,8 @@ export const STAFF_CONSTANTS = {
   BONUS_THRESHOLD_PERCENT: 100,
   BONUS_MULTIPLIER_FULL: 1.0,
   BONUS_MULTIPLIER_REDUCED: 0.7,
-  DEFAULT_BUYING_COMMISSION: 3000000,
-  DEFAULT_SALE_COMMISSION: 5000000,
+  DEFAULT_BUYING_COMMISSION: 0,
+  DEFAULT_SALE_COMMISSION: 0,
 };
 
 export const INVENTORY_CONSTANTS = {

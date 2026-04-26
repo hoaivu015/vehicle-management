@@ -2,6 +2,11 @@ import { GetStaffList, StaffWithSalary } from '../application/GetStaffList';
 import { AddStaff } from '../application/AddStaff';
 import { UpdateStaff } from '../application/UpdateStaff';
 import { DeleteStaff } from '../application/DeleteStaff';
+import { AddStaffExpense } from '../application/AddStaffExpense';
+import { ToggleStaffExpenseReimbursement } from '../application/ToggleStaffExpenseReimbursement';
+import { DeleteStaffExpense } from '../application/DeleteStaffExpense';
+import { UpdateStaffExpense } from '../application/UpdateStaffExpense';
+import { ReimburseStaffExpenses } from '../application/ReimburseStaffExpenses';
 import { Vehicle } from '../../../shared/domain/types';
 import { UserRole } from '../../../shared/domain/constants';
 
@@ -13,6 +18,7 @@ export interface StaffView {
   onStaffAdded(): void;
   onStaffUpdated(): void;
   onStaffDeleted(): void;
+  onExpenseAdded?(): void;
 }
 
 export class StaffPresenter {
@@ -24,7 +30,12 @@ export class StaffPresenter {
     private readonly getStaffListUseCase: GetStaffList,
     private readonly addStaffUseCase?: AddStaff,
     private readonly updateStaffUseCase?: UpdateStaff,
-    private readonly deleteStaffUseCase?: DeleteStaff
+    private readonly deleteStaffUseCase?: DeleteStaff,
+    private readonly addStaffExpenseUseCase?: AddStaffExpense,
+    private readonly toggleReimbursementUseCase?: ToggleStaffExpenseReimbursement,
+    private readonly deleteStaffExpenseUseCase?: DeleteStaffExpense,
+    private readonly updateStaffExpenseUseCase?: UpdateStaffExpense,
+    private readonly reimburseExpensesUseCase?: ReimburseStaffExpenses
   ) {}
 
   attachView(view: StaffView): void {
@@ -100,6 +111,75 @@ export class StaffPresenter {
       this.view.onStaffDeleted();
     } catch (error: any) {
       this.view.showError(error.message || 'Lỗi khi xóa nhân viên');
+    } finally {
+      this.view.hideLoading();
+    }
+  }
+
+  async addStaffExpense(staffId: string, expenseData: any): Promise<void> {
+    if (!this.view || !this.addStaffExpenseUseCase) return;
+    this.view.showLoading();
+    try {
+      await this.addStaffExpenseUseCase.execute({
+        staffId,
+        ...expenseData
+      });
+      if (this.view.onExpenseAdded) this.view.onExpenseAdded();
+      else this.view.onStaffUpdated();
+    } catch (error: any) {
+      this.view.showError(error.message || 'Lỗi khi thêm chi phí');
+    } finally {
+      this.view.hideLoading();
+    }
+  }
+
+  async toggleReimbursement(staffId: string, expenseId: string): Promise<void> {
+    if (!this.view || !this.toggleReimbursementUseCase) return;
+    this.view.showLoading();
+    try {
+      await this.toggleReimbursementUseCase.execute(staffId, expenseId);
+      this.view.onStaffUpdated();
+    } catch (error: any) {
+      this.view.showError(error.message || 'Lỗi khi cập nhật trạng thái');
+    } finally {
+      this.view.hideLoading();
+    }
+  }
+
+  async deleteExpense(staffId: string, expenseId: string): Promise<void> {
+    if (!this.view || !this.deleteStaffExpenseUseCase) return;
+    this.view.showLoading();
+    try {
+      await this.deleteStaffExpenseUseCase.execute(staffId, expenseId);
+      this.view.onStaffUpdated();
+    } catch (error: any) {
+      this.view.showError(error.message || 'Lỗi khi xóa khoản chi');
+    } finally {
+      this.view.hideLoading();
+    }
+  }
+
+  async updateExpense(staffId: string, expenseId: string, data: any): Promise<void> {
+    if (!this.view || !this.updateStaffExpenseUseCase) return;
+    this.view.showLoading();
+    try {
+      await this.updateStaffExpenseUseCase.execute(staffId, expenseId, data);
+      this.view.onStaffUpdated();
+    } catch (error: any) {
+      this.view.showError(error.message || 'Lỗi khi cập nhật khoản chi');
+    } finally {
+      this.view.hideLoading();
+    }
+  }
+
+  async reimburseMultiple(staffId: string, expenseIds: string[]): Promise<void> {
+    if (!this.view || !this.reimburseExpensesUseCase) return;
+    this.view.showLoading();
+    try {
+      await this.reimburseExpensesUseCase.execute(staffId, expenseIds);
+      this.view.onStaffUpdated();
+    } catch (error: any) {
+      this.view.showError(error.message || 'Lỗi khi thực hiện thanh toán hàng loạt');
     } finally {
       this.view.hideLoading();
     }

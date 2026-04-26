@@ -14,10 +14,11 @@ export class CloudinaryVehicleStorageRepository implements VehicleStorageReposit
     formData.append('file', file);
     formData.append('upload_preset', UPLOAD_PRESET);
     
+    // NOTE: For unsigned uploads, Cloudinary recommends NOT sending public_id 
+    // from the client unless specifically enabled in the preset.
+    // If fileName is provided, we append a timestamp to ensure uniqueness.
     if (fileName) {
-      // For unsigned uploads, Cloudinary only respects public_id if the preset 
-      // is configured to allow it.
-      formData.append('public_id', fileName);
+      formData.append('public_id', `${fileName}_${Date.now()}`);
     }
     
     formData.append('folder', 'inventory');
@@ -34,15 +35,21 @@ export class CloudinaryVehicleStorageRepository implements VehicleStorageReposit
       const data = await response.json();
       
       if (data.error) {
-        throw new Error(data.error.message);
+        console.error('Cloudinary API Error:', data.error);
+        throw new Error(data.error.message || 'Lỗi từ máy chủ Cloudinary');
+      }
+
+      if (!data.secure_url) {
+        throw new Error('Không nhận được URL ảnh từ Cloudinary');
       }
 
       return data.secure_url;
     } catch (error: any) {
-      console.error('Cloudinary Upload Error:', error);
-      throw new Error(error.message || 'Không thể kết nối đến máy chủ Cloudinary');
+      console.error('Cloudinary Upload Exception:', error);
+      throw new Error(error.message || 'Không thể kết nối đến máy chủ Cloudinary. Vui lòng kiểm tra kết nối mạng.');
     }
   }
+
 
   async deleteImage(imageUrl: string): Promise<void> {
     try {

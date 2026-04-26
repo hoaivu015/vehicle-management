@@ -16,7 +16,7 @@ interface StaffAddModalProps {
 
 export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, onAdd, member }) => {
   const isEdit = !!member;
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,7 +24,7 @@ export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, o
     department: 'Kinh doanh',
     base_salary: 0,
     commission_per_car: 0,
-    target: 0,
+    target: 1,
     status: 'ACTIVE',
     password: ''
   });
@@ -41,7 +41,7 @@ export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, o
           department: member.department || 'Kinh doanh',
           base_salary: member.base_salary || 0,
           commission_per_car: member.commission_per_car || 0,
-          target: member.target || 0,
+          target: member.target || 1,
           status: member.status || 'ACTIVE',
           password: '' // Don't edit password here
         });
@@ -53,7 +53,7 @@ export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, o
           department: 'Kinh doanh',
           base_salary: 0,
           commission_per_car: 0,
-          target: 0,
+          target: 1,
           status: 'ACTIVE',
           password: ''
         });
@@ -76,7 +76,7 @@ export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, o
       const dataToSubmit = {
         ...formData
       };
-      
+
       // Remove password if empty in edit mode
       if (isEdit && !formData.password) {
         delete (dataToSubmit as any).password;
@@ -113,24 +113,24 @@ export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, o
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} maxWidth="2xl">
       <form onSubmit={handleSubmit} className="p-8 space-y-10">
-        
+
         {/* Section: Thông tin cơ bản */}
         <div className="space-y-6">
           <div className="flex items-center gap-3 ml-1">
             <div className="w-1.5 h-1.5 rounded-full bg-kraft-accent" />
             <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-kraft-ink/40">Thông tin định danh</h4>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest ml-1 opacity-40">Họ và tên</label>
               <div className="relative group">
                 <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-kraft-accent/30 group-focus-within:text-kraft-accent transition-colors" size={16} />
-                <input 
+                <input
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="liquid-input pl-12 h-14" 
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="liquid-input pl-12 h-14"
                   placeholder="NGUYỄN VĂN A"
                 />
               </div>
@@ -140,12 +140,12 @@ export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, o
               <label className="text-[10px] font-black uppercase tracking-widest ml-1 opacity-40">Email đăng nhập</label>
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-kraft-accent/30 group-focus-within:text-kraft-accent transition-colors" size={16} />
-                <input 
+                <input
                   type="email"
                   value={formData.email}
                   disabled={isEdit}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className={cn("liquid-input pl-12 h-14", isEdit && "opacity-50 cursor-not-allowed bg-black/5")} 
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className={cn("liquid-input pl-12 h-14", isEdit && "opacity-50 cursor-not-allowed bg-black/5")}
                   placeholder="Để trống nếu không có"
                 />
               </div>
@@ -155,9 +155,9 @@ export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, o
               <label className="text-[10px] font-black uppercase tracking-widest ml-1 opacity-40">Chức vụ</label>
               <div className="relative group/select">
                 <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-kraft-accent/30 pointer-events-none" size={16} />
-                <select 
+                <select
                   value={formData.role}
-                  onChange={(e) => setFormData({...formData, role: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                   className="liquid-input h-14 pl-12 pr-6 appearance-none"
                 >
                   {Object.values(UserRole).filter(r => r !== UserRole.ADMIN).map(role => (
@@ -165,17 +165,17 @@ export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, o
                   ))}
                 </select>
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-20">
-                   <Layout size={14} />
+                  <Layout size={14} />
                 </div>
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest ml-1 opacity-40">Phòng ban</label>
-              <input 
+              <input
                 value={formData.department}
-                onChange={(e) => setFormData({...formData, department: e.target.value})}
-                className="liquid-input h-14" 
+                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                className="liquid-input h-14"
                 placeholder="Phòng kinh doanh"
               />
             </div>
@@ -190,17 +190,17 @@ export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, o
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <SmartAmountInput 
+            <SmartAmountInput
               label="Lương cơ bản"
               value={formData.base_salary}
-              onChange={(v) => setFormData({...formData, base_salary: v})}
+              onChange={(v) => setFormData({ ...formData, base_salary: v })}
               placeholder="VD: 7tr"
             />
 
-            <SmartAmountInput 
+            <SmartAmountInput
               label="Hoa hồng/Xe"
               value={formData.commission_per_car}
-              onChange={(v) => setFormData({...formData, commission_per_car: v})}
+              onChange={(v) => setFormData({ ...formData, commission_per_car: v })}
               placeholder="VD: 500k"
             />
 
@@ -208,11 +208,11 @@ export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, o
               <label className="text-[10px] font-black uppercase tracking-widest ml-1 opacity-40">Mục tiêu xe/tháng</label>
               <div className="relative group">
                 <Target className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500/40 group-focus-within:text-emerald-500 transition-colors" size={16} />
-                <input 
+                <input
                   type="number"
                   value={formData.target || ''}
-                  onChange={(e) => setFormData({...formData, target: parseInt(e.target.value) || 0})}
-                  className="liquid-input pl-12 h-16 pr-4" 
+                  onChange={(e) => setFormData({ ...formData, target: parseInt(e.target.value) || 0 })}
+                  className="liquid-input pl-12 h-16 pr-4"
                   placeholder="Số xe"
                 />
               </div>
@@ -227,17 +227,17 @@ export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, o
               <div className="w-1.5 h-1.5 rounded-full bg-kraft-red" />
               <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-kraft-ink/40">Bảo mật hệ thống</h4>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest ml-1 opacity-40">Mật khẩu khởi tạo</label>
                 <div className="relative group">
                   <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-kraft-red/30 group-focus-within:text-kraft-red transition-colors" size={16} />
-                  <input 
+                  <input
                     type="password"
                     value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
-                    className="liquid-input pl-12 h-14" 
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="liquid-input pl-12 h-14"
                     placeholder="Mặc định: auto28"
                   />
                 </div>
@@ -247,20 +247,20 @@ export const StaffAddModal: React.FC<StaffAddModalProps> = ({ isOpen, onClose, o
         )}
 
         <div className="pt-8 border-t border-black/5 flex gap-4">
-          <button 
+          <button
             type="button"
             onClick={onClose}
             className="liquid-button-secondary h-16 flex-1 text-[10px] font-black uppercase tracking-widest"
           >
             Hủy
           </button>
-          <button 
+          <button
             type="submit"
             disabled={loading}
             className="liquid-button-primary h-16 flex-[1.5] text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-3"
           >
             {loading ? (
-               <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
+              <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
             ) : isEdit ? <ShieldCheck size={18} /> : <UserPlus size={18} />}
             {isEdit ? 'Cập nhật thay đổi' : 'Khởi tạo nhân sự'}
           </button>

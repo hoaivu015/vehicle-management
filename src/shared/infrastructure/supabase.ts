@@ -1,15 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || 
-                   (import.meta as any).env.NEXT_PUBLIC_SUPABASE_URL || 
-                   (typeof process !== 'undefined' ? (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL) : '') || '';
+const getEnv = (key: string): string => {
+  // Try Vite's import.meta.env first
+  if ((import.meta as any).env && (import.meta as any).env[key]) {
+    return (import.meta as any).env[key];
+  }
+  // Try process.env (for define or Node environments)
+  if (typeof process !== 'undefined' && process.env && process.env[key]) {
+    return process.env[key];
+  }
+  return '';
+};
 
-const supabaseAnonKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY || 
-                        (import.meta as any).env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || 
-                        (typeof process !== 'undefined' ? (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || process.env.VITE_SUPABASE_ANON_KEY) : '') || '';
+const supabaseUrl = getEnv('VITE_SUPABASE_URL') || 
+                   getEnv('NEXT_PUBLIC_SUPABASE_URL') || '';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase URL or Anon Key is missing. Check your environment variables.');
+const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY') || 
+                         getEnv('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY') || '';
+
+if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('placeholder')) {
+  console.warn('Supabase URL or Anon Key is missing or invalid. Check your environment variables.');
 }
 
 // Ensure createClient is only called with a valid URL to prevent crashing

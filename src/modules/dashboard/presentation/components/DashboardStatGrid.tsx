@@ -1,12 +1,12 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { 
-  TrendingUp, 
-  Wallet, 
-  Car, 
-  CircleDollarSign, 
-  ShoppingBag, 
-  AlertCircle, 
+import {
+  TrendingUp,
+  Wallet,
+  Car,
+  CircleDollarSign,
+  ShoppingBag,
+  AlertCircle,
   Coins,
   CheckCircle2,
   Edit3
@@ -35,18 +35,27 @@ export const DashboardStatGrid: React.FC<DashboardStatGridProps> = ({ stats }) =
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
       {stats.map((stat, i) => (
         <motion.div
-           key={stat.label}
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ delay: i * 0.05 }}
-           whileHover={{ y: -5, scale: 1.02 }}
-           onClick={stat.onClick}
-           className={cn(
-             "relative group p-8 rounded-[2.5rem] border backdrop-blur-3xl transition-all duration-500 cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl",
-             stat.isWarning 
-               ? "bg-red-50/40 border-red-200/60 hover:bg-red-50/60" 
-               : "bg-white/40 border-white/60 hover:bg-white/60"
-           )}
+          key={stat.label}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.05 }}
+          whileHover={{ y: -5, scale: 1.02 }}
+          onClick={stat.onClick}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              stat.onClick?.();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label={`Thống kê ${stat.label}: ${stat.value}`}
+          className={cn(
+            "relative group p-5 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border backdrop-blur-3xl transition-all duration-500 cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl",
+            stat.isWarning
+              ? "bg-red-50/40 border-red-200/60 hover:bg-red-50/60"
+              : "bg-white/40 border-white/60 hover:bg-white/60"
+          )}
         >
           {/* Background Gradient Accents */}
           <div className={cn(
@@ -57,15 +66,15 @@ export const DashboardStatGrid: React.FC<DashboardStatGridProps> = ({ stats }) =
           <div className="flex justify-between items-start mb-6">
             <div className={cn(
               "w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner border transition-all duration-500 group-hover:rotate-12",
-              stat.isWarning 
-                ? "bg-red-100/50 text-red-600 border-red-200" 
+              stat.isWarning
+                ? "bg-red-100/50 text-red-600 border-red-200"
                 : "bg-kraft-accent/10 text-kraft-accent border-kraft-accent/10 group-hover:bg-kraft-accent group-hover:text-white"
             )}>
               <stat.icon size={24} />
             </div>
-            
+
             {stat.actionIcon && (
-              <button 
+              <button
                 onClick={stat.onActionClick}
                 className="p-3 bg-white/60 rounded-xl border border-white/80 text-kraft-ink/40 hover:text-kraft-accent hover:border-kraft-accent/40 shadow-sm transition-all active:scale-95"
                 title="Hành động nhanh"

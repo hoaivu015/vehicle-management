@@ -40,7 +40,7 @@ export const AccountPage: React.FC = () => {
   };
 
   const handleUpdatePassword = async (email: string, currentPassword: string) => {
-    const newPassword = prompt(`Cập nhật mật khẩu cho ${email}:`, currentPassword);
+    const newPassword = prompt(`⚠️ XÁC NHẬN ĐỔI MẬT KHẨU:\nBạn đang thực hiện đổi mật khẩu đăng nhập cho tài khoản ${email}.\n\nNhập mật khẩu mới (tối thiểu 6 ký tự):`, currentPassword);
     if (!newPassword || newPassword === currentPassword) return;
     
     if (newPassword.length < 6) {
@@ -51,10 +51,10 @@ export const AccountPage: React.FC = () => {
     setIsUpdating(email);
     try {
       await repository.updateAccountPassword(email, newPassword);
-      toast.success('Cập nhật mật khẩu thành công');
+      toast.success('Đã cập nhật mật khẩu đăng nhập thành công!');
       fetchAccounts();
     } catch (error) {
-      toast.error('Lỗi khi cập nhật mật khẩu');
+      toast.error('Lỗi khi cập nhật mật khẩu. Hãy đảm bảo Edge Function đã được deploy.');
     } finally {
       setIsUpdating(null);
     }
@@ -69,9 +69,9 @@ export const AccountPage: React.FC = () => {
   );
 
   return (
-    <div className="space-y-12 pt-24 pb-20 px-6 md:px-12 max-w-[1700px] mx-auto h-full overflow-y-auto">
+    <div className="space-y-10 md:space-y-14 py-4 md:py-12 px-4 md:px-12 max-w-[1700px] mx-auto h-full overflow-y-auto">
       {/* Header Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-center gap-10 shrink-0 border-b border-black/5 pb-12 relative z-30">
+      <div className="flex flex-col lg:flex-row justify-between items-center gap-8 border-b border-black/5 pb-10 relative z-30">
         <div className="text-center lg:text-left">
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-kraft-ink uppercase flex items-center gap-6 justify-center lg:justify-start">
              <div className="w-16 h-16 rounded-[2rem] bg-kraft-accent/10 flex items-center justify-center text-kraft-accent border border-kraft-accent/20 shadow-inner">
@@ -110,7 +110,7 @@ export const AccountPage: React.FC = () => {
 
       {/* Content Section */}
       <div className="relative">
-        <div className="liquid-card overflow-hidden p-0">
+        <div className="liquid-card overflow-hidden p-0 border-white/60 shadow-2xl">
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -193,15 +193,6 @@ export const AccountPage: React.FC = () => {
                         <UserCheck size={48} />
                         <p className="text-xs font-black uppercase tracking-[0.3em] italic">Không tìm thấy tài khoản phù hợp</p>
                       </div>
-                    </td>
-                  </tr>
-                )}
-                {loading && (
-                  <tr>
-                    <td colSpan={5} className="py-20 text-center">
-                       <div className="flex justify-center">
-                         <div className="w-8 h-8 border-4 border-kraft-accent/20 border-t-kraft-accent rounded-full animate-spin" />
-                       </div>
                     </td>
                   </tr>
                 )}
