@@ -1,0 +1,61 @@
+# Bản Thiết Kế Kỹ Thuật: Landing Page Thu Mua Xe VinFast
+
+Bản thiết kế này quy định chi tiết cấu trúc (5 Sections), nội dung Copywriting và hướng dẫn UI/UX nhằm tối ưu hóa tỷ lệ chuyển đổi cho chiến dịch thu mua xe VinFast cũ, tuân thủ nguyên tắc "Zero-Noise" và tập trung duy nhất vào hành động: **Định giá xe**.
+
+---
+
+## 1. Section 1: Hero - "Cú chạm đầu tiên"
+*Mục tiêu: Giữ chân khách hàng. Đừng nói về bạn, hãy nói về tiền của họ.*
+
+*   **Visual:** Ảnh chất lượng cao một chiếc VinFast VF8 hoặc VF9 sáng bóng trong một showroom hiện đại (tạo cảm giác cao cấp).
+*   **Headline:** "Bán chiếc VinFast của bạn trong 30 phút - Nhận ngay tiền mặt."
+*   **Sub-headline:** "Giá mua lại cao hơn thị trường 10-20 triệu VNĐ. Kiểm tra xe tận nơi, thanh toán 100% một lần duy nhất."
+*   **Action (Form định giá nhanh):**
+    *   Thiết kế một Box nổi bật (Glassmorphism).
+    *   Field 1: Chọn dòng xe (Dropdown: Fadil, Lux A, Lux SA, VF e34, VF5, VF8, VF9...).
+    *   Field 2: Năm sản xuất & Số KM đã đi.
+    *   Button: "Xem giá thu mua dự kiến" (Màu cam hoặc đỏ VinFast, có hiệu ứng đổ bóng).
+
+## 2. Section 2: Social Proof - "Lòng tin tức thì"
+*Mục tiêu: Đập tan sự sợ hãi bị ép giá bằng bằng chứng thực tế.*
+
+*   **Counter:** "Đã thu mua 1.245 xe VinFast" (Số liệu chạy từ 0 đến đích).
+*   **Trust Logos:** Các đối tác bảo hiểm, ngân hàng uy tín.
+*   **Carousel:** Video ngắn 15s khách hàng nhận tiền mặt/chuyển khoản bên cạnh chiếc xe vừa bán.
+*   **Testimonial:** "Tôi bán chiếc Lux A 2021 chỉ trong 1 buổi chiều. Giá tốt hơn showroom bên ngoài 15 triệu." - *Anh Hoàng, Hà Nội*.
+
+## 3. Section 3: Value Proposition - "Tại sao là chúng tôi?"
+*Mục tiêu: Đưa ra 4 lợi ích độc quyền "bắt đúng bệnh" của chủ xe VinFast.*
+
+*   **Định giá bằng dữ liệu thực:** "Chúng tôi sử dụng AI để cập nhật giá thị trường VinFast theo từng giờ."
+*   **Xử lý voucher/pin:** "Hỗ trợ thu hồi voucher VinFast, xử lý thủ tục chuyển nhượng pin xe điện phức tạp." *(Điểm chạm cực mạnh).*
+*   **Thu mua tận nhà:** "Bạn không cần lái xe đi đâu. Chúng tôi tới tận hầm chung cư của bạn."
+*   **Bảo mật thông tin:** "Xóa trắng dữ liệu cá nhân trên màn hình xe (Log, Map, Phone) trước khi bàn giao."
+
+## 4. Section 4: The Process - "3 Bước đơn giản"
+*Mục tiêu: Trực quan hóa quy trình bằng đồ họa đường kẻ nối.*
+
+*   **Bước 1:** Gửi thông tin xe qua Form hoặc Zalo.
+*   **Bước 2:** Nhận báo giá sơ bộ & Hẹn lịch kiểm tra xe (tốn 15 phút).
+*   **Bước 3:** Ký giấy tờ & Nhận tiền (Thanh toán qua App ngân hàng ngay tại chỗ).
+
+## 5. Section 5: Objection Handling - "Giải đáp nỗi sợ"
+*Mục tiêu: FAQ dạng thu gọn (Accordion) xử lý ngay sự từ chối.*
+
+*   **Q:** Xe đang vay ngân hàng có bán được không? -> **A:** Có, chúng tôi hỗ trợ tất toán khoản vay.
+*   **Q:** Tôi có phải trả phí nếu không đồng ý bán sau khi kiểm tra? -> **A:** Hoàn toàn không. Phí kiểm tra là 0đ.
+*   **Q:** Giá xe điện VinFast có bị mất giá nhiều không? -> **A:** Chúng tôi có quỹ thu mua xe điện riêng để đảm bảo giá tốt nhất cho khách hàng tin dùng xe Việt.
+
+---
+
+## 6. UX/UI Guidelines Chi Tiết (Dành cho Dev)
+
+*   **Sticky Footer (Mobile):** Thanh bar dính dưới cùng màn hình có 2 nút: `[Gọi điện ngay]` - `[Chat Zalo]`.
+*   **Micro-interactions:** Khi người dùng chọn dòng xe "VF9" ở Hero Form, ảnh nền tự động đổi sang hình VF9 (Sử dụng Framer Motion `AnimatePresence` để chuyển đổi mượt mà).
+*   **Typography:** Sử dụng font không chân (Inter hoặc Montserrat) tạo cảm giác công nghệ, sạch sẽ, đọc tốt trên Mobile.
+*   **Màu sắc (Color Palette):**
+    *   Nền: `White` hoặc `Off-white` (Tạo không gian Zero-Noise).
+    *   Text: `Dark Navy` (Dễ đọc, sang trọng hơn màu đen tuyền).
+    *   Accent/Action: `VinFast Red` hoặc `Orange` (Cho nút bấm).
+
+> **Triết lý cốt lõi:** Thiết kế này tập trung vào 1 hành động duy nhất là Định giá xe. Mọi thành phần khác (lòng tin, quy trình, FAQ) chỉ phục vụ mục đích duy nhất là làm người dùng tin tưởng để điền vào cái Form đó.

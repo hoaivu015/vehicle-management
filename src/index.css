@@ -1,62 +1,138 @@
 @import "tailwindcss";
 
+:root {
+  /* Kích thước chữ (Font Sizes) - Neural Expressive Spec */
+  --font-size-metric: 2.5rem;      /* 40px */
+  --font-size-title: 1.5rem;       /* 24px */
+  --font-size-body: 1.0rem;        /* 16px */
+  --font-size-caption: 0.875rem;   /* 14px */
+  --font-size-pill: 0.75rem;       /* 12px */
+
+  /* Chiều cao dòng (Line Heights) */
+  --line-height-heading: 1.25;
+  --line-height-body: 1.6;
+
+  /* Khóa phông chữ cho Tiêu đề (Headings) - Giả lập Google Sans Display */
+  --font-expressive-display: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  
+  /* Khóa phông chữ cho Đoạn văn (Body) - Giả lập Google Sans Text */
+  --font-expressive-text: 'Be Vietnam Pro', BlinkMacSystemFont, sans-serif;
+}
+
 @theme {
-  --font-sans: "Mulish", sans-serif;
-  --font-heading: "Mulish", sans-serif;
+  --font-sans: "Be Vietnam Pro", "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: "Plus Jakarta Sans", "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   
-  /* Liquid Glass Palette V2 (High Purity) */
-  --color-kraft-bg: #F9F0F1; 
-  --color-kraft-folder: rgba(255, 255, 255, 0.4);
-  --color-kraft-paper: rgba(255, 255, 255, 0.6);
-  --color-kraft-accent: #6366f1;
-  --color-kraft-ink: #0f172a;
-  --color-kraft-blue: #3b82f6;
-  --color-kraft-red: #ef4444;
+  /* Meta 2026 Design System Palette - Refined with OKLCH */
+  --color-kraft-bg: oklch(100% 0 0); /* Pure Canvas */
+  --color-kraft-folder: oklch(96.25% 0 0); /* Soft Cloud */
+  --color-kraft-paper: oklch(100% 0 0);
+  --color-kraft-accent: oklch(45% 0.18 260); /* Cobalt Primary */
+  --color-kraft-ink: oklch(15% 0 0); /* Deep Ink (Non-pure black) */
+  --color-kraft-blue: oklch(45% 0.18 260);
+  --color-kraft-red: oklch(60% 0.22 25); /* Critical Red */
   
-  /* Shadows - Liquid Glass V2 Glow */
-  --shadow-kraft: 0 10px 40px -10px rgba(15, 23, 42, 0.1);
-  --shadow-kraft-deep: 0 40px 80px -20px rgba(15, 23, 42, 0.2);
-  --shadow-glass-glow: 0 0 30px rgba(99, 102, 241, 0.15);
+  /* Neural Expressive Colors - Google Standard */
+  --color-neon-blue: oklch(75% 0.15 200); /* Neon Blue */
+  --color-neon-mint: oklch(85% 0.15 160); /* Neon Mint */
+  --color-coral: oklch(65% 0.22 25);       /* Vibrant Coral */
+  --color-amber: oklch(80% 0.15 75);       /* Vibrant Amber */
+  --color-warm-bone: oklch(98% 0.01 60);   /* Warm Bone background */
+  
+  /* Semantic Financial Colors (SSOT) */
+  --color-income: oklch(70% 0.18 150);    /* Emerald Success */
+  --color-expense: oklch(60% 0.22 25);    /* Critical Red */
+  --color-warning: oklch(80% 0.15 75);    /* Amber Warning */
+  --color-accent-soft: oklch(45% 0.18 260 / 0.1); /* Primary Soft */
+  --color-surface-pure: oklch(98.5% 0 0); /* Off-white */
+  --color-hairline: oklch(90% 0 0);
+  --color-hairline-soft: oklch(95% 0 0);
+  
+  /* Elevation - Claymorphism & Glassmorphism Shadows */
+  --shadow-kraft: 0 4px 20px -4px oklch(0% 0 0 / 0.04);
+  --shadow-kraft-deep: 0 10px 40px -10px oklch(0% 0 0 / 0.08);
+  --shadow-glass-glow: none;
+  --shadow-neural-t2: inset 2px 2px 5px rgba(255, 255, 255, 0.7), 8px 8px 16px rgba(0, 0, 0, 0.06);
+  --shadow-neural-t3: 0px 20px 40px rgba(79, 172, 254, 0.25);
+  --shadow-neon-glow: 0px 0px 40px rgba(0, 242, 254, 0.4);
+  --shadow-coral-pulse: 0px 4px 16px rgba(255, 8, 68, 0.06);
 
-  /* Industrial Card Shadows - Multi-layered for depth */
-  --shadow-card-industrial: 
-    0 10px 40px -10px rgba(0, 0, 0, 0.05), 
-    0 5px 15px -5px rgba(0, 0, 0, 0.02);
-  --shadow-card-hover: 
-    0 30px 60px -12px rgba(0, 0, 0, 0.12), 
-    0 18px 36px -18px rgba(0, 0, 0, 0.12);
+  /* Design Tier Radii - Meta Standard */
+  --radius-t1: 2.5rem;   /* 40px - Feature/Hero */
+  --radius-t2: 2rem;     /* 32px - xxxl Photographic cards */
+  --radius-t3: 1rem;     /* 16px - xl Standard cards */
+  --radius-t4: 0.5rem;   /* 8px  - lg Form inputs */
+  --radius-pill: 9999px; /* Pill buttons */
+}
 
-  /* Design Tier Radii - Liquid Glass Standard */
-  --radius-t1: 3rem;   /* Main Cards & Containers (48px) */
-  --radius-t2: 2rem;   /* Inner Sections & Large Blocks (32px) */
-  --radius-t3: 1rem;   /* Interaction Elements: Buttons, Inputs (16px) */
-  --radius-t4: 0.5rem; /* Micro Elements: Badges, Small Chips (8px) */
+@media (width < 600px) {
+  :root {
+    --radius-t1: 1.5rem; /* 24px - Mobile Container */
+    --radius-t2: 1.25rem; /* 20px - Mobile Component */
+    --spacing-g5: 1.25rem; /* 20px - Mobile Page Margin (was 64px desktop) */
+  }
+}
+
+@theme {
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+
+  /* Golden Ratio Spacing System (Factor ~1.6) */
+  --spacing-gs: 0.25rem;   /* 4px - Micro gap */
+  --spacing-g1: 0.5rem;    /* 8px - Small gap */
+  --spacing-g2: 1rem;      /* 16px - Standard gutter */
+  --spacing-g3: 1.25rem;   /* 20px - Section padding (GS * 1.25, optimized from 24px) */
+  --spacing-g4: 1.75rem;   /* 28px - Component margin (GS * 1.75, optimized from 40px) */
+  --spacing-g5: 2.5rem;    /* 40px - Page margin (optimized from 64px) */
+  --spacing-g6: 4.5rem;    /* 72px - Hero spacing (optimized from 104px) */
+
+  /* Typographic Scale - Golden Major Third (1.25x - 1.5x) */
+  --text-body: 0.875rem;   /* 14px - Base */
+  --text-h4: 1.125rem;     /* 18px - Sub-heading */
+  --text-h3: 1.5rem;       /* 24px - Section title */
+  --text-h2: 2.25rem;      /* 36px - Page title */
+  --text-h1: 3.5rem;       /* 56px - Hero/Big numbers */
 
   /* Meta Step Design Tokens */
   --meta-step-1: #F0F2F5; /* L1 Background & L2 Inactive Surface */
   --meta-step-2: #F0F2F5; /* L2 Inactive Tab (Collapsed into L1) */
   --meta-step-3: #F7F8F9; /* L3 Main Panel Canvas */
   --meta-step-4: #FFFFFF; /* L4 Content Bodies (Popping) */
+
+  /* Safe Area Variables for Mobile (Capacitor) */
+  --safe-area-top: env(safe-area-inset-top, 44px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 34px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+
+  /* Golden Margin & Spacing Enforcer */
+  --mobile-margin: 20px;
+  --touch-target-min: 44px;
+
+  /* Animations & Keyframes */
+  --animate-micro-shake: micro-shake 150ms ease-in-out 2;
+  --animate-breathe-glow: breathe-glow 4s ease-in-out infinite;
+
+  @keyframes micro-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  @keyframes breathe-glow {
+    0%, 100% { box-shadow: 0px 4px 20px -4px oklch(0% 0 0 / 0.04); }
+    50% { box-shadow: 0px 0px 30px rgba(0, 242, 254, 0.35); }
+  }
 }
 
 @layer base {
   body {
     @apply bg-kraft-bg text-kraft-ink font-sans antialiased selection:bg-kraft-accent/10 selection:text-kraft-accent;
-    background-color: var(--meta-step-1);
-    background-image:
-      /* Góc trên phải: Xanh biển nhạt Ultra-Smooth - #DFEFF8 */
-      radial-gradient(circle at 100% 0%, rgba(223, 239, 248, 0.7) 0%, transparent 60%),
-      /* Góc dưới phải: Xanh bạc hà tươi mới */
-      radial-gradient(circle at 100% 100%, rgba(234, 247, 240, 0.4) 0%, transparent 50%),
-      /* Góc dưới trái: Xanh Sky sâu lắng */
-      radial-gradient(circle at 0% 100%, rgba(229, 240, 250, 0.4) 0%, transparent 50%),
-      /* Góc trên trái: Hồng kem Ultra-Smooth - #F9F0F1 */
-      radial-gradient(circle at 0% 0%, rgba(249, 240, 241, 0.6) 0%, transparent 60%);
-    background-attachment: fixed;
-    line-height: 1.6;
-    letter-spacing: -0.015em;
-    animation: bgPulse 30s ease-in-out infinite alternate;
+    background-color: var(--color-surface-pure);
+    background-image: none; /* Stark White Canvas */
+    line-height: var(--line-height-body, 1.6);
+    letter-spacing: -0.014em; /* Tight body spacing like Optimistic VF */
   }
 
   @keyframes bgPulse {
@@ -64,10 +140,23 @@
     100% { background-position: 100% 100%; }
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply tracking-tight font-black;
-    font-family: var(--font-heading);
+  /* Áp dụng vào các thẻ hệ thống */
+  h1, h2, h3, h4, h5, h6, .pill-label, .folder-tab {
+    font-family: var(--font-expressive-display);
+    font-weight: 900; /* Bắt buộc đặt font-black để chữ nảy khối thị giác */
+    @apply tracking-tighter;
+    -webkit-font-smoothing: antialiased;
   }
+
+  p, span, input, textarea, select {
+    font-family: var(--font-expressive-text);
+  }
+
+  /* Standard Apple Typography Scale */
+  .text-apple-large-title { @apply text-[34px] leading-tight font-black tracking-tighter; }
+  .text-apple-headline { @apply text-[17px] font-black tracking-tight; }
+  .text-apple-subheadline { @apply text-[15px] font-medium text-kraft-ink/60; }
+  .text-apple-footnote { @apply text-[11px] font-black uppercase tracking-widest text-kraft-ink/40; }
 }
 
 @layer components {
@@ -78,19 +167,21 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  .liquid-glass-core, .folder-tab, .highlight-card, .liquid-button-primary, .liquid-button-secondary, .liquid-input {
+  .liquid-glass-core, .folder-tab, .highlight-card, .liquid-button-primary, .liquid-button-secondary, .liquid-input, .active-press {
     will-change: transform, backdrop-filter;
     transform: translateZ(0);
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Native Feel: Active States */
+  .active-press {
+    @apply transition-all duration-200 active:scale-[0.98] active:brightness-95;
+  }
+
   .liquid-glass-core, .folder-tab-active, .liquid-card {
-    backdrop-filter: blur(24px) saturate(150%);
-    -webkit-backdrop-filter: blur(24px) saturate(150%);
-    background: rgba(255, 255, 255, 0.65);
-    border: 1px solid rgba(255, 255, 255, 1);
-    border-top-color: rgba(255, 255, 255, 1);
-    border-left-color: rgba(255, 255, 255, 1);
+    background: var(--color-surface-pure);
+    border: 1px solid var(--color-hairline-soft);
+    box-shadow: none;
   }
 
   .folder-tab {
@@ -114,11 +205,11 @@
 
   /* Layer 3: Main Content Card - Blends with Tab */
   .liquid-card {
-    @apply rounded-[3rem] p-6 md:p-10 z-20;
+    @apply rounded-[32px] p-6 md:p-10 z-20;
     margin-top: -1px;
-    box-shadow: 
-      0 40px 80px -20px rgba(15, 23, 42, 0.15),
-      inset 0 1px 2px rgba(255, 255, 255, 1);
+    background: var(--color-surface-pure);
+    border: 1px solid var(--color-hairline-soft);
+    box-shadow: none;
   }
   
   .highlight-card {
@@ -126,55 +217,167 @@
     box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
   }
   
+  /* Meta Cobalt Pill (Buy Now) */
   .liquid-button-primary {
-    @apply bg-kraft-accent text-white font-black px-8 py-4 rounded-2xl shadow-xl shadow-kraft-accent/30 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 uppercase tracking-widest text-xs;
+    @apply bg-kraft-accent text-white font-black px-8 h-14 rounded-full hover:scale-[1.02] active:scale-[0.95] tracking-tight text-[14px] flex items-center justify-center shadow-lg transition-all duration-300;
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+    background-color: var(--color-kraft-accent);
   }
   
+  /* Meta Ghost Pill - Zero visual noise (remove harsh pure-black borders from secondary buttons like "CHỐT VỐN") */
   .liquid-button-secondary {
-    @apply bg-white/70 backdrop-blur-md text-kraft-ink font-black px-8 py-4 rounded-2xl border border-white hover:bg-white/90 active:scale-[0.98] transition-all duration-300 uppercase tracking-widest text-xs shadow-md;
+    @apply bg-slate-100/60 backdrop-blur-md text-kraft-ink font-black px-7 h-14 rounded-full border border-black/5 hover:scale-[1.02] hover:bg-slate-200/50 active:scale-[0.95] tracking-tight text-[14px] flex items-center justify-center shadow-sm transition-all duration-300;
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .liquid-input {
-    @apply w-full bg-white/60 border border-white/80 rounded-2xl px-6 py-4 text-kraft-ink placeholder:text-kraft-ink/40 focus:border-kraft-accent focus:bg-white/80 focus:ring-8 focus:ring-kraft-accent/10 transition-all duration-300 outline-none font-bold shadow-inner;
+    @apply w-full bg-white border border-hairline rounded-2xl px-6 h-14 text-kraft-ink placeholder:text-kraft-ink/20 focus:border-kraft-accent focus:ring-4 focus:ring-kraft-accent/5 transition-all duration-300 outline-none font-bold text-sm;
   }
 
-  .text-liquid-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-kraft-ink to-kraft-accent font-black;
+  /* Liquid Glassmorphic DatePicker & MonthPicker */
+  .liquid-datepicker {
+    @apply w-full text-kraft-ink transition-all duration-300 outline-none font-black text-sm h-14 px-6;
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: inset 2px 2px 5px rgba(255, 255, 255, 0.7), 8px 8px 16px rgba(0, 0, 0, 0.06) !important;
+    border-radius: var(--radius-t2) !important;
+  }
+
+  .liquid-datepicker-dense {
+    @apply w-full text-kraft-ink transition-all duration-300 outline-none font-black text-xs h-12 px-6;
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: inset 2px 2px 5px rgba(255, 255, 255, 0.7), 8px 8px 16px rgba(0, 0, 0, 0.06) !important;
+    border-radius: var(--radius-t2) !important;
+  }
+
+  /* Reset standard webkit date/month picker defaults for iPhone native quality */
+  input[type="date"],
+  input[type="month"] {
+    position: relative;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    font-family: var(--font-expressive-text) !important;
+  }
+  
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="month"]::-webkit-calendar-picker-indicator {
+    background: transparent !important;
+    color: transparent !important;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    z-index: 10;
+  }
+
+  input[type="date"]::-webkit-datetime-edit,
+  input[type="month"]::-webkit-datetime-edit {
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    padding: 0;
+    color: var(--color-kraft-ink);
+    font-weight: 900;
   }
 
   .bg-ambient-gradient {
-    background-color: var(--meta-step-1);
-    background-image:
-      /* Góc trên phải: Xanh biển nhạt Ultra-Smooth - #DFEFF8 */
-      radial-gradient(circle at 100% 0%, rgba(223, 239, 248, 0.7) 0%, transparent 60%),
-      /* Góc dưới phải: Xanh bạc hà tươi mới */
-      radial-gradient(circle at 100% 100%, rgba(234, 247, 240, 0.4) 0%, transparent 50%),
-      /* Góc dưới trái: Xanh Sky sâu lắng */
-      radial-gradient(circle at 0% 100%, rgba(229, 240, 250, 0.4) 0%, transparent 50%),
-      /* Góc trên trái: Hồng kem Ultra-Smooth - #F9F0F1 */
-      radial-gradient(circle at 0% 0%, rgba(249, 240, 241, 0.6) 0%, transparent 60%);
-    background-attachment: fixed;
-    background-size: 100% 100%;
-    animation: bgPulse 30s ease-in-out infinite alternate;
+    background-color: var(--color-surface-pure);
+    background-image: none;
   }
 
   .text-sub-label {
     @apply text-[10px] font-black uppercase tracking-[0.2em] text-kraft-ink/60 transition-opacity duration-300;
   }
 
+  /* ─────────────────────────────────────────────
+     ENFORCEMENT UTILITIES (Root Cause Fix)
+     ───────────────────────────────────────────── */
+  .text-liquid-label {
+    @apply text-[10px] font-black uppercase tracking-[0.2em] text-kraft-ink/60 transition-opacity duration-300;
+  }
+
+  /* ─────────────────────────────────────────────
+     GOLDEN RATIO SEMANTIC UTILITIES
+     ───────────────────────────────────────────── */
+  .text-golden-h1 { font-size: var(--text-h1); line-height: 1.1; @apply font-black tracking-tighter; }
+  .text-golden-h2 { font-size: var(--text-h2); line-height: 1.2; @apply font-black tracking-tight; }
+  .text-golden-h3 { font-size: var(--text-h3); line-height: 1.3; @apply font-black; }
+  .text-golden-body { font-size: var(--text-body); line-height: 1.6; }
+
+  .p-golden { padding: var(--spacing-g3); } /* Standard 24px */
+  .m-golden { margin: var(--spacing-g4); }  /* Standard 40px */
+  .gap-golden { gap: var(--spacing-g2); }   /* Standard 16px */
+
+  /* ─────────────────────────────────────────────
+     SEMANTIC COLOR UTILITIES (SSOT)
+     ───────────────────────────────────────────── */
+  .text-income { color: var(--color-income); }
+  .text-expense { color: var(--color-expense); }
+  .text-warning { color: var(--color-warning); }
+  .bg-income { background-color: var(--color-income); @apply text-white; }
+  .bg-expense { background-color: var(--color-expense); @apply text-white; }
+  .bg-accent-soft { background-color: var(--color-accent-soft); }
+
+  .glass-purity-surface {
+    @apply bg-white border border-[#f3f4f6] rounded-[32px];
+    box-shadow: none;
+  }
+
   .glass-badge {
-    @apply px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/20 shadow-lg backdrop-blur-md transition-all duration-300;
-    background: rgba(15, 23, 42, 0.8);
+    @apply px-[10px] py-[4px] rounded-full text-[12px] font-bold tracking-tight transition-all duration-300;
+    background: var(--color-kraft-ink);
     color: white;
   }
 
-  .glass-badge-blue    { background: rgba(59, 130, 246, 0.85); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
-  .glass-badge-purple  { background: rgba(139, 92, 246, 0.85); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
-  .glass-badge-emerald { background: rgba(16, 185, 129, 0.85); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
-  .glass-badge-red     { background: rgba(239, 68, 68, 0.85);  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
-  .glass-badge-orange  { background: rgba(245, 158, 11, 0.85);  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
-  .glass-badge-sky     { background: rgba(14, 165, 233, 0.85);  box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); }
-  .glass-badge-dark    { background: rgba(15, 23, 42, 0.9);    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+  .glass-badge-blue    { background: rgba(29, 78, 216, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: white; }
+  .glass-badge-purple  { 
+    background: rgba(126, 34, 206, 0.75); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    color: white; 
+    box-shadow: 0 4px 12px rgba(126, 34, 206, 0.25);
+    transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 96px;
+    justify-content: center;
+  }
+  .glass-badge-purple:hover {
+    background: linear-gradient(135deg, oklch(75% 0.15 280), oklch(90% 0.05 300)); /* Tím ánh bạc */
+    box-shadow: 0 8px 20px rgba(126, 34, 206, 0.4);
+    min-width: 120px;
+  }
+  .glass-badge-emerald { background: rgba(16, 185, 129, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: white; }
+  .glass-badge-red     { background: rgba(239, 68, 68, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: white; }
+  .glass-badge-orange  { 
+    background: rgba(245, 158, 11, 0.75); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    color: #0a0a0a; 
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 96px;
+    justify-content: center;
+  }
+  .glass-badge-orange:hover {
+    background: linear-gradient(135deg, oklch(80% 0.15 75), oklch(90% 0.05 100)); /* Cam ánh bạc sáng */
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+    min-width: 120px;
+  }
+  .glass-badge-sky     { background: rgba(3, 105, 161, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: white; }
+  .glass-badge-dark    { background: rgba(15, 15, 15, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: white; }
 
   /* ─────────────────────────────────────────────
      4-LAYER CONTAINED TAB SYSTEM (RE-INTEGRATED)
@@ -250,31 +453,253 @@
     position: relative;
     z-index: 30;
   }
+
+  /* ─────────────────────────────────────────────
+     PREMIUM DESIGN SYSTEM (5-WHY OPTIMIZATION)
+     ───────────────────────────────────────────── */
+  .kraft-premium-card {
+    @apply bg-white text-kraft-ink rounded-[32px] border border-hairline-soft relative overflow-hidden;
+    box-shadow: none;
+  }
+
+  .kraft-premium-header {
+    @apply font-heading text-[11px] font-black uppercase tracking-[0.3em] text-kraft-accent/60 px-2;
+  }
+
+  /* Mobile/Native Specific Utilities */
+  .safe-pt { 
+    padding-top: 44px; /* Fallback for iPhone Notch */
+    padding-top: constant(safe-area-inset-top);
+    padding-top: env(safe-area-inset-top, 44px); 
+  }
+  .safe-pb { 
+    padding-bottom: 34px; /* Fallback for iPhone Home Indicator */
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom, 34px); 
+  }
+  .h-safe-bottom {
+    height: 34px;
+    height: constant(safe-area-inset-bottom);
+    height: env(safe-area-inset-bottom, 34px);
+  }
+  .xl\:safe-pt-0 {
+    @media (min-width: 1280px) {
+      padding-top: 0 !important;
+    }
+  }
+  
+  /* Disable hover effects on touch devices to prevent "sticky" states */
+  @media (hover: none) {
+    .hover-none {
+      @apply hover:scale-100 hover:brightness-100;
+    }
+  }
+
+  /* Prevent text selection on interactive elements for a more native feel */
+  .native-interactive {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    @apply transition-all duration-200 active:scale-95 active:brightness-90;
+  }
+
+  /* Layout Enforcement */
+  .mobile-container {
+    padding-left: var(--mobile-margin);
+    padding-right: var(--mobile-margin);
+    @apply w-full mx-auto;
+  }
+
+  /* ─────────────────────────────────────────────
+     HARDWARE ACCELERATION & SCROLL PERFORMANCE SPEC
+     ───────────────────────────────────────────── */
+  .expressive-hardware-card {
+    width: 100%;
+    max-width: 360px;
+    aspect-ratio: 1 / 1.414; /* Khóa tỷ lệ căn bậc hai */
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(24px);
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    /* Thiết lập đường cong lò xo nảy vật lý */
+    transition: transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 450ms ease, 
+                background 450ms ease;
+    
+    /* ÉP TRÌNH DUYỆT BẬT TĂNG TỐC PHẦN CỨNG BẰNG GPU */
+    will-change: transform; 
+    transform: translateZ(0); /* Thủ thuật kích hoạt 3D Layer trên Safari/iOS cũ */
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* TRẠNG THÁI HOVER NẢY LÒ XO ĐÃ ĐƯỢC GPU XỬ LÝ MƯỢT MÀ */
+  .expressive-hardware-card:hover {
+    transform: translateY(-8px) scale(1.02) translateZ(0);
+    background: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 20px 40px -4px rgba(0, 0, 0, 0.15);
+  }
+
+  /* TRẠNG THÁI ẤN LÚN VẬT LÝ */
+  .expressive-hardware-card:active {
+    transform: scale(0.96) translateZ(0);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  }
+
+  /* Thuật toán tối ưu bộ nhớ ẩn (Containment Rule) */
+  .card-grid-container {
+    contain: layout style; /* Ngăn chặn sự thay đổi của thẻ card bên trong làm ảnh hưởng đến toàn bộ cấu trúc cây DOM bên ngoài */
+  }
+
+  /* Vật liệu Shimmer Kính Lỏng (Liquid Glassmorphism Skeleton) */
+  .expressive-shimmer-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(24px);
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    will-change: transform;
+  }
+
+  .expressive-shimmer-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.06) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: translateX(-100%);
+    animation: shimmer 1.5s infinite linear;
+    will-change: transform;
+  }
+
+  /* ==================== CẤU HÌNH TOÀN CỤC CHUYỂN TRANG LÒ XO EXPRESSIVE ==================== */
+
+  /* 1. Trạng thái trang mới tiến vào (Enter) */
+  .expressive-flow-enter-active {
+    transition: transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 450ms ease;
+    will-change: transform, opacity;
+  }
+  .expressive-flow-enter-from {
+    opacity: 0;
+    transform: scale(0.95) translateY(12px); /* Nở nhẹ từ dưới lên */
+  }
+
+  /* 2. Trạng thái trang cũ rời đi (Leave) */
+  .expressive-flow-leave-active {
+    transition: transform 250ms cubic-bezier(0.4, 0, 1, 1),
+                opacity 250ms ease;
+    will-change: transform, opacity;
+  }
+  /* 3. Khởi chạy nhanh thẻ card Liquid Glassmorphism (FCP Spec) */
+  .card-fast-load {
+    background: rgba(22, 26, 35, 0.95);
+    /* Trì hoãn bật hiệu ứng blur nặng sau 200ms bằng hiệu ứng mượt */
+    animation: enableBlur 400ms 200ms forwards;
+    will-change: background, backdrop-filter;
+  }
+
+  /* ─────────────────────────────────────────────
+     HIGH PERFORMANCE ANIMATION UTILITIES (Modern Web Standards)
+     ───────────────────────────────────────────── */
+  
+  /* Scroll-Driven Reveal (Tăng cường lũy tiến) */
+  @keyframes reveal-cascade {
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.97);
+      filter: blur(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0px);
+    }
+  }
+
+  .scroll-reveal-item {
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: view()) {
+        animation: reveal-cascade auto cubic-bezier(0.25, 0.8, 0.25, 1) both;
+        animation-timeline: view();
+        animation-range: entry 5% cover 32%;
+        will-change: transform, opacity;
+      }
+    }
+  }
+
+  /* Chuyển tiếp Discrete Native (display: none -> display: block) */
+  .discrete-transition-fade {
+    transition: opacity 250ms ease-out, display 250ms allow-discrete;
+  }
+  @starting-style {
+    .discrete-transition-fade {
+      opacity: 0;
+    }
+  }
+
+  /* Cô lập Render của Container */
+  .render-boundary-isolated {
+    contain: layout style paint;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 350px;
+  }
+}
+
+@keyframes enableBlur {
+  to {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(24px);
+  }
 }
 
 /* Custom Scrollbar - Minimal High Purity */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(15, 23, 42, 0.2) transparent;
+}
+
+/* Tối ưu hóa kích thước thanh cuộn tổng thể */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 6px;  /* Khóa độ mảnh dọc */
+  height: 6px; /* Khóa độ mảnh ngang */
 }
-
+/* Thiết lập vùng đường ray chạy của thanh cuộn */
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background: transparent; /* Hoàn toàn trong suốt để lộ lớp nền Canvas */
 }
-
+/* Thiết lập con trượt viên thuốc dạng lỏng */
 ::-webkit-scrollbar-thumb {
-  @apply bg-kraft-accent/20 rounded-full hover:bg-kraft-accent/40 transition-colors;
+  background: rgba(15, 23, 42, 0.08); /* Độ mờ tĩnh thấp của màu Ink */
+  backdrop-filter: blur(8px);
+  border-radius: 9999px; /* Khóa bo tròn viên thuốc tối đa */
+  border: 1px solid rgba(15, 23, 42, 0.02);
+  transition: background 0.3s ease;
+}
+/* Tăng độ tương phản rực rỡ khi người dùng kéo giữ thanh cuộn */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.4); /* Chuyển màu ánh tím nhẹ của Gemini khi tương tác */
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% { transform: translateX(-150%) translateZ(0); }
+  100% { transform: translateX(150%) translateZ(0); }
 }
 
 .shimmer-wrapper {
   position: relative;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--meta-step-1);
   border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .shimmer-effect {
@@ -286,8 +711,48 @@
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.6) 50%,
     rgba(255, 255, 255, 0) 100%
   );
-  animation: shimmer 2s infinite;
+  animation: shimmer 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+  /* ─────────────────────────────────────────────
+     GPU EXCLUSIVES: PURE CSS PHYSICS ANIMATIONS (Tối ưu TBT & INP di động)
+     ───────────────────────────────────────────── */
+  .expressive-reveal-card {
+    animation: reveal-card-spring 500ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    will-change: transform, opacity;
+  }
+
+  @keyframes reveal-card-spring {
+    0% {
+      opacity: 0;
+      transform: translateY(20px) translateZ(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) translateZ(0);
+    }
+  }
+
+  .animate-ambient-flow {
+    animation: ambient-spin-scale 8s ease-in-out infinite;
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  @keyframes ambient-spin-scale {
+    0% { transform: scale(1) rotate(0deg) translateZ(0); }
+    50% { transform: scale(1.12) rotate(45deg) translateZ(0); }
+    100% { transform: scale(1) rotate(0deg) translateZ(0); }
+  }
+
+/* Khóa overscroll trên thiết bị di động để mang lại trải nghiệm Native iOS */
+@media (max-width: 1279px) {
+  html, body {
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+  }
 }

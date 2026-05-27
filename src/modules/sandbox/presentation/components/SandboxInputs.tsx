@@ -1,6 +1,5 @@
-import React from 'react';
 import { Search, AlertCircle, Sparkles } from 'lucide-react';
-import { SmartAmountInput } from '@/src/components/SmartAmountInput';
+import { SmartAmountInput } from '@/src/shared/design-system/SmartAmountInput';
 
 export const SandboxInputs = ({ testAmount, setTestAmount }: any) => (
   <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">

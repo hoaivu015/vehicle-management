@@ -1,0 +1,1042 @@
+{
+  "/Users/phanvu/Desktop/auto-28/src/App.tsx": {
+    "mtime": 1779277339.5015168,
+    "hash": "6bb761ceb5d463b462a6bd1cdd0635dd"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/main.tsx": {
+    "mtime": 1779110922.2046392,
+    "hash": "84fbf23573e6e77ec435bd24dfe6cbc9"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/vite-env.d.ts": {
+    "mtime": 1777815060.7075117,
+    "hash": "c2e30c379d28a70b40ea02a39bf2b696"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/constants.ts": {
+    "mtime": 1777815060.7076914,
+    "hash": "86e3492f84bdd98d3fd37335e94ffe80"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/test/setup.ts": {
+    "mtime": 1777815060.6915832,
+    "hash": "3df7d099169f2a1cfe74970bf2fef71d"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/financial_formulas.ts": {
+    "mtime": 1777815060.6917708,
+    "hash": "e3f59bc247b0de2b25e0b4df71114236"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/date.ts": {
+    "mtime": 1777815060.6919427,
+    "hash": "8f22bdf996508b45acb6d04a23c625e9"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/currency.ts": {
+    "mtime": 1777815060.6921074,
+    "hash": "7354d8871f647427ad51887e5bd414c4"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/string.ts": {
+    "mtime": 1777815060.6922872,
+    "hash": "7588c1b0962543b353c478382c920b0b"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/cloudinary.ts": {
+    "mtime": 1777906485.441902,
+    "hash": "78c76b2fa6d2a666cf7ae05fb2da063d"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/numberFormatter.ts": {
+    "mtime": 1777815060.692491,
+    "hash": "f527330c39aab5bf5994cbfaa8ff5b0c"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/cn.ts": {
+    "mtime": 1777815060.6926553,
+    "hash": "6e450de11ec0c1460b1b46afa9026c30"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/numberParser.ts": {
+    "mtime": 1777815060.6928194,
+    "hash": "b28046a6790e91ce771ca8da08577195"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/vehicle_calculations.ts": {
+    "mtime": 1777815060.693008,
+    "hash": "a8c8fd8176fe256bb6463c6960ab2006"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/url.ts": {
+    "mtime": 1777815060.6931732,
+    "hash": "9dea93558da4b4938f4dccf77a95d95d"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/export.ts": {
+    "mtime": 1777906471.3644776,
+    "hash": "efec55ac7297d2ee5e115e4a779d79c8"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/logger.ts": {
+    "mtime": 1779110972.5343292,
+    "hash": "1376ab980ce696c625a78952e120db6a"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/stringUtils.ts": {
+    "mtime": 1779069917.6772406,
+    "hash": "58ee8ce559136c574d062195ea8f3125"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/haptics.ts": {
+    "mtime": 1777815060.6945004,
+    "hash": "caaa9ae4767866e9f070573dd534f442"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/check_db_schema.ts": {
+    "mtime": 1778670047.8118274,
+    "hash": "3522a0a86f5dae7f567bcf4f9ff0af11"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/error.ts": {
+    "mtime": 1777815060.6947186,
+    "hash": "a56e23039b9894a9f3b2939eaff81d56"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/zod.ts": {
+    "mtime": 1778670047.809635,
+    "hash": "4e7d28d5063eb77745f31d67aac586c5"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/finance.ts": {
+    "mtime": 1778721782.1547155,
+    "hash": "72c35186ea5bf3815d97ce7d47e8fada"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/__tests__/vehicle_calculations.test.ts": {
+    "mtime": 1777815060.693556,
+    "hash": "9edb0cd256d3244f1b1ce0165b71d001"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/__tests__/mock_data.ts": {
+    "mtime": 1778202858.4337094,
+    "hash": "3cfa18192589e1ecefb30940153e086a"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/utils/__tests__/financial_formulas.test.ts": {
+    "mtime": 1777815060.6939907,
+    "hash": "1834bac0d1b07767023c80820d018cd9"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/application/EventBus.ts": {
+    "mtime": 1777815060.6952236,
+    "hash": "9322d3f707f40eeb462bcc7cf01fc6cf"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/application/UseCaseFactory.ts": {
+    "mtime": 1777815060.6954281,
+    "hash": "a6cc7d7ae45cdd6e5aef33d2768ed9a8"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/infrastructure/database.types.ts": {
+    "mtime": 1777815060.6963077,
+    "hash": "b0287ea2cd98935d3112ca9f169fbd1c"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/infrastructure/SonnerNotificationService.ts": {
+    "mtime": 1777815060.6966026,
+    "hash": "25fa2b9a9ddfe56bdef72ffa436313b2"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/infrastructure/supabase.ts": {
+    "mtime": 1777815060.696786,
+    "hash": "f373fd9b32c46bfee98abb4fff5716de"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/infrastructure/RepositoryFactory.ts": {
+    "mtime": 1777815060.697011,
+    "hash": "865f3c7f7048ab005bbc97bfe0334682"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/infrastructure/SupabaseRepository.ts": {
+    "mtime": 1777815060.6971998,
+    "hash": "267f2ed8d823190640ca51e0fb89c77b"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/infrastructure/flags/FeatureFlagService.ts": {
+    "mtime": 1779110978.5634954,
+    "hash": "6203a8f46f579948a78a7693adc23ef5"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/infrastructure/storage/storageService.ts": {
+    "mtime": 1777815060.6956294,
+    "hash": "286cc078b6da82073f3f1f0fd3ed74ed"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/infrastructure/storage/cloudinaryService.ts": {
+    "mtime": 1777815060.695834,
+    "hash": "1ea99fddfdd65f83413081e3f467d378"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/infrastructure/hooks/useSupabaseSync.ts": {
+    "mtime": 1777815060.6960406,
+    "hash": "520f70048a7993734c73f1573e1a0b76"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/infrastructure/monitoring/SentryProvider.tsx": {
+    "mtime": 1779110917.7029793,
+    "hash": "92e10098f8b79dde5ecce967e31cdeac"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/domain/Repository.ts": {
+    "mtime": 1777815060.697408,
+    "hash": "c7763f44c8b825dee8b2a2d9c0587e91"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/domain/errors.ts": {
+    "mtime": 1777815060.6976552,
+    "hash": "fd81cb56fe94aa4c5db595ce0e7d9ee8"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/domain/NotificationService.ts": {
+    "mtime": 1777815060.697897,
+    "hash": "ca6c3863f9fc1cb4225e5b504b48826f"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/domain/schemas.ts": {
+    "mtime": 1778243036.9068842,
+    "hash": "b558db8e4642af30d4a759e2503faf66"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/domain/types.ts": {
+    "mtime": 1778243186.4258392,
+    "hash": "f650c0aa8d43618a1017f3e5ac0355b5"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/domain/constants.ts": {
+    "mtime": 1777907043.8644106,
+    "hash": "d6cadcba2de86bea5278bd85e0b3a856"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/domain/database.types.ts": {
+    "mtime": 1779189453.8091018,
+    "hash": "b0287ea2cd98935d3112ca9f169fbd1c"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/PageTransition.tsx": {
+    "mtime": 1777815060.6985269,
+    "hash": "8f65c4b8254960a77ad914c11a8b616d"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/SmartAmountInput.tsx": {
+    "mtime": 1779280209.9658177,
+    "hash": "01fec248a4fae5113995ae94735b67fa"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/ExecutiveModules.tsx": {
+    "mtime": 1778379779.30107,
+    "hash": "86630cfc12571998a99ac01eb5e7d577"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/BaseModal.tsx": {
+    "mtime": 1779368822.0167036,
+    "hash": "b75276f590aedc13f66381ca1b607c1e"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/PageShell.tsx": {
+    "mtime": 1777815060.7010474,
+    "hash": "3176cea12e9db1cbc561cd67497ffef8"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/ConfirmModal.tsx": {
+    "mtime": 1777815060.701265,
+    "hash": "c28668a36cfc20aeff421de2a7db2275"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/FormElements.tsx": {
+    "mtime": 1779327028.94521,
+    "hash": "cebc7877feece8eee7a93ef1ff99c684"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/AccountSkeleton.tsx": {
+    "mtime": 1777815060.701787,
+    "hash": "53d98b1dc014b01b3a7220048b150c31"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/Buttons.tsx": {
+    "mtime": 1779327032.8566673,
+    "hash": "ae35a3fafbc8c96d19ddf5fec4fc6c4e"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/BaseCard.tsx": {
+    "mtime": 1779368817.5186188,
+    "hash": "07b61239266402cdb5b1ccd0d6f590a4"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/DataDisplay.tsx": {
+    "mtime": 1779365955.0659437,
+    "hash": "c48d8eefd41e70bde82889d61c89491a"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/index.ts": {
+    "mtime": 1779277659.5716991,
+    "hash": "82076255f6b2b02de15b94e489bb710c"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/HeaderSkeleton.tsx": {
+    "mtime": 1777815060.703256,
+    "hash": "c814019220583c517b517a7681274f44"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/Skeleton.tsx": {
+    "mtime": 1777816402.3875937,
+    "hash": "a40347a2485274d84a7ccbc11bdd4992"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/ErrorBoundary.tsx": {
+    "mtime": 1779109793.7785366,
+    "hash": "6acbf2e8f031d893ebbf164920e43163"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/native/NativeTypography.tsx": {
+    "mtime": 1777815060.6987953,
+    "hash": "1a8df130fa730a4091de7be824370ab4"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/native/NativePage.tsx": {
+    "mtime": 1778327503.172281,
+    "hash": "2ebf798c585317b1dd8c4822c78fe03e"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/components/dashboard/InventoryPieChart.tsx": {
+    "mtime": 1779190866.261138,
+    "hash": "fa5834eaefe7caba19547a3d5edbf427"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/components/dashboard/DashboardSkeleton.tsx": {
+    "mtime": 1779190840.8401496,
+    "hash": "aacd3e105f161ac67e6821c8a9812dff"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/components/dashboard/DashboardStatGrid.tsx": {
+    "mtime": 1779190849.758614,
+    "hash": "7424538cc48f69a2feca2eb6ff274285"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/design-system/__tests__/SmartAmountInput.test.tsx": {
+    "mtime": 1777815060.7021716,
+    "hash": "a246de310e4cc06a007e71af9a7e7671"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/useNotification.ts": {
+    "mtime": 1777815060.703983,
+    "hash": "6857dfdafdf1bbf2001ed6a462a3b014"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/useActionResponse.ts": {
+    "mtime": 1777815060.7064002,
+    "hash": "a11a339ed4dfa5f771214d679a85942f"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/BasePresenter.ts": {
+    "mtime": 1778323924.076749,
+    "hash": "524562aed4361edbb90e2bbcf46915b3"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/components/SmartTableFactory.tsx": {
+    "mtime": 1777815060.7042294,
+    "hash": "80bc5988b4f0c09725a97eebffc05667"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/components/NotificationInitializer.tsx": {
+    "mtime": 1777815060.7054305,
+    "hash": "c37b64c4e6d3a240b45f243aba0f288b"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/components/FinancialCardFactory.tsx": {
+    "mtime": 1777815060.7056518,
+    "hash": "21bcf9216927911d0b8f6cbd0616abf8"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/components/Toast.tsx": {
+    "mtime": 1777815060.705865,
+    "hash": "d73243a05a9a3a206f998bc777744843"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/components/ErrorBoundary/ErrorFallback.tsx": {
+    "mtime": 1779109813.4210162,
+    "hash": "bb0e9346f745503dfbe9826279392835"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/components/ErrorBoundary/index.ts": {
+    "mtime": 1779109781.3557017,
+    "hash": "a58e794bbcc49fdfe1893fe21aa4ec88"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/components/ErrorBoundary/ErrorBoundary.tsx": {
+    "mtime": 1779109812.010376,
+    "hash": "2f0892eefddb3c0a9e4aafcf02913352"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/components/Layout/MobileBottomNav.tsx": {
+    "mtime": 1779369059.1594653,
+    "hash": "18b28523b4834142811af255af417fd6"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/components/Layout/MobileBottomNavContainer.tsx": {
+    "mtime": 1777859660.755006,
+    "hash": "4dfb54741f56b54fcc6c286caabbf51b"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/components/Layout/MainContent.tsx": {
+    "mtime": 1779005043.3663821,
+    "hash": "f1d6be87d2e77b5158d6a1a38ccc6254"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/components/Layout/Header.tsx": {
+    "mtime": 1779370072.5636237,
+    "hash": "cea64c9f822f529c59fa9925fe70c2cc"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/hooks/useUnifiedExpense.ts": {
+    "mtime": 1779191212.9375236,
+    "hash": "3ea1c293949bc14e6f4b0c7c69c29075"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/hooks/useWindowSizeClass.ts": {
+    "mtime": 1779368926.4431047,
+    "hash": "808a1a2a40eb5b1e5e977275c755e2e8"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/hooks/useNavigation.ts": {
+    "mtime": 1777815060.7060397,
+    "hash": "06f9bd8409831296b4ee788cc0d6f351"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/hooks/useIsMobile.ts": {
+    "mtime": 1777815060.7062197,
+    "hash": "cde14e7dd3080d6b92993c98f640b8d2"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/presentation/interfaces/IUnifiedExpensePresenter.ts": {
+    "mtime": 1779189472.7790074,
+    "hash": "5cc85cde88c5f116af79d1d312c95302"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/ioc/ModuleRegistry.ts": {
+    "mtime": 1777815060.7067733,
+    "hash": "bc6bba0e9a82bc819afbd48bb7b4605a"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/shared/ioc/DependencyContext.tsx": {
+    "mtime": 1779191554.3733392,
+    "hash": "7e938af269ddd7c5c6909c294cc82838"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/__tests__/E2E_Flows.test.ts": {
+    "mtime": 1777815060.7073083,
+    "hash": "64eab88822bbbf36196a2855d39d7b16"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/PersonalWebView.tsx": {
+    "mtime": 1779277514.4511442,
+    "hash": "692885d063da32e8e72f0737e7f8cc40"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/PersonalView.tsx": {
+    "mtime": 1777815060.7081897,
+    "hash": "21682dc182767c916d073145d547b7ab"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/PersonalMobileView.tsx": {
+    "mtime": 1779363562.6457126,
+    "hash": "f8b37cdaf869f0545c6e4855abb75067"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/usePersonalState.ts": {
+    "mtime": 1779192450.3002708,
+    "hash": "de8ec3f99119e6ef80799c3e147a5237"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/components/PersonalAdvancesCard.tsx": {
+    "mtime": 1778321519.1027336,
+    "hash": "a8b6dbd3b6b201f0092d4aac5003d9a4"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/components/SalaryBreakdownCard.tsx": {
+    "mtime": 1778164182.3737538,
+    "hash": "2ecc8cdb86ee14fe1dad96129c86a7f0"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/components/PersonalShared.tsx": {
+    "mtime": 1777815060.709521,
+    "hash": "079649f9f70f9c27e8bb4153205cdb6e"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/components/RecentActivityCard.tsx": {
+    "mtime": 1777815060.7097511,
+    "hash": "7117944a700794a991ddd565e76b745e"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/components/PersonalSidebar.tsx": {
+    "mtime": 1777947520.3231797,
+    "hash": "9862b44a7aaefed594b3f78d88657b10"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/components/PersonalVehiclesSection.tsx": {
+    "mtime": 1777946655.2442365,
+    "hash": "ea62cced61558a9b96afd4e1b5b13a9d"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/components/PersonalSkeleton.tsx": {
+    "mtime": 1777815060.710646,
+    "hash": "e115de7613bd55b6bb72d9f6a17f79ce"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/components/PersonalStatsGrid.tsx": {
+    "mtime": 1777815060.7109084,
+    "hash": "aa458935ed62b323ecfd8e7ff130b249"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/auth/infrastructure/SupabaseAuthRepository.ts": {
+    "mtime": 1779191545.851857,
+    "hash": "674856739cc3c882b8ed998a141c74ad"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/auth/infrastructure/SupabasePermissionRepository.ts": {
+    "mtime": 1779189538.1671405,
+    "hash": "41301f20bc50c3d833381571b9277097"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/auth/domain/PermissionService.ts": {
+    "mtime": 1777815060.7111638,
+    "hash": "586fd2949a0c5dedc33b4fba630c6b74"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/auth/domain/AuthRepository.ts": {
+    "mtime": 1779191541.5097249,
+    "hash": "c85001997db5a61200a0f2f317ab34d4"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/auth/domain/PermissionRepository.ts": {
+    "mtime": 1779189524.9831576,
+    "hash": "71cc4e9e94fa89d9390d60e88cddbd09"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/auth/presentation/useAuth.ts": {
+    "mtime": 1779191597.2935312,
+    "hash": "f977c09f7576d8b979fd1d19c1d8aa8e"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/auth/presentation/PermissionsPage.tsx": {
+    "mtime": 1779189576.5031607,
+    "hash": "4c659e8f6be226ab3bbb6f69b07b3726"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/auth/presentation/PermissionsPresenter.ts": {
+    "mtime": 1779189567.8044138,
+    "hash": "f4c9851cdc1cef733458c83d806beee3"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/auth/presentation/hooks/useUserManagement.ts": {
+    "mtime": 1779191018.816094,
+    "hash": "94037e0584d7a556332d219fe83e9dd1"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/auth/presentation/views/Login.tsx": {
+    "mtime": 1779191578.1415987,
+    "hash": "b46e07abc8a85d5fc73e20e8673f6a30"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/auth/presentation/views/UserManagement.tsx": {
+    "mtime": 1779280242.499159,
+    "hash": "4a6a02f6b5ce87daf4a39621fd9cee53"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/user/infrastructure/SupabaseUserRepository.ts": {
+    "mtime": 1777815060.712752,
+    "hash": "6d6f3a7091dc6e7e404e31cec7d79997"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/user/domain/UserRepository.ts": {
+    "mtime": 1779189466.8263652,
+    "hash": "b79109d5107ab562ba54fd32fe0ad462"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/user/domain/UserSchema.ts": {
+    "mtime": 1777815060.7131546,
+    "hash": "5df161710cb017af1dda12446c76c3d8"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/user/presentation/UserManagementPresenter.ts": {
+    "mtime": 1777815060.7133949,
+    "hash": "8e52f4c474307ded3e6a37e61d3a9f99"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/user/presentation/PersonalPresenter.ts": {
+    "mtime": 1778320377.1043441,
+    "hash": "b302aec654eb69567a7add2ed182ec9d"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/user/presentation/hooks/useUserManagement.ts": {
+    "mtime": 1779191034.0008516,
+    "hash": "3a597a51db3af4e26e82d0f38c5f8fec"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/dashboard/presentation/DashboardSkeleton.tsx": {
+    "mtime": 1779190914.0303926,
+    "hash": "a5afde37938bf1daa96c2c4824c8de68"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/dashboard/presentation/components/WeeklyCashflowChart.tsx": {
+    "mtime": 1778164110.2177343,
+    "hash": "3c30f66f378f0a8f29e89132400ec5fd"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/dashboard/presentation/components/InventoryPieChart.tsx": {
+    "mtime": 1779190923.3849833,
+    "hash": "223bbab9f35cf1fb0ef9819d3e9d299b"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/dashboard/presentation/components/DashboardStatGrid.tsx": {
+    "mtime": 1779190918.5178394,
+    "hash": "8ed23b78705d9db4669046d3525fa0fe"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/sandbox/presentation/SandboxPage.tsx": {
+    "mtime": 1779366773.575181,
+    "hash": "d60d60196b5fc2ca3a7c742570d1f38c"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/sandbox/presentation/components/SandboxHeader.tsx": {
+    "mtime": 1777815060.715529,
+    "hash": "91b1c9a8c015216e04442b1e27ecc964"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/sandbox/presentation/components/SandboxResizers.tsx": {
+    "mtime": 1778162930.5482473,
+    "hash": "78a0914295c67102bdb917775226855d"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/sandbox/presentation/components/HapticPhysicsLab.tsx": {
+    "mtime": 1779277720.075399,
+    "hash": "e8f5df18292b1ab196d4c59be1406f88"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/sandbox/presentation/components/ThemeSpec.tsx": {
+    "mtime": 1779411839.0872192,
+    "hash": "807dafb0de10bab0c0b645325f11629b"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/sandbox/presentation/components/DomainGallery.tsx": {
+    "mtime": 1779277722.753789,
+    "hash": "cbe70f9fdb305c3d045041ca00548827"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/sandbox/presentation/components/SandboxUIElements.tsx": {
+    "mtime": 1777815060.71605,
+    "hash": "1ce53938b09479802e5998baafb4d633"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/sandbox/presentation/components/SandboxSkeletons.tsx": {
+    "mtime": 1777815060.7162595,
+    "hash": "c8faa9222531c8f99d861dd1b65ac6b7"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/sandbox/presentation/components/SandboxInputs.tsx": {
+    "mtime": 1777815060.7164633,
+    "hash": "16ed780cab83efb75234e7ae309df7f9"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/sandbox/presentation/components/AtomicShowroom.tsx": {
+    "mtime": 1779366526.242721,
+    "hash": "9cd50c4dad1fd8584838e5732ef38398"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/sandbox/presentation/components/LiquidGlassCard.tsx": {
+    "mtime": 1779369062.7302804,
+    "hash": "433823ad1d68253c94d592d0aa6a447e"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/AddPurchasePayment.ts": {
+    "mtime": 1777815060.7167213,
+    "hash": "55b4b9501f836cdd83dcc2590b82cf20"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/DeleteVehicle.ts": {
+    "mtime": 1777815060.717146,
+    "hash": "318f3063dff4d8ac3305ec99fbbb2e54"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/AddSalePayment.ts": {
+    "mtime": 1777815060.7173574,
+    "hash": "b8a3a15d12175db807d0583b0c97c5fc"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/DeleteVehicleCost.ts": {
+    "mtime": 1777815060.717583,
+    "hash": "cf6a6169ef43c7a03d36e51d85e343b5"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/AddVehicle.ts": {
+    "mtime": 1778721313.194521,
+    "hash": "e9b24659f47c362a6a2de1e0089bdcb1"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/GetNextVehicleCode.ts": {
+    "mtime": 1778721288.711114,
+    "hash": "6968ac2207008d6ca317560acad5e169"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/CancelSale.ts": {
+    "mtime": 1777815060.7190602,
+    "hash": "da2a710a2d568a4f6116435e35892f77"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/UpdateVehicle.ts": {
+    "mtime": 1779069932.7689817,
+    "hash": "8cbf50f27196a305ded2aef24cd40795"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/UpdateVehicleStatus.ts": {
+    "mtime": 1777815060.7197208,
+    "hash": "7a8f3fa6c9e78e72532ec6f573bf8cca"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/GetInventoryList.ts": {
+    "mtime": 1777815060.7199895,
+    "hash": "7ed92742bcfce875fb426184fd5d6fc6"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/VehicleService.ts": {
+    "mtime": 1777815060.7202554,
+    "hash": "9afe5213e9bc2e2809ba8ea9913162f9"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/__tests__/UpdateVehicle.test.ts": {
+    "mtime": 1778668934.2054396,
+    "hash": "b0f63f58c54f05b2b410504c90a8ef6d"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/__tests__/AddSalePayment.test.ts": {
+    "mtime": 1777815060.7180517,
+    "hash": "944ac37f566afbf763c194716c3203ff"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/__tests__/CancelSale.test.ts": {
+    "mtime": 1777815060.7182746,
+    "hash": "6b4e2d7f78cfe72820cb9305458b363a"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/application/__tests__/AddVehicle.test.ts": {
+    "mtime": 1778721334.4569068,
+    "hash": "4143a87ed4722c15f998be05edf84f89"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/infrastructure/SupabaseVehicleRepository.ts": {
+    "mtime": 1779071510.2617438,
+    "hash": "a3964dc43e7f48534b5d87dc0e9fa3db"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/infrastructure/CloudinaryVehicleStorageRepository.ts": {
+    "mtime": 1777896373.4888105,
+    "hash": "ad91a4ec6892ab2637fb8a422aed9148"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/infrastructure/SupabaseVehicleStaffRepository.ts": {
+    "mtime": 1777815060.7213027,
+    "hash": "0434c891f824f0de280a7e67b94f709f"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/infrastructure/services/SupabaseVehicleCodeGenerator.ts": {
+    "mtime": 1778721249.7343693,
+    "hash": "382b7dff68f2752d2c4d8d80e1c500d1"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/domain/VehicleStateMachine.ts": {
+    "mtime": 1777819373.1127064,
+    "hash": "ad80ab8d9921691e1e5f57c938072fc8"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/domain/VehicleStaffRepository.ts": {
+    "mtime": 1777815060.7217195,
+    "hash": "e53ce69947b9e5a7e806df2bb4f68c27"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/domain/VehicleStorageRepository.ts": {
+    "mtime": 1777815060.7218997,
+    "hash": "eadf8329e148dd8532b85586e40b5556"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/domain/VehicleSchema.ts": {
+    "mtime": 1779069942.5957842,
+    "hash": "98ec192eac0082bb303bd9d91bfe5363"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/domain/VehicleRepository.ts": {
+    "mtime": 1778721269.046112,
+    "hash": "343e2939ba3cae2c20f5cb9cbb3b54b7"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/domain/VehicleEntity.ts": {
+    "mtime": 1778681120.0943778,
+    "hash": "cc9a3288887477324070cd37edfb6ad6"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/domain/__tests__/VehicleStateMachine.test.ts": {
+    "mtime": 1777815060.7226193,
+    "hash": "68f9c6dd7ffe0af2afe081fabcd931e7"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/domain/__tests__/VehicleRepositoryContract.spec.ts": {
+    "mtime": 1779110991.786092,
+    "hash": "4e6a608f2e6381cb024644bd3cf23213"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/domain/services/VehicleCodeGenerator.ts": {
+    "mtime": 1778721240.6848876,
+    "hash": "43f85a8246055263810858814a11fbe5"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/InventoryListPresenter.ts": {
+    "mtime": 1777815060.7236338,
+    "hash": "d61fd48a568ba868eccdefed2e358a24"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/InventoryPage.tsx": {
+    "mtime": 1777815060.723876,
+    "hash": "c8f3a0c889273753b15a9c2939ac4ea3"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/InventoryWebView.tsx": {
+    "mtime": 1777815155.3484633,
+    "hash": "8af80313bbd7314966880a1bf30cf17b"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/useInventoryState.ts": {
+    "mtime": 1779192435.7083244,
+    "hash": "182a446128710c8e303ae782616c7568"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/VehicleTransactionPresenter.ts": {
+    "mtime": 1779192413.6395884,
+    "hash": "e8555cd8432bf6f289f248a0e7b846df"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/InventoryMobileView.tsx": {
+    "mtime": 1779370000.606925,
+    "hash": "0b537f93496569e12b264fbccc6c6f68"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/VehicleActionPresenter.ts": {
+    "mtime": 1779192406.6427674,
+    "hash": "9ee630feeac0771d6a562325def7a277"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/InventoryPresenter.ts": {
+    "mtime": 1779192540.636765,
+    "hash": "a869aae2f13b22805c64c5e1854c5281"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/CarCardSkeleton.tsx": {
+    "mtime": 1779367832.0437615,
+    "hash": "12245aad47c52a4328c5acbf2e1589ff"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/AddVehicleModal.tsx": {
+    "mtime": 1778668827.025078,
+    "hash": "71fe3ddd8579f1fbd36b99438499aa02"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/CarCard.tsx": {
+    "mtime": 1779367832.0442007,
+    "hash": "0f699c490bdf41be7558ec09575a3363"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/InventoryHeader.tsx": {
+    "mtime": 1779369809.6197197,
+    "hash": "fad7f53b7750f22ba5d32ac202c7cbe5"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/InventorySkeleton.tsx": {
+    "mtime": 1777816847.8657343,
+    "hash": "2fddd5f3730779d391a1fc699a6795ca"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/VehicleDetailModal.tsx": {
+    "mtime": 1779367832.0445375,
+    "hash": "b5f147f09c649d999daa98a04890cca2"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/InventoryPerformanceBar.tsx": {
+    "mtime": 1777815060.7300673,
+    "hash": "8f84739debc84ee584a31307a29ca179"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/InventoryGrid.tsx": {
+    "mtime": 1778328070.3301325,
+    "hash": "c3b03857cb6ed03e33a890446abb79da"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/AddVehicle/index.tsx": {
+    "mtime": 1777896861.1763167,
+    "hash": "daca7eef802dff71e54fceecdcf3b951"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/AddVehicle/AddVehicleForm.tsx": {
+    "mtime": 1778668919.2847137,
+    "hash": "379a2ba522a1f52bc068e3c2f51ab2e9"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/AddVehicle/components/ImageUploader.tsx": {
+    "mtime": 1778164341.1776555,
+    "hash": "3b7cff663174240c976c9557832bc457"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/AddVehicle/components/EconomicSection.tsx": {
+    "mtime": 1779105217.7553446,
+    "hash": "74809d710bad228caa9e16264b6615e8"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/AddVehicle/components/VehicleProfile.tsx": {
+    "mtime": 1778668878.8262086,
+    "hash": "c319c3934f400bb2d706b2e69660b3e0"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/AddVehicle/components/CoInvestModule.tsx": {
+    "mtime": 1778668897.4213042,
+    "hash": "761c53611b8dca3f66a3172b624ae426"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/AddVehicle/hooks/useAddVehicleForm.ts": {
+    "mtime": 1779105304.1148186,
+    "hash": "5a0c5df04ad5d1f6795f27b6fa4ce73f"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/VehicleDetail/FinancialsTab.tsx": {
+    "mtime": 1779365943.6877851,
+    "hash": "546c13f7a21bbe389be3565a7c759947"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/VehicleDetail/HistoryTab.tsx": {
+    "mtime": 1779365949.5215867,
+    "hash": "a64796fd1805b02673db5a004422445b"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/VehicleDetail/AddCostOverlay.tsx": {
+    "mtime": 1779071469.2687342,
+    "hash": "92330a2f9d82ea3b8e2ab2cd05206929"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/VehicleDetail/useVehicleFinancials.ts": {
+    "mtime": 1779189071.397494,
+    "hash": "6e905fc0f2dcd70c8bc54347edb5dd66"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/VehicleDetail/useVehicleDetail.ts": {
+    "mtime": 1779189063.998101,
+    "hash": "6f81cc0996dc93ca67478a9798e51dbc"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/VehicleDetail/VehicleSidebar.tsx": {
+    "mtime": 1779365914.8577406,
+    "hash": "e07daf55c3477c0344fbf9a180cfeb42"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/VehicleDetail/InfoTab.tsx": {
+    "mtime": 1778379777.6065567,
+    "hash": "f17d39cfd68e6b6c13fb1c12383bc4e2"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/VehicleDetail/VehicleDetailModalShared.tsx": {
+    "mtime": 1777815060.7285006,
+    "hash": "d5844f95341300152a1deac189c2c3db"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/VehicleDetail/StatusUpdateOverlay.tsx": {
+    "mtime": 1779365809.5527706,
+    "hash": "fd0ae1c27ddcc76f504ee7c6c38d99ad"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/application/GetFinancialOverview.ts": {
+    "mtime": 1777815060.7311087,
+    "hash": "c02603f10c393a9ddfe65a82098369e1"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/application/GetMonthlyFinance.ts": {
+    "mtime": 1777815060.7313569,
+    "hash": "8c3ee5282eaf58adcf3459e122914083"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/application/RecordExpense.ts": {
+    "mtime": 1779069925.909569,
+    "hash": "1b3c6cd2fc0c0f319e04f96d785b5091"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/infrastructure/SupabaseExpenseRepository.ts": {
+    "mtime": 1777815060.7317564,
+    "hash": "12fabaf71da7052fe8572a2523b6d1d8"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/domain/ExpenseRepository.ts": {
+    "mtime": 1779189459.221748,
+    "hash": "346ce4e20cc97300a4bdb88215a216ac"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/domain/ExpenseSchema.ts": {
+    "mtime": 1778243430.2126956,
+    "hash": "c7c546ebad44a32d50519a7a0ffe3d39"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/domain/FinanceService.ts": {
+    "mtime": 1777815060.7328746,
+    "hash": "0fd33a24ac3f1a6de3bb4dd77b7e3f5e"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/domain/__tests__/FinanceService.test.ts": {
+    "mtime": 1777815060.732633,
+    "hash": "c894d73242f4c04cd1a05aa7a197bb76"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/CashflowWebView.tsx": {
+    "mtime": 1779327041.3523648,
+    "hash": "c46049f8c262b940fe8eff95b964de09"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/CashflowMobileView.tsx": {
+    "mtime": 1779363560.903233,
+    "hash": "d86249eddb2819e456d0649e4b23dfbf"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/DashboardWebView.tsx": {
+    "mtime": 1779190872.251416,
+    "hash": "ea814db18e3ce0dbe6a692b837691602"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/CashflowPage.tsx": {
+    "mtime": 1779005047.1740654,
+    "hash": "78f7b9ec41932392b7459e6d536b4703"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/useCashflowState.ts": {
+    "mtime": 1779191216.996317,
+    "hash": "917064a0d07f5c7ab2c9604397c718da"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/FinancePresenter.ts": {
+    "mtime": 1779189481.3949788,
+    "hash": "3d81fdf3ec0ac4758bd78609e997986b"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/DashboardMobileView.tsx": {
+    "mtime": 1779363555.8890042,
+    "hash": "3458312cd22d9d4059ff3de6ec982ca5"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/useFinance.ts": {
+    "mtime": 1777815060.7367148,
+    "hash": "dbb1d88031b5aad27da6e219ee0831cc"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/useDashboardState.ts": {
+    "mtime": 1779005568.5523672,
+    "hash": "08d5dad4170b1b065fb9b3b622e6772c"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/DashboardPage.tsx": {
+    "mtime": 1777906463.6605682,
+    "hash": "cbdeb4119954f893ba2ed31f86dd3ede"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/components/DashboardCharts.tsx": {
+    "mtime": 1779190894.8846161,
+    "hash": "8256e9581e25d3f8a3a98a6a01d50091"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/components/NetProfitComparisonReport.tsx": {
+    "mtime": 1778993527.2126734,
+    "hash": "0f6878de62b02e36c025587f48dc1592"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/components/PayableDebtsList.tsx": {
+    "mtime": 1779006533.4335132,
+    "hash": "61043624e29c6e8ef7e71afceaa4355c"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/components/CashflowSkeleton.tsx": {
+    "mtime": 1777815060.7359343,
+    "hash": "96df443280008d2d64a99319d9048ad0"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/components/DashboardHeader.tsx": {
+    "mtime": 1779327048.4664803,
+    "hash": "3e3ca97f6d026623fe5ff78855ff0fd4"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/components/DashboardActivityLogs.tsx": {
+    "mtime": 1777815060.7365432,
+    "hash": "a4fe2bda274382b777534b2ba46f83b9"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/finance/presentation/components/ReceivableDebtsList.tsx": {
+    "mtime": 1779006525.0590189,
+    "hash": "7181b9c3fe1cee70a4d131fe32e40941"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/application/ReimburseStaffExpenses.ts": {
+    "mtime": 1777815060.7374907,
+    "hash": "c50d0e1e957ca6919c7972c111cbf385"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/application/ToggleStaffExpenseReimbursement.ts": {
+    "mtime": 1777815060.7378838,
+    "hash": "505a85565e1c8116f6ef44998d889f19"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/application/UpdateStaffExpense.ts": {
+    "mtime": 1778243213.9858906,
+    "hash": "0a73e3088beff4597a1eeda8454129b0"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/application/AddStaff.ts": {
+    "mtime": 1778203010.2690809,
+    "hash": "0e1d6efe8665b65eb0a271871c474fa6"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/application/DeleteStaffExpense.ts": {
+    "mtime": 1778243221.783498,
+    "hash": "d4bd6f317bb57aade88042d5b00b1d24"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/application/DeleteStaff.ts": {
+    "mtime": 1777815060.7408667,
+    "hash": "1b9d06584c7b93130b244fc85123fdde"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/application/GetStaffList.ts": {
+    "mtime": 1778320129.2061,
+    "hash": "a47eb9e26d0d73590115eaa5013351b7"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/application/UpdateStaff.ts": {
+    "mtime": 1778154134.9044232,
+    "hash": "afc5525632846db1e79abca78f328182"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/application/__tests__/AddStaffExpense.test.ts": {
+    "mtime": 1778243440.7893355,
+    "hash": "0f8b34f20b12ab182c5d8d1c732ceb58"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/infrastructure/SupabaseStaffRepository.ts": {
+    "mtime": 1778154212.0075064,
+    "hash": "cab3478ee6c92785dd04475f52d24dbb"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/domain/StaffSalaryService.ts": {
+    "mtime": 1779015565.8268063,
+    "hash": "81fbaaa4499cd19ebfc74c6adc6f0b1b"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/domain/StaffSchema.ts": {
+    "mtime": 1778320129.2068794,
+    "hash": "7b9b476a8a69fa4b5ba58c2f67654b24"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/domain/StaffValidation.ts": {
+    "mtime": 1778243062.9359646,
+    "hash": "af568fa3ececf96e426522ee0af43b33"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/domain/StaffEntity.ts": {
+    "mtime": 1777815060.7448292,
+    "hash": "cfb9f59ca21c6056c70132991f955937"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/domain/StaffRepository.ts": {
+    "mtime": 1778154079.647568,
+    "hash": "a89276fe2fd0baa2e2188da7ee63d216"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/domain/__tests__/StaffSalaryService.test.ts": {
+    "mtime": 1777815060.7421217,
+    "hash": "5e0cf2919d2f1cb8f2dd1edeca07d03e"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/StaffMobileView.tsx": {
+    "mtime": 1779363558.7666368,
+    "hash": "7a87c92027dd0f76c630b95c553c5a01"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/PayrollPresenter.ts": {
+    "mtime": 1777815060.7465749,
+    "hash": "73da8b6fb9818f07c4ce07f3757b7796"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/StaffActionPresenter.ts": {
+    "mtime": 1778154157.3591893,
+    "hash": "5355352bcc91e7ad0df7cb4b334e4d60"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/StaffPresenter.ts": {
+    "mtime": 1779192467.0094435,
+    "hash": "b03aba01dd41b28eaafae6a08c1ec764"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/StaffListPresenter.ts": {
+    "mtime": 1777945587.4685547,
+    "hash": "1a343cb3cfe5d3edba48d26821eeee6d"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/StaffExpensePresenter.ts": {
+    "mtime": 1778243073.150373,
+    "hash": "4f4220b1aa081500303f6eacf1eb75f5"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/AccountPage.tsx": {
+    "mtime": 1777907344.2636807,
+    "hash": "ea5e873a528771f603fb8e597bc219e2"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/StaffWebView.tsx": {
+    "mtime": 1779192510.0856397,
+    "hash": "703af99d56f93666ad1eaffb860a4562"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/StaffPage.tsx": {
+    "mtime": 1777815060.762245,
+    "hash": "2f77853e245a9def506e07058d917fd0"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/useStaffState.ts": {
+    "mtime": 1779192506.2178314,
+    "hash": "a6c827de74caf69668dc6ca88ef1d427"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffAddExpenseModal.tsx": {
+    "mtime": 1778320129.2054403,
+    "hash": "5fa9053c5737ee08ff024d8065495193"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffCard.tsx": {
+    "mtime": 1779368828.5431747,
+    "hash": "893c8752a09ede6d16f63eed5252da48"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffAddModal.tsx": {
+    "mtime": 1778202973.6425495,
+    "hash": "9288e043a6bed1244a49922759d46e55"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffList.tsx": {
+    "mtime": 1778202521.3019807,
+    "hash": "529c07ad035e591ebf3be8b2006316e7"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffSkeleton.tsx": {
+    "mtime": 1778165073.5266826,
+    "hash": "aec4e7c09b699fba7ec3ec0c6f91d641"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffSalaryPaymentModal.tsx": {
+    "mtime": 1778071304.295341,
+    "hash": "2b3944f273abd67bc092c95553a2dbb6"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffDetailModal.tsx": {
+    "mtime": 1779192399.575744,
+    "hash": "adc4d4c44f4b171e40795f928ac640cb"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffHeader.tsx": {
+    "mtime": 1779327044.6835017,
+    "hash": "80fc30afdb881f13aaf200aaa95250b9"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffDetail/ExpenseTable.tsx": {
+    "mtime": 1779192362.8220487,
+    "hash": "8ca9249598defb4d238a6267dbdb0316"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffDetail/TabsBar.tsx": {
+    "mtime": 1777894556.2030969,
+    "hash": "8e941bfe6b4d7eb049fb29b688da1e8c"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffDetail/Sidebar.tsx": {
+    "mtime": 1777903370.1251228,
+    "hash": "8684cca63083430b18c417230582232d"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffDetail/CarTable.tsx": {
+    "mtime": 1779192394.834579,
+    "hash": "974108bbd035d1cb80265aa63695e811"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/staff/presentation/components/StaffDetail/__tests__/ExpenseTable.test.tsx": {
+    "mtime": 1779111014.3009524,
+    "hash": "819c91496d3dd363bee3fdfef53cfdcb"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/payroll/application/ProcessSalaryPayment.ts": {
+    "mtime": 1777815060.762753,
+    "hash": "4329417190afcc843fbb478695305d22"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/modules/payroll/domain/PayrollService.ts": {
+    "mtime": 1777815060.7629368,
+    "hash": "95c78f79e029c9ea298902caa6c8d9f2"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/assets/logo.jpg": {
+    "mtime": 1774266641.1239004,
+    "hash": "fdf015f24fe69f6dfd660e23d6356768"
+  },
+  "/Users/phanvu/Desktop/auto-28/src/assets/default-car.jpg": {
+    "mtime": 1774266641.1208053,
+    "hash": "0084cb99a79fb9318203b62e85abe7e7"
+  }
+}

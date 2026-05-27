@@ -1,115 +1,121 @@
-import { Vehicle } from '../domain/types';
-import { VehicleStatus } from '../domain/constants';
-import { 
-  calcGrossProfit, 
-  calcNetProfit, 
-  calcProfitShare, 
-  calcTotalCapitalNeeded, 
-  calcShowroomCapital, 
-  calcTotalInvestment 
-} from './financial_formulas';
+import { VehicleStatus } from '@/src/shared/domain/constants';
+import { calcProfitShare } from './financial_formulas';
+
+/**
+ * Vehicle Calculation Utilities
+ * Project: Auto-28
+ * Goal: Centralized business logic for vehicle metrics and financials.
+ */
 
 export interface VehicleFinancials {
   purchasePrice: number;
-  totalCost: number; // Spa, repair
-  buyingCommission: number;
-  sellingCommission: number;
-  totalInvestment: number;
-  
+  totalCost: number;
+  totalInvestment: number; // purchasePrice + totalCost
   salePrice: number;
-  receivedAmount: number;
-  
-  grossProfit: number; // Sale - (Purchase + Spa)
-  netProfit: number;   // Gross - Commissions
-  preCommissionProfit: number; // Same as grossProfit (for clarity)
-  
-  isCoinvested: boolean;
-  coinvestAmount: number;
+  grossProfit: number;
+  netProfit: number;
   showroomCapital: number;
-  showroomProfitShare: number; // Showroom's portion of net profit
-  partnerProfitShare: number;   // Partner's portion of net profit
-  
+  isCoinvested: boolean;
+  coinvestAmount: number; // Partner investment
+  showroomProfitShare: number;
+  partnerProfitShare: number;
   isEstimated: boolean;
+  // Commissions
+  buyingCommission: number;
+  buyingBonus: number;
+  sellingCommission: number;
+}
+
+export interface FinancialInput {
+  purchase_price?: number | null;
+  total_cost?: number | null;
+  sale_price?: number | null;
+  buying_commission?: number | null;
+  buying_bonus?: number | null;
+  commission?: number | null;
+  is_coinvested?: boolean | null;
+  coinvest_amount?: number | null;
+  status: VehicleStatus;
+  cost_history?: { amount: number }[] | null;
 }
 
 /**
- * COORDINATOR FUNCTION
- * Aggregates data and uses atomic formulas to build the full financials object.
+ * Calculates comprehensive financials for a vehicle.
+ * Ensures consistent profit calculation across the app.
  */
-export function calculateVehicleFinancials(vehicle: Vehicle): VehicleFinancials {
-  // Priority 1: Use finalized snapshot if exists
-  if (vehicle.final_financials) {
-    const s = vehicle.final_financials;
-    const grossProfit = s.grossProfit;
-    const purchasePrice = vehicle.purchase_price || 0;
-    const costFromHistory = (vehicle.cost_history || []).reduce((sum, c) => sum + (c.amount || 0), 0);
-    const totalCost = costFromHistory > 0 ? costFromHistory : (vehicle.total_cost || 0);
-
-    return {
-      purchasePrice,
-      totalCost,
-      buyingCommission: s.buyingCommission,
-      sellingCommission: s.sellingCommission,
-      totalInvestment: s.totalInvestment,
-      salePrice: vehicle.sale_price || 0,
-      receivedAmount: vehicle.received_amount || 0,
-      grossProfit: grossProfit,
-      netProfit: s.netProfit,
-      preCommissionProfit: grossProfit,
-      isCoinvested: !!vehicle.is_coinvested,
-      coinvestAmount: vehicle.coinvest_amount || 0,
-      showroomCapital: calcShowroomCapital(calcTotalCapitalNeeded(purchasePrice, totalCost), vehicle.coinvest_amount || 0),
-      showroomProfitShare: s.showroomProfitShare,
-      partnerProfitShare: s.partnerProfitShare || (s.netProfit - s.showroomProfitShare),
-      isEstimated: false
-    };
-  }
-
+export const calculateVehicleFinancials = (vehicle: FinancialInput): VehicleFinancials => {
   const purchasePrice = vehicle.purchase_price || 0;
-  const costFromHistory = (vehicle.cost_history || []).reduce((sum, c) => sum + (c.amount || 0), 0);
-  const totalCost = costFromHistory > 0 ? costFromHistory : (vehicle.total_cost || 0);
-  const buyingCommission = vehicle.buying_commission ?? 0;
-  const sellingCommission = vehicle.commission ?? 0;
   
+  // Use cost_history if available, otherwise fallback to total_cost field
+  const costHistory = vehicle.cost_history || [];
+  const totalCost = costHistory.length > 0
+    ? costHistory.reduce((sum: number, item: any) => sum + (item.amount || 0), 0)
+    : (vehicle.total_cost || 0);
+
+  const totalInvestment = purchasePrice + totalCost;
   const salePrice = vehicle.sale_price || 0;
-  const receivedAmount = vehicle.received_amount || 0;
+  const buyingCommission = vehicle.buying_commission || 0;
+  const buyingBonus = vehicle.buying_bonus || 0;
+  const sellingCommission = vehicle.commission || 0;
+
+  // Gross Profit = Sale - (Purchase + Costs)
+  const grossProfit = salePrice > 0 ? salePrice - totalInvestment : 0;
   
-  // Use atomic formulas
-  const grossProfit = calcGrossProfit(salePrice, purchasePrice, totalCost);
-  const netProfit = calcNetProfit(grossProfit, buyingCommission, sellingCommission);
-  
-  const isCoinvested = !!vehicle.is_coinvested;
+  // Net Profit = Gross Profit - (All Commissions & Bonuses)
+  const netProfit = salePrice > 0 ? grossProfit - (buyingCommission + buyingBonus + sellingCommission) : 0;
+
+  const isCoinvested = vehicle.is_coinvested || false;
   const coinvestAmount = vehicle.coinvest_amount || 0;
-  const totalCapitalNeeded = calcTotalCapitalNeeded(purchasePrice, totalCost);
-  
-  const showroomCapital = calcShowroomCapital(totalCapitalNeeded, coinvestAmount);
-  
-  // Use atomic formula for profit share
-  const showroomProfitShare = calcProfitShare(netProfit, showroomCapital, totalCapitalNeeded);
-  const partnerProfitShare = netProfit - showroomProfitShare;
+
+  let showroomCapital = totalInvestment;
+  let partnerProfitShare = 0;
+  let showroomProfitShare = netProfit;
+
+  if (isCoinvested && totalInvestment > 0) {
+    showroomCapital = totalInvestment - coinvestAmount;
+    partnerProfitShare = calcProfitShare(netProfit, coinvestAmount, totalInvestment);
+    showroomProfitShare = netProfit - partnerProfitShare;
+  }
 
   return {
     purchasePrice,
     totalCost,
-    buyingCommission,
-    sellingCommission,
-    totalInvestment: calcTotalInvestment(
-      purchasePrice, 
-      totalCost, 
-      buyingCommission, 
-      sellingCommission, 
-      vehicle.status === VehicleStatus.SOLD
-    ),
+    totalInvestment,
     salePrice,
-    receivedAmount,
     grossProfit,
     netProfit,
-    preCommissionProfit: grossProfit,
+    showroomCapital,
     isCoinvested,
     coinvestAmount,
-    showroomCapital,
     showroomProfitShare,
     partnerProfitShare,
-    isEstimated: vehicle.status !== VehicleStatus.SOLD
+    isEstimated: vehicle.status !== VehicleStatus.SOLD,
+    buyingCommission,
+    buyingBonus,
+    sellingCommission
   };
-}
+};
+
+/**
+ * Calculates the number of days since the vehicle was purchased.
+ * @param purchaseDate Date string (YYYY-MM-DD)
+ * @returns Number of days (Math.floor)
+ */
+export const calculateAgingDays = (purchaseDate: string | null | undefined): number => {
+  if (!purchaseDate) return 0;
+  
+  const start = new Date(purchaseDate);
+  const now = new Date();
+  
+  const diffTime = now.getTime() - start.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  return diffDays >= 0 ? diffDays : 0;
+};
+
+/**
+ * Checks if a vehicle is considered "Aging" based on a threshold.
+ */
+export const isVehicleAging = (purchaseDate: string | null | undefined, thresholdDays: number): boolean => {
+  return calculateAgingDays(purchaseDate) >= thresholdDays;
+};

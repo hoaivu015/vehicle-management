@@ -3,6 +3,7 @@ import { Vehicle } from '../../../shared/domain/types';
 
 export interface PersonalViewInterface {
   updateVehicles(vehicles: Vehicle[]): void;
+  setAllVehicles(vehicles: Vehicle[]): void;
   setLoading(loading: boolean): void;
 }
 
@@ -16,7 +17,7 @@ export class PersonalPresenter {
     this.view = view;
     this.loadVehicles();
     this.unsubscribe = this.vehicleRepository.subscribe(vehicles => {
-      this.view?.updateVehicles(vehicles);
+      this.view?.setAllVehicles(vehicles);
     });
   }
 
@@ -31,7 +32,7 @@ export class PersonalPresenter {
     this.view?.setLoading(true);
     try {
       const vehicles = await this.vehicleRepository.getAll();
-      this.view?.updateVehicles(vehicles);
+      this.view?.setAllVehicles(vehicles);
     } catch (err) {
       console.error('Error loading vehicles in PersonalPresenter:', err);
     } finally {

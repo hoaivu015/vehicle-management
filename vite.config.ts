@@ -22,6 +22,25 @@ export default defineConfig(({mode}) => {
       // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
     },
+    build: {
+      rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, 'index.html'),
+          lading: path.resolve(__dirname, 'lading-page/index.html'),
+          sell: path.resolve(__dirname, 'lading-page/sell.html'),
+          guide: path.resolve(__dirname, 'lading-page/guide.html'),
+        },
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+            'vendor-mantine': ['@mantine/core', '@mantine/hooks'],
+            'vendor-ui': ['lucide-react', 'framer-motion', 'motion'],
+            'vendor-charts': ['recharts'],
+            'vendor-infra': ['@supabase/supabase-js'],
+          },
+        },
+      },
+    },
     test: {
       globals: true,
       environment: 'jsdom',

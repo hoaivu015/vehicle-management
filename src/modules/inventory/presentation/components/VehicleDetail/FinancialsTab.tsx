@@ -1,248 +1,412 @@
 import React from 'react';
-import { motion } from 'motion/react';
-import { Plus, Trash2, RefreshCw, Award, Clock } from 'lucide-react';
-import { SmartAmountInput } from '@/src/components/SmartAmountInput';
-import { Vehicle } from '@/src/shared/domain/types';
-import { VehicleStatus } from '@/src/shared/domain/constants';
-import { formatCurrency } from '@/src/utils/currency';
-import { VehicleFinancials } from '@/src/shared/utils/vehicle_calculations';
-import { FinancialBox, formatDate } from './VehicleDetailModalShared';
+import { motion, AnimatePresence } from 'motion/react';
+import { AlertCircle, CircleDollarSign, Check, Plus, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { SmartAmountInput } from '@/src/shared/design-system/SmartAmountInput';
+import { Vehicle, Staff } from '@/src/shared/domain/types';
+import { VehicleStatus, VEHICLE_STATUS_LABELS, UserRole } from '@/src/shared/domain/constants';
+import { formatCurrency } from '@/src/shared/utils/currency';
+import { cn } from '@/src/shared/utils/cn';
+import { formatDate, ActivityItem, EmptyState } from './VehicleDetailModalShared';
+import { BaseInput, BaseSelect } from '@/src/shared/design-system/FormElements';
+import { VehicleStateMachine } from '@/src/modules/inventory/domain/VehicleStateMachine';
+import { DESIGN_TOKENS } from '@/src/shared/design-system/tokens';
+import { 
+   FinancialMatrix, 
+   MatrixSummary, MatrixLedger, MatrixRow, PillButton, ExecutiveSection
+} from '@/src/shared/design-system/ExecutiveModules';
+import { AddCostOverlay } from './AddCostOverlay';
+
+import { useVehicleFinancials } from './useVehicleFinancials';
 
 interface FinancialsTabProps {
    vehicle: Vehicle;
-   financials: VehicleFinancials;
-   costForm: { name: string; amount: number };
-   setCostForm: React.Dispatch<React.SetStateAction<{ name: string; amount: number }>>;
-   handleAddCost: (vehicle: Vehicle, name: string, amount: number) => Promise<void>;
-   handleDeleteCost: (vehicle: Vehicle, index: number) => Promise<void>;
-   isSubmitting: boolean;
    canSeeFinancials: boolean;
    isAdminOrAccountant: boolean;
+   userCode: string;
+   staffList: Staff[];
+   actions: {
+      onAddCost: (id: number, name: string, amount: number) => Promise<void>;
+      onDeleteCost: (id: number, index: number) => Promise<void>;
+      onAddPurchasePayment: (id: number, amount: number, note: string, receiver: string) => Promise<void>;
+      onAddSalePayment: (
+        id: number, 
+        amount: number, 
+        note: string, 
+        receiver: string, 
+        nextStatus: VehicleStatus, 
+        seller: string, 
+        buyerName?: string, 
+        salePrice?: number, 
+        commission?: number, 
+        buyingBonus?: number
+      ) => Promise<void>;
+      onCancelSale: (id: number, userCode: string) => Promise<void>;
+   };
 }
 
 export const FinancialsTab: React.FC<FinancialsTabProps> = ({
    vehicle,
-   financials,
-   costForm,
-   setCostForm,
-   handleAddCost,
-   handleDeleteCost,
-   isSubmitting,
    canSeeFinancials,
-   isAdminOrAccountant
+   isAdminOrAccountant,
+   userCode,
+   staffList,
+   actions
 }) => {
+   if (!canSeeFinancials) return <EmptyState icon={AlertCircle} title="Bạn không có quyền xem thông tin tài chính" />;
+
+   const {
+      financials,
+      activeLedger,
+      setActiveLedger,
+      purchaseDebt,
+      saleDebt,
+      isAddingCost,
+      setIsAddingCost,
+      isSubmitting,
+      paymentForm,
+      setPaymentForm,
+      purchasePaymentForm,
+      setPurchasePaymentForm,
+      nextStatusInTab,
+      setNextStatusInTab,
+      showCancelSaleConfirm,
+      setShowCancelSaleConfirm,
+      handleAddCost,
+      handleDeleteCost,
+      handleAddPurchasePayment,
+      handleAddSalePayment,
+      handleCancelSale
+   } = useVehicleFinancials({
+      vehicle,
+      userCode,
+      ...actions
+   });
+
+   if (!financials) return null;
+
+   const formatFinance = (val: number) => formatCurrency(val);
+
    return (
       <motion.div
-         key="fin"
+         key="financials"
          initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-         className="space-y-10"
+         className="space-y-12 pb-32"
       >
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FinancialBox label="Vốn gốc nhập xe" value={financials.purchasePrice} color="ink" />
-            <FinancialBox label="Tổng phí Spa/Dọn" value={financials.totalCost} color="amber" />
-            <FinancialBox
-               label={vehicle.status === VehicleStatus.SOLD ? "Lợi nhuận ròng" : "Dự tính LN ròng"}
-               value={financials.netProfit}
-               color="emerald"
-               isEstimated={financials.isEstimated}
-            />
-         </div>
+         {/* SECTION 1: PROFIT & CASHFLOW MATRIX */}
+         <section className="space-y-2">
+            <FinancialMatrix>
+               <MatrixSummary className="shadow-kraft-deep">
+                  <div className="grid grid-cols-2 gap-x-g2 lg:gap-x-g4 gap-y-3">
+                     <MatrixRow label="Doanh thu bán xe" value={<span className="text-base lg:text-sm">{formatCurrency(financials.salePrice)}</span>} type="income" className="border-b-0" />
+                     <MatrixRow label="Vốn nhập xe" value={<span className="text-base lg:text-sm">{`-${formatCurrency(financials.purchasePrice)}`}</span>} type="expense" className="border-b-0" />
+                     <MatrixRow label="Chi phí Spa/Dọn" value={<span className="text-base lg:text-sm">{`-${formatCurrency(financials.totalCost)}`}</span>} type="expense" className="col-span-2 border-b-0" />
+                     
+                     <div className={cn("col-span-2 pt-5 mt-3 border-t border-hairline-soft flex justify-between items-center", DESIGN_TOKENS.layout.item_px)}>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-warning opacity-80">Lợi nhuận gộp</span>
+                        <span className="text-2xl lg:text-xl font-black text-warning tracking-tighter">{formatCurrency(financials.grossProfit)}</span>
+                     </div>
+                  </div>
 
-         <section className="space-y-6">
-            <h4 className="font-heading text-[11px] font-black uppercase tracking-[0.3em] text-kraft-accent/60 px-2">Chi phí phát sinh (Spa/Dọn)</h4>
-            <div className="bg-white/60 rounded-[2.5rem] border border-white/60 shadow-sm relative">
-               <div className="p-8 border-b border-black/5 bg-kraft-ink/[0.02] rounded-t-[2.5rem] grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
-                  <div className="md:col-span-6 space-y-2.5">
-                     <label className="text-[9px] font-black uppercase tracking-widest opacity-40 ml-2">Nội dung chi phí</label>
-                     <input
-                        type="text" value={costForm.name}
-                        onChange={e => setCostForm({ ...costForm, name: e.target.value })}
-                        className="w-full h-14 bg-white border border-black/5 rounded-2xl px-6 font-bold text-sm outline-none focus:border-kraft-accent transition-all"
-                        placeholder="Vd: Thay lốp mới, Spa, Dọn nội thất..."
-                     />
-                  </div>
-                  <div className="md:col-span-4">
-                     <SmartAmountInput label="Số tiền chi" value={costForm.amount} onChange={v => setCostForm({ ...costForm, amount: v })} />
-                  </div>
-                  <div className="md:col-span-2">
-                     <button
-                        onClick={() => {
-                           if (!costForm.name || !costForm.amount) return;
-                           handleAddCost(vehicle, costForm.name, costForm.amount);
-                           setCostForm({ name: '', amount: 0 });
-                        }}
-                        disabled={isSubmitting}
-                        className="w-full h-14 bg-kraft-accent text-white rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-kraft-accent/80 transition-all disabled:opacity-50 shadow-lg shadow-kraft-accent/20"
-                     >
-                        {isSubmitting ? <RefreshCw className="animate-spin" size={14} /> : <Plus size={14} />}
-                        Thêm
-                     </button>
-                  </div>
-               </div>
-
-               <div className="hidden sm:block overflow-x-auto rounded-b-[2.5rem]">
-                  <table className="w-full text-left min-w-[600px]">
-                     <thead className="bg-black/[0.02] border-b border-black/5">
-                        <tr>
-                           <th className="px-8 py-5 text-sub-label w-1/4">Ngày ghi nhận</th>
-                           <th className="px-8 py-5 text-sub-label">Nội dung</th>
-                           <th className="px-8 py-5 text-sub-label text-right min-w-[150px]">Số tiền</th>
-                           <th className="px-8 py-5 w-20"></th>
-                        </tr>
-                     </thead>
-                     <tbody className="divide-y divide-black/5">
-                        {(vehicle.cost_history || []).map((cost, idx) => (
-                           <tr key={idx} className="group hover:bg-white/60 transition-colors">
-                              <td className="px-8 py-5 text-sm font-bold opacity-40">{formatDate(cost.date)}</td>
-                              <td className="px-8 py-5 text-sm font-black text-kraft-ink">{cost.note}</td>
-                              <td className="px-8 py-5 text-sm font-black text-right text-red-500">{formatCurrency(cost.amount)}</td>
-                              <td className="px-8 py-5 text-right">
-                                 <button
-                                    onClick={() => handleDeleteCost(vehicle, idx)}
-                                    disabled={isSubmitting}
-                                    className="p-2 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-50 rounded-xl disabled:opacity-50"
-                                 >
-                                    {isSubmitting ? <RefreshCw className="animate-spin" size={16} /> : <Trash2 size={16} />}
-                                 </button>
-                              </td>
-                           </tr>
-                        ))}
-                        {(vehicle.cost_history || []).length === 0 && (
-                           <tr>
-                              <td colSpan={4} className="px-8 py-16 text-center italic opacity-20 text-sm">Chưa có dữ liệu chi phí spa/dọn</td>
-                           </tr>
+                  <div className="pt-8 border-t border-hairline-soft mt-8">
+                     <p className={cn("text-[10px] font-black uppercase tracking-widest text-sub-label opacity-40 mb-4", DESIGN_TOKENS.layout.item_px)}>Nhân sự & Hoa hồng</p>
+                     <div className="grid grid-cols-2 gap-x-g2 lg:gap-x-g4 gap-y-3">
+                        <MatrixRow label="Lương mua" value={<span className="text-base lg:text-sm">{`-${formatCurrency(financials.buyingCommission)}`}</span>} type="expense" className="border-b-0" />
+                        <MatrixRow label="Lương bán" value={<span className="text-base lg:text-sm">{`-${formatCurrency(financials.sellingCommission)}`}</span>} type="expense" className="border-b-0" />
+                        {financials.buyingBonus > 0 && (
+                           <MatrixRow label="Thưởng mua" value={<span className="text-base lg:text-sm">{`-${formatCurrency(financials.buyingBonus)}`}</span>} type="expense" className="col-span-2 border-b-0" />
                         )}
-                     </tbody>
-                  </table>
-               </div>
+                     </div>
+                  </div>
 
-               <div className="sm:hidden space-y-3 pb-8">
-                  {(vehicle.cost_history || []).map((cost, idx) => (
-                     <div key={idx} className="p-4 bg-white/40 rounded-2xl border border-white/60 flex justify-between items-start gap-4 shadow-sm">
-                        <div className="space-y-1 flex-1">
-                           <div className="flex justify-between">
-                              <span className="text-[10px] font-bold opacity-40">{formatDate(cost.date)}</span>
-                              <button
-                                 onClick={() => handleDeleteCost(vehicle, idx)}
-                                 className="text-red-500 p-1"
-                              >
-                                 <Trash2 size={14} />
-                              </button>
-                           </div>
-                           <div className="text-sm font-black text-kraft-ink">{cost.note}</div>
-                           <div className="text-sm font-black text-red-500">{formatCurrency(cost.amount)}</div>
+                  {financials.isCoinvested && (
+                     <div className="pt-8 border-t border-hairline-soft mt-8 space-y-4">
+                        <p className={cn("text-[10px] font-black uppercase tracking-widest text-sub-label opacity-40 mb-4", DESIGN_TOKENS.layout.item_px)}>Cơ cấu góp vốn</p>
+                        <div className="grid grid-cols-2 gap-x-g4">
+                           <MatrixRow label="Phần Showroom" value={formatCurrency(financials.showroomProfitShare)} type="income" className="bg-income/5 rounded-xl border-none" />
+                           <MatrixRow label="Phần Đối tác" value={formatCurrency(financials.partnerProfitShare)} type="neutral" className="bg-surface-soft rounded-xl border-none" />
                         </div>
                      </div>
-                  ))}
-                  {(vehicle.cost_history || []).length === 0 && (
-                     <div className="p-8 text-center italic opacity-20 text-xs text-kraft-ink">Chưa có dữ liệu chi phí</div>
                   )}
-               </div>
-            </div>
+               </MatrixSummary>
+
+               <MatrixLedger className="shadow-kraft-deep">
+                  <div className="absolute top-0 right-0 p-8 opacity-5 text-kraft-accent">
+                     <CircleDollarSign size={120} />
+                  </div>
+
+                  <div className="flex items-center justify-between mb-10 relative z-10">
+                     <div className="flex gap-1 bg-surface-soft p-1 rounded-full border border-hairline-soft">
+                        <motion.button 
+                           whileTap={{ scale: 0.95 }}
+                           onClick={() => setActiveLedger('purchase')}
+                           className={cn(
+                              "px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
+                              activeLedger === 'purchase' ? "bg-white text-kraft-ink shadow-sm" : "text-sub-label opacity-40 hover:opacity-100"
+                           )}
+                        >
+                           Lịch sử Chi
+                        </motion.button>
+                        <motion.button 
+                           whileTap={{ scale: 0.95 }}
+                           onClick={() => setActiveLedger('sale')}
+                           className={cn(
+                              "px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
+                              activeLedger === 'sale' ? "bg-white text-kraft-ink shadow-sm" : "text-sub-label opacity-40 hover:opacity-100"
+                           )}
+                        >
+                           Lịch sử Thu
+                        </motion.button>
+                     </div>
+                     <div className="text-right">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-sub-label opacity-40 mb-1">
+                           {activeLedger === 'purchase' ? 'Tiền xe nợ' : 'Khách nợ'}
+                        </p>
+                        <p className={cn(
+                           "text-2xl lg:text-xl font-black tracking-tighter",
+                           (activeLedger === 'purchase' ? purchaseDebt : saleDebt) > 0 ? "text-expense" : "text-income"
+                        )}>
+                           {formatFinance(activeLedger === 'purchase' ? purchaseDebt : saleDebt)}
+                        </p>
+                     </div>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 -mr-2 min-h-[300px]">
+                     <AnimatePresence mode="wait">
+                        <motion.div
+                           key={activeLedger}
+                           initial={{ opacity: 0, y: 15, filter: 'blur(3px)' }}
+                           animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                           exit={{ opacity: 0, y: -15, filter: 'blur(3px)' }}
+                           transition={{ duration: 0.25 }}
+                           className="space-y-4"
+                        >
+                           {activeLedger === 'purchase' ? (
+                              (vehicle.purchase_payment_history || []).length > 0 ? (
+                                 (vehicle.purchase_payment_history || []).map((p, idx) => (
+                                    <motion.div
+                                       key={idx}
+                                       initial={{ opacity: 0, y: 10, filter: 'blur(2px)' }}
+                                       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                                       transition={{ type: 'spring', stiffness: 120, damping: 18, delay: idx * 0.04 }}
+                                    >
+                                       <ActivityItem 
+                                          date={formatDate(p.date)}
+                                          title={p.note || "Thanh toán tiền mua xe"}
+                                          category="Chi tiền mặt"
+                                          amount={formatCurrency(p.amount)}
+                                          amountType="expense"
+                                       />
+                                    </motion.div>
+                                 ))
+                              ) : <EmptyState title="Chưa có dữ liệu chi tiền" icon={AlertCircle} className="py-12" />
+                           ) : (
+                              (vehicle.sale_payment_history || []).length > 0 ? (
+                                 (vehicle.sale_payment_history || []).map((p, idx) => (
+                                    <motion.div
+                                       key={idx}
+                                       initial={{ opacity: 0, y: 10, filter: 'blur(2px)' }}
+                                       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                                       transition={{ type: 'spring', stiffness: 120, damping: 18, delay: idx * 0.04 }}
+                                    >
+                                       <ActivityItem 
+                                          date={formatDate(p.date)}
+                                          title={p.note || "Thu tiền bán xe"}
+                                          category={p.receiver || "Kế toán"}
+                                          amount={formatCurrency(p.amount)}
+                                          amountType={p.amount < 0 ? "expense" : "income"}
+                                       />
+                                    </motion.div>
+                                 ))
+                              ) : <EmptyState title="Chưa có dữ liệu thu tiền" icon={AlertCircle} className="py-12" />
+                           )}
+                        </motion.div>
+                     </AnimatePresence>
+                  </div>
+               </MatrixLedger>
+            </FinancialMatrix>
          </section>
 
-         {canSeeFinancials && (
-            <section className="space-y-6">
-               <h4 className="font-heading text-[11px] font-black uppercase tracking-[0.3em] text-kraft-accent/60 px-2">Bảng kê lợi nhuận ròng</h4>
-               <div className="p-8 bg-white text-kraft-ink rounded-[2.5rem] shadow-2xl border border-black/5 space-y-8 relative overflow-hidden">
-                  <div className="absolute -top-16 -right-16 w-48 h-48 bg-kraft-accent/20 rounded-full blur-3xl pointer-events-none" />
+          {/* SECTION 2: OPERATIONAL MANAGEMENT */}
+          <div className="space-y-0 pt-12 border-t border-hairline-soft">
+             <ExecutiveSection 
+                title="Quản lý chi phí Spa/Dọn" 
+                accent="bg-kraft-accent"
+                action={
+                  isAdminOrAccountant ? (
+                    <PillButton 
+                      onClick={() => setIsAddingCost(true)} 
+                      variant="primary"
+                      className="!h-11 !px-6 shadow-kraft-deep"
+                      icon={Plus}
+                    >
+                      Ghi chi phí
+                    </PillButton>
+                  ) : undefined
+                }
+             >
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar mt-4">
+                   {(vehicle.cost_history || []).map((c, idx) => (
+                      <motion.div
+                         key={idx}
+                         initial={{ opacity: 0, y: 10, filter: 'blur(2px)' }}
+                         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                         transition={{ type: 'spring', stiffness: 120, damping: 18, delay: idx * 0.04 }}
+                      >
+                         <ActivityItem 
+                            date={c.date ? formatDate(c.date) : 'Chi phí'}
+                            title={c.note}
+                            amount={formatCurrency(c.amount)}
+                            amountType="expense"
+                            onDelete={isAdminOrAccountant ? () => handleDeleteCost(vehicle.id, idx) : undefined}
+                         />
+                      </motion.div>
+                   ))}
+                   {(vehicle.cost_history || []).length === 0 && (
+                      <div className="py-12 text-center text-[10px] font-black uppercase tracking-widest text-sub-label opacity-20 italic">Chưa có chi phí phát sinh</div>
+                   )}
+                </div>
+             </ExecutiveSection>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
-                     <div className="space-y-4">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-kraft-ink/40">1. Doanh thu & Vốn</p>
-                        <div className="space-y-2">
-                           <div className="flex justify-between text-xs font-bold">
-                              <span className="opacity-60">Giá bán chốt:</span>
-                              <span className="text-emerald-600">{formatCurrency(financials.salePrice)}</span>
-                           </div>
-                           <div className="flex justify-between text-xs font-bold">
-                              <span className="opacity-60">Giá nhập gốc:</span>
-                              <span className="text-red-500">-{formatCurrency(financials.purchasePrice)}</span>
-                           </div>
-                           <div className="flex justify-between text-xs font-bold">
-                              <span className="opacity-60">Spa/Dọn:</span>
-                              <span className="text-red-500">-{formatCurrency(financials.totalCost)}</span>
-                           </div>
-                           <div className="pt-2 border-t border-black/5 flex justify-between text-sm font-black text-amber-600">
-                              <span>Lợi nhuận gộp:</span>
-                              <span>{formatCurrency(financials.grossProfit)}</span>
-                           </div>
-                        </div>
-                     </div>
+             <AddCostOverlay 
+                isOpen={isAddingCost}
+                onClose={() => setIsAddingCost(false)}
+                isSubmitting={isSubmitting}
+                onAdd={async (name, amount) => {
+                   await handleAddCost(vehicle.id, name, amount);
+                }}
+             />
 
-                     <div className="space-y-4">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-kraft-ink/40">2. Thưởng & Hoa hồng</p>
-                        <div className="space-y-2">
-                           <div className="flex justify-between text-xs font-bold">
-                              <span className="opacity-60">Hoa hồng mua xe:</span>
-                              <span className="text-red-500">-{formatCurrency(financials.buyingCommission)}</span>
-                           </div>
-                           <div className="flex justify-between text-xs font-bold">
-                              <span className="opacity-60">Hoa hồng bán:</span>
-                              <span className="text-red-500">-{formatCurrency(financials.sellingCommission)}</span>
-                           </div>
-                           <div className="pt-2 border-t border-black/5 flex justify-between text-sm font-black text-emerald-600">
-                              <span>Lợi nhuận ròng:</span>
-                              <span>{formatCurrency(financials.netProfit)}</span>
-                           </div>
+            {isAdminOrAccountant && (
+            <ExecutiveSection title="Nghiệp vụ Thu / Chi tiền" accent="bg-income" divider>
+               <div className={cn("space-y-10 mt-6", DESIGN_TOKENS.layout.item_px)}>
+                  {(vehicle.status === VehicleStatus.DEPOSIT_BUY || purchaseDebt > 0) && (
+                     <motion.div 
+                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                        className="space-y-8 p-g4 glass-surface-soft rounded-t2 border border-hairline-soft shadow-kraft-deep"
+                     >
+                        <div className="flex items-center gap-3 text-warning">
+                           <ArrowDownCircle size={20} strokeWidth={2.5} />
+                           <p className="text-[10px] font-black uppercase tracking-widest">Phiếu chi (Trả tiền chủ cũ)</p>
                         </div>
-                     </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-g4">
+                           <SmartAmountInput label="Số tiền chi" value={purchasePaymentForm.amount} onChange={v => setPurchasePaymentForm({ ...purchasePaymentForm, amount: v })} />
+                           <BaseInput label="Ghi chú" placeholder="Ghi chú chi tiền..." value={purchasePaymentForm.note} onChange={e => setPurchasePaymentForm({ ...purchasePaymentForm, note: e.target.value })} />
+                        </div>
+                        <PillButton 
+                           onClick={() => handleAddPurchasePayment(vehicle.id, purchasePaymentForm.amount, purchasePaymentForm.note, vehicle.buyer || '')}
+                           isLoading={isSubmitting} 
+                           variant="primary"
+                           className="w-full h-14 shadow-kraft-deep"
+                           icon={Check}
+                        >
+                           Xác nhận Chi tiền
+                        </PillButton>
+                     </motion.div>
+                  )}
 
-                     {financials.isCoinvested ? (
-                        <div className="space-y-4 lg:col-span-2">
-                           <p className="text-[9px] font-black uppercase tracking-widest text-kraft-ink/40">3. Lợi nhuận</p>
-                           <div className="bg-kraft-accent/5 rounded-t2 p-6 border border-kraft-accent/10 space-y-4">
-                              <div className="grid grid-cols-2 gap-4">
-                                 <div>
-                                    <p className="text-[8px] font-black uppercase tracking-widest opacity-40 mb-1">Vốn Showroom</p>
-                                    <p className="text-sm font-black">{formatCurrency(financials.showroomCapital)}</p>
-                                 </div>
-                                 <div className="text-right">
-                                    <p className="text-[8px] font-black uppercase tracking-widest opacity-40 mb-1">Vốn Đối tác</p>
-                                    <p className="text-sm font-black">{formatCurrency(financials.coinvestAmount)}</p>
-                                 </div>
-                              </div>
-                              <div className="pt-4 border-t border-black/5 flex justify-between items-center gap-6">
-                                 <div className="flex-1 flex justify-between">
-                                    <div>
-                                       <p className="text-[8px] font-black uppercase tracking-widest text-amber-600 mb-1">Showroom:</p>
-                                       <p className="text-lg font-black text-emerald-600">{formatCurrency(financials.showroomProfitShare)}</p>
-                                    </div>
-                                    <div className="text-right">
-                                       <p className="text-[8px] font-black uppercase tracking-widest text-purple-600 mb-1">Đối tác:</p>
-                                       <p className="text-lg font-black text-kraft-ink">{formatCurrency(financials.partnerProfitShare)}</p>
-                                    </div>
-                                 </div>
-                                 <div className="w-12 h-12 rounded-2xl bg-kraft-accent/10 flex items-center justify-center text-kraft-accent shrink-0">
-                                    <Award size={24} />
-                                 </div>
-                              </div>
-                           </div>
+                  {VehicleStateMachine.isSalePhase(vehicle.status) && (
+                     <motion.div 
+                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                        className="space-y-8 p-g4 glass-surface-soft rounded-t2 border border-hairline-soft shadow-kraft-deep"
+                     >
+                        <div className="flex items-center gap-3 text-income">
+                           <ArrowUpCircle size={20} strokeWidth={2.5} />
+                           <p className="text-[10px] font-black uppercase tracking-widest">Phiếu thu (Nhận tiền khách hàng)</p>
                         </div>
-                     ) : (
-                        <div className="lg:col-span-2 flex items-center justify-center bg-black/[0.02] rounded-3xl border border-dashed border-black/10 p-8">
-                           <div className="text-center">
-                              <p className="text-[10px] font-black uppercase tracking-widest text-kraft-ink/20 mb-2">Showroom sở hữu 100%</p>
-                              <p className="text-xs font-bold text-kraft-ink/40 max-w-[200px]">Không có đối tác góp vốn cho chiếc xe này.</p>
-                           </div>
-                        </div>
-                     )}
-                  </div>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-g4">
+                           <SmartAmountInput label="Số tiền nhận" value={paymentForm.amount} onChange={v => setPaymentForm({ ...paymentForm, amount: v })} />
+                           
+                           <BaseSelect 
+                              label="Nhân viên bán xe"
+                              value={paymentForm.seller || ''}
+                              onChange={e => setPaymentForm({ ...paymentForm, seller: e.target.value, receiver: e.target.value })}
+                           >
+                              <option value="">Nhân viên...</option>
+                              {staffList.filter(s => s.role !== String(UserRole.ADMIN)).map(s => (
+                                 <option key={s.id} value={s.code}>{s.name} ({s.code})</option>
+                              ))}
+                           </BaseSelect>
 
-                  <div className="pt-6 border-t border-black/5 flex justify-between items-center text-[10px]">
-                     <div className="flex items-center gap-2 text-kraft-ink/40 italic">
-                        <Clock size={12} />
-                        <span>Lợi nhuận {financials.isEstimated ? 'dự tính (chưa hoàn tất giao dịch)' : 'thực tế (đã thu đủ tiền)'}</span>
-                     </div>
-                     {isAdminOrAccountant && (
-                        <div className="px-3 py-1 bg-kraft-accent/10 rounded-full font-black uppercase tracking-widest text-kraft-accent/60">
-                           Admin View Only
+                           <BaseSelect 
+                              label="Trạng thái tiếp theo"
+                              value={nextStatusInTab || ''}
+                              onChange={e => setNextStatusInTab(e.target.value as VehicleStatus)}
+                           >
+                              <option value="">Trạng thái...</option>
+                              {VehicleStateMachine.getValidNextStatuses(vehicle.status)
+                                 .filter(s => s !== VehicleStatus.IN_STOCK)
+                                 .map(s => <option key={s} value={s}>{VEHICLE_STATUS_LABELS[s] || s}</option>)
+                              }
+                           </BaseSelect>
+
+                           <BaseInput 
+                              label="Ghi chú giao dịch" 
+                              placeholder="Ghi chú thu tiền..." 
+                              value={paymentForm.note} 
+                              onChange={e => setPaymentForm({ ...paymentForm, note: e.target.value })} 
+                           />
                         </div>
-                     )}
-                  </div>
+
+                         {(vehicle.status === VehicleStatus.IN_STOCK || nextStatusInTab === VehicleStatus.SOLD) && (
+                            <div className="space-y-8 p-g4 bg-surface-soft rounded-xl border border-dashed border-hairline-soft">
+                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-g4">
+                                  <BaseInput label="Tên khách hàng" value={paymentForm.buyerName} onChange={e => setPaymentForm({ ...paymentForm, buyerName: e.target.value })} />
+                                  <SmartAmountInput label="Giá chốt bán" value={paymentForm.salePrice || 0} onChange={v => setPaymentForm({ ...paymentForm, salePrice: v })} />
+                               </div>
+                               {isAdminOrAccountant && (
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-g4 pt-6 border-t border-hairline-soft">
+                                     <SmartAmountInput label="Hoa hồng bán xe" value={paymentForm.commission} onChange={v => setPaymentForm({ ...paymentForm, commission: v })} />
+                                     <SmartAmountInput label="Thưởng NV thu mua" value={paymentForm.buying_bonus} onChange={v => setPaymentForm({ ...paymentForm, buying_bonus: v })} />
+                                  </div>
+                               )}
+                            </div>
+                         )}
+
+                        <PillButton 
+                           onClick={() => handleAddSalePayment(vehicle.id, paymentForm.amount, paymentForm.note, paymentForm.receiver || userCode, nextStatusInTab || vehicle.status, paymentForm.seller || userCode, paymentForm.buyerName, paymentForm.salePrice, paymentForm.commission, paymentForm.buying_bonus)}
+                           isLoading={isSubmitting}
+                           disabled={!nextStatusInTab} 
+                           variant="success"
+                           className="w-full h-16 shadow-income/20"
+                           icon={Check}
+                        >
+                           {nextStatusInTab === vehicle.status ? 'Xác nhận Thu tiền' : `Sang ${VEHICLE_STATUS_LABELS[nextStatusInTab as VehicleStatus] || '...'}`}
+                        </PillButton>
+
+                        {vehicle.status !== VehicleStatus.IN_STOCK && (
+                           <div className="pt-6 border-t border-hairline-soft">
+                              <AnimatePresence mode="wait">
+                                 {!showCancelSaleConfirm ? (
+                                    <motion.button 
+                                       initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                                       onClick={() => setShowCancelSaleConfirm(true)} 
+                                       className="w-full h-12 text-expense text-[10px] font-black uppercase tracking-widest hover:bg-expense/5 rounded-full transition-all"
+                                    >
+                                       Hủy giao dịch (Quay về kho)
+                                    </motion.button>
+                                 ) : (
+                                    <motion.div 
+                                       initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                                       className="flex gap-2"
+                                    >
+                                       <button onClick={() => setShowCancelSaleConfirm(false)} className="flex-1 h-12 bg-white border border-hairline-soft rounded-full text-[10px] font-black uppercase tracking-widest">Quay lại</button>
+                                       <button onClick={() => handleCancelSale(vehicle.id, userCode)} className="flex-1 h-12 bg-expense text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-kraft-deep">Xác nhận Hủy</button>
+                                    </motion.div>
+                                 )}
+                              </AnimatePresence>
+                           </div>
+                        )}
+                     </motion.div>
+                  )}
                </div>
-            </section>
-         )}
+            </ExecutiveSection>
+            )}
+          </div>
+
+         <div className="pt-12 border-t border-hairline-soft flex justify-end items-center text-[10px] font-black text-sub-label opacity-20 uppercase tracking-widest">
+            {isAdminOrAccountant && <span>Quyền Quản trị viên</span>}
+         </div>
       </motion.div>
    );
 };

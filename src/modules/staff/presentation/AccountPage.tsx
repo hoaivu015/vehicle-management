@@ -1,27 +1,84 @@
 import React, { useEffect, useState } from 'react';
 import { Shield, Eye, EyeOff, RefreshCw, Key, Search, Mail, UserCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { toast } from 'sonner';
-import { SupabaseStaffRepository } from '@/src/modules/staff/infrastructure/SupabaseStaffRepository';
-import { cn } from '@/src/utils/cn';
+import { useNotification } from '@/src/shared/presentation/useNotification';
+import { cn } from '@/src/shared/utils/cn';
 import { UserRole } from '@/src/shared/domain/constants';
+import { useDependencies } from '@/src/shared/ioc/DependencyContext';
+import { Account } from '@/src/shared/domain/types';
+import { Skeleton } from '@/src/shared/design-system/Skeleton';
+
+const AccountPageSkeleton = () => (
+  <div className="space-y-10 md:space-y-14 py-4 md:py-12 px-4 md:px-12 max-w-[1700px] mx-auto">
+    {/* Header skeleton */}
+    <div className="flex flex-col lg:flex-row justify-between items-center gap-8 border-b border-black/5 pb-10">
+      <div className="flex items-center gap-6">
+        <Skeleton variant="rectangle" width={64} height={64} className="rounded-[2rem] bg-black/5 animate-pulse" />
+        <Skeleton variant="text" width={180} height={52} className="animate-pulse" />
+      </div>
+      <div className="flex gap-4">
+        <Skeleton variant="rectangle" width={280} height={56} className="rounded-2xl animate-pulse bg-black/5" />
+        <Skeleton variant="rectangle" width={56} height={56} className="rounded-2xl animate-pulse bg-black/5" />
+      </div>
+    </div>
+    {/* Table skeleton */}
+    <div className="liquid-card overflow-hidden p-0 border-white/60">
+      {/* Table header */}
+      <div className="bg-kraft-accent/5 grid grid-cols-5 gap-4 py-5 px-8 border-b border-black/5">
+        {[...Array(5)].map((_, i) => (
+          <Skeleton key={i} variant="text" width="60%" height={10} className="animate-pulse bg-black/5" />
+        ))}
+      </div>
+      {/* Table rows */}
+      <div className="divide-y divide-black/5">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="grid grid-cols-5 gap-4 items-center py-5 px-8">
+            {/* Avatar + Name */}
+            <div className="flex items-center gap-4">
+              <Skeleton variant="circle" width={40} height={40} className="rounded-full shrink-0 animate-pulse bg-black/5" />
+              <Skeleton variant="text" width={100} height={14} className="animate-pulse bg-black/5" />
+            </div>
+            {/* Email */}
+            <div className="space-y-1.5">
+              <Skeleton variant="text" width={130} height={12} className="animate-pulse bg-black/5" />
+              <Skeleton variant="text" width={80} height={10} className="animate-pulse bg-black/5" />
+            </div>
+            {/* Role */}
+            <Skeleton variant="rectangle" width={70} height={24} className="rounded-full animate-pulse bg-black/5" />
+            {/* Password */}
+            <div className="flex items-center gap-3">
+              <Skeleton variant="rectangle" width={128} height={36} className="rounded-lg animate-pulse bg-black/5" />
+              <Skeleton variant="rectangle" width={32} height={32} className="rounded-lg animate-pulse bg-black/5" />
+            </div>
+            {/* Action */}
+            <div className="flex justify-end">
+              <Skeleton variant="rectangle" width={80} height={40} className="rounded-xl animate-pulse bg-black/5" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 export const AccountPage: React.FC = () => {
-  const [accounts, setAccounts] = useState<any[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showPasswordMap, setShowPasswordMap] = useState<Record<string, boolean>>({});
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
+  const notification = useNotification();
 
-  const repository = new SupabaseStaffRepository();
+
+  const { staffRepo: repository } = useDependencies();
 
   const fetchAccounts = async () => {
     setLoading(true);
     try {
       const data = await repository.getAccounts();
       setAccounts(data);
-    } catch (error: any) {
-      toast.error('Không thể tải danh sách tài khoản');
+    } catch (error: unknown) {
+      notification.error('Không thể tải danh sách tài khoản');
       console.error(error);
     } finally {
       setLoading(false);
@@ -40,22 +97,24 @@ export const AccountPage: React.FC = () => {
   };
 
   const handleUpdatePassword = async (email: string, currentPassword: string) => {
-    const newPassword = prompt(`⚠️ XÁC NHẬN ĐỔI MẬT KHẨU:\nBạn đang thực hiện đổi mật khẩu đăng nhập cho tài khoản ${email}.\n\nNhập mật khẩu mới (tối thiểu 6 ký tự):`, currentPassword);
+    const newPassword = prompt(`⚠️ ĐỔI MẬT KHẨU:\nBạn đang thực hiện đổi mật khẩu cho tài khoản ${email}.\n\nNhập mật khẩu mới (tối thiểu 6 ký tự):`, currentPassword);
     if (!newPassword || newPassword === currentPassword) return;
     
     if (newPassword.length < 6) {
-      toast.error('Mật khẩu phải từ 6 ký tự trở lên');
+      notification.error('Mật khẩu phải từ 6 ký tự trở lên');
       return;
     }
+
 
     setIsUpdating(email);
     try {
       await repository.updateAccountPassword(email, newPassword);
-      toast.success('Đã cập nhật mật khẩu đăng nhập thành công!');
+      notification.success('Đã cập nhật mật khẩu đăng nhập thành công!');
       fetchAccounts();
     } catch (error) {
-      toast.error('Lỗi khi cập nhật mật khẩu. Hãy đảm bảo Edge Function đã được deploy.');
+      notification.error('Lỗi khi cập nhật mật khẩu. Hãy đảm bảo Edge Function đã được deploy.');
     } finally {
+
       setIsUpdating(null);
     }
   };
@@ -68,8 +127,10 @@ export const AccountPage: React.FC = () => {
     )
   );
 
+  if (loading) return <AccountPageSkeleton />;
+
   return (
-    <div className="space-y-10 md:space-y-14 py-4 md:py-12 px-4 md:px-12 max-w-[1700px] mx-auto h-full overflow-y-auto">
+    <div className="space-y-10 md:space-y-14 py-4 md:py-12 px-4 md:px-12 max-w-[1700px] mx-auto h-full overflow-y-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row justify-between items-center gap-8 border-b border-black/5 pb-10 relative z-30">
         <div className="text-center lg:text-left">
@@ -79,7 +140,7 @@ export const AccountPage: React.FC = () => {
              </div>
              Tài khoản
           </h2>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] mt-4 opacity-30 flex items-center gap-3 justify-center lg:justify-start">
+          <p className="text-liquid-label mt-4 opacity-30 flex items-center gap-3 justify-center lg:justify-start">
             <span className="w-2 h-2 rounded-full bg-kraft-accent animate-pulse" />
             Quản lý quyền truy cập và bảo mật hệ thống
           </p>
@@ -124,12 +185,13 @@ export const AccountPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-black/5">
                 <AnimatePresence mode="popLayout">
-                  {filteredAccounts.map((account) => (
+                  {filteredAccounts.map((account, index) => (
                     <motion.tr 
                       key={account.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
+                      transition={{ delay: index * 0.05 }}
                       className="group hover:bg-white/40 transition-colors"
                     >
                       <td className="py-5 px-8">
@@ -147,12 +209,12 @@ export const AccountPage: React.FC = () => {
                             {account.email}
                           </div>
                           {account.linkedfrom && (
-                            <span className="text-[9px] font-black uppercase tracking-widest text-kraft-accent opacity-40">Mã NV: {account.linkedfrom}</span>
+                            <span className="text-liquid-label text-kraft-accent opacity-40">Mã NV: {account.linkedfrom}</span>
                           )}
                         </div>
                       </td>
                       <td className="py-5 px-8">
-                        <span className="px-3 py-1 bg-kraft-ink/5 border border-black/5 rounded-full text-[9px] font-black uppercase tracking-widest text-kraft-ink/60">
+                        <span className="px-3 py-1 bg-kraft-ink/5 border border-black/5 rounded-full text-liquid-label text-kraft-ink/60">
                           {account.role}
                         </span>
                       </td>
@@ -160,27 +222,27 @@ export const AccountPage: React.FC = () => {
                         <div className="flex items-center gap-3">
                           <div className="w-32 bg-kraft-ink/5 px-3 py-2 rounded-lg font-mono text-sm tracking-widest flex justify-between items-center border border-black/5 shadow-inner">
                             <span className="mt-0.5">
-                              {showPasswordMap[account.email] ? account.password : '••••••••'}
+                              {showPasswordMap[account.email || ''] ? account.password : '••••••••'}
                             </span>
                           </div>
                           <button 
-                            onClick={() => togglePassword(account.email)}
+                            onClick={() => togglePassword(account.email || '')}
                             className="p-2 hover:bg-kraft-accent/10 rounded-lg text-kraft-accent transition-colors"
                           >
-                            {showPasswordMap[account.email] ? <EyeOff size={16} /> : <Eye size={16} />}
+                            {showPasswordMap[account.email || ''] ? <EyeOff size={16} /> : <Eye size={16} />}
                           </button>
                         </div>
                       </td>
                       <td className="py-5 px-8 text-right">
                         <button 
-                          onClick={() => handleUpdatePassword(account.email, account.password)}
+                          onClick={() => handleUpdatePassword(account.email || '', account.password || '')}
                           disabled={isUpdating === account.email}
                           className="h-10 px-4 liquid-button-primary rounded-xl flex items-center gap-2 float-right group"
                         >
                           {isUpdating === account.email ? (
                             <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
                           ) : <Key size={14} strokeWidth={3} className="group-hover:rotate-45 transition-transform" />}
-                          <span className="text-[9px]">CẬP NHẬT</span>
+                          <span className="text-liquid-label !text-white">LƯU</span>
                         </button>
                       </td>
                     </motion.tr>
@@ -191,7 +253,7 @@ export const AccountPage: React.FC = () => {
                     <td colSpan={5} className="py-20 text-center">
                       <div className="flex flex-col items-center gap-4 opacity-20">
                         <UserCheck size={48} />
-                        <p className="text-xs font-black uppercase tracking-[0.3em] italic">Không tìm thấy tài khoản phù hợp</p>
+                        <p className="text-liquid-label opacity-40">Không tìm thấy tài khoản phù hợp</p>
                       </div>
                     </td>
                   </tr>

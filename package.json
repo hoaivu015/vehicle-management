@@ -4,20 +4,29 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx server.ts",
-    "build": "vite build",
+    "dev": "tsx watch server.ts",
+    "build": "vite build && cp -r lading-page dist/",
     "preview": "vite preview",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit",
+    "lint": "tsc --noEmit && eslint src",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "lint:arch": "depcruise src --config .dependency-cruiser.cjs",
+    "health-check": "./scripts/check-complexity.sh",
+    "prepare": "husky"
   },
   "dependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/cli": "^8.3.1",
+    "@capacitor/core": "^8.3.1",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.3.1",
     "@google/genai": "^1.29.0",
     "@mantine/charts": "^9.0.2",
     "@mantine/core": "^9.0.2",
     "@mantine/dates": "^9.0.2",
     "@mantine/hooks": "^9.0.2",
+    "@sentry/react": "^10.53.1",
     "@supabase/supabase-js": "^2.99.3",
     "@tabler/icons-react": "^3.41.1",
     "@tailwindcss/vite": "^4.1.14",
@@ -40,8 +49,10 @@
     "lucide-react": "^0.546.0",
     "motion": "^12.23.24",
     "multer": "^2.1.1",
+    "pino": "^10.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.14.2",
     "react-use": "^17.6.0",
     "react-virtuoso": "^4.18.3",
     "recharts": "^3.7.0",
@@ -49,9 +60,14 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "vite": "^6.2.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
+    "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/cookie-session": "^2.0.49",
@@ -59,13 +75,29 @@
     "@types/helmet": "^0.0.48",
     "@types/multer": "^2.1.0",
     "@types/node": "^22.19.17",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.59.0",
+    "@typescript-eslint/parser": "^8.59.0",
     "@vitest/ui": "^4.1.5",
     "autoprefixer": "^10.4.21",
+    "dependency-cruiser": "^17.4.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "husky": "^9.1.7",
     "jsdom": "^29.0.2",
+    "lint-staged": "^16.4.0",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0",
     "vitest": "^4.1.5"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "bash -c 'tsc --noEmit'"
+    ]
   }
 }

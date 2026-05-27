@@ -1,30 +1,27 @@
+import { createValidatedRepository } from '@/src/shared/infrastructure/RepositoryFactory';
 import { supabase } from '@/src/shared/infrastructure/supabase';
 import { UserProfile, UserRepository } from '../domain/UserRepository';
+import { UserProfileSchema, UserProfileDTO } from '../domain/UserSchema';
 
 export class SupabaseUserRepository implements UserRepository {
-  async getAll(): Promise<UserProfile[]> {
-    const { data, error } = await supabase
-      .from('employees')
-      .select('*')
-      .order('id', { ascending: false });
+  private readonly TABLE = 'employees';
+  private readonly baseRepo = createValidatedRepository<UserProfile, UserProfileDTO>(this.TABLE, UserProfileSchema);
 
-    if (error) throw error;
-    return (data || []).map(u => ({ ...u, docId: u.id }));
+  async getAll(): Promise<UserProfile[]> {
+    const users = await this.baseRepo.getAll();
+    return users.map(u => ({ ...u, docId: u.id }));
   }
 
   async add(user: Partial<UserProfile>): Promise<void> {
-    const { error } = await supabase.from('employees').insert([user]);
-    if (error) throw error;
+    await this.baseRepo.create(user);
   }
 
   async update(id: string, user: Partial<UserProfile>): Promise<void> {
-    const { error } = await supabase.from('employees').update(user).eq('id', id);
-    if (error) throw error;
+    await this.baseRepo.update(id, user);
   }
 
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('employees').delete().eq('id', id);
-    if (error) throw error;
+    await this.baseRepo.delete(id);
   }
 
   subscribe(callback: (users: UserProfile[]) => void): () => void {

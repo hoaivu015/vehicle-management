@@ -144,8 +144,8 @@ async execute(request: AddVehicleRequest): Promise<Vehicle> {
   // 2. Trạng thái ban đầu LUÔN là DEPOSIT_BUY
   status: VehicleStatus.DEPOSIT_BUY,
 
-  // 3. Hoa hồng mua mặc định: 3,000,000đ (nếu không nhập)
-  buying_commission: request.buying_commission ?? 3_000_000,
+  // 3. Hoa hồng mua mặc định
+  buying_commission: request.buying_commission ?? 0,
 
   // 4. Khởi tạo history log đầu tiên
   history: [{ date, status: DEPOSIT_BUY, user: 'Hệ thống', note: 'Khởi tạo xe mới' }]
@@ -507,7 +507,6 @@ interface Vehicle {
   // Computed (tính trong Domain)
   profit?: number;          // Lợi nhuận tạm tính
   days?: number;            // Số ngày lưu kho
-  final_financials?: VehicleFinancialSnapshot; // Khóa khi SOLD
 }
 ```
 

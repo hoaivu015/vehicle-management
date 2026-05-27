@@ -8,8 +8,8 @@ export interface UpdateStatusRequest {
   nextStatus: VehicleStatus;
   user: string;
   note?: string;
-  updates?: Partial<any>;
-  extra?: any;
+  updates?: Partial<import('../../../shared/domain/types').Vehicle>;
+  extra?: Record<string, any>;
 }
 
 export class UpdateVehicleStatus {

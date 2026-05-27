@@ -1,4 +1,4 @@
-import { Vehicle, PaymentItem } from '../../../shared/domain/types';
+import { PaymentItem } from '../../../shared/domain/types';
 import { VehicleRepository } from '../domain/VehicleRepository';
 
 export interface AddPurchasePaymentRequest {
@@ -17,7 +17,9 @@ export class AddPurchasePayment {
       amount: request.amount,
       note: request.note,
       date: request.date || new Date().toISOString().split('T')[0],
-      receiver: request.receiver
+      receiver: request.receiver,
+      staff_id: '',
+      staff_expense_id: ''
     };
 
     if (payment.amount <= 0) throw new Error('Số tiền thanh toán phải lớn hơn 0');

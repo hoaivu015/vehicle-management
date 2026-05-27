@@ -5,8 +5,35 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
-  password?: string;
   linkedStaffCode?: string;
+  linkedfrom?: string;
+  password?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Account extends User {
+  // Account is used for authentication and user management
+}
+
+export interface Staff {
+  id: number;
+  code: string;
+  name: string;
+  role: string;
+  email: string;
+  phone?: string;
+  status: string;
+  department: string;
+  base_salary: number;
+  commission_per_car: number;
+  target: number;
+  expenses: StaffExpense[] | null;
+  paid_months: string[] | null;
+  password_hash?: string | null;
+  auth_id?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface StaffExpense {
@@ -15,104 +42,80 @@ export interface StaffExpense {
   note: string;
   date: string;
   type: 'vehicle' | 'operating';
-  vehicle_id?: number;
+  vehicleId?: number;
   vehicle_code?: string;
   category?: string;
   is_reimbursed: boolean;
-}
-
-export interface Staff {
-  id: string;
-  code: string;
-  name: string;
-  role: string;
-  base_salary: number;
-  target: number;
-  commission_per_car: number;
-  email?: string;
-  status?: string;
-  department?: string;
-  tracked_cars?: string[];
-  expenses?: StaffExpense[];
 }
 
 export interface CostItem {
   amount: number;
   note: string;
   date: string;
+  staff_id: string;
+  staff_expense_id: string;
 }
 
 export interface PaymentItem extends CostItem {
-  receiver?: string;
+  receiver: string;
 }
 
 export interface VehicleHistoryEntry {
   date: string;
   status: VehicleStatus;
   user: string;
-  note?: string;
-}
-
-export interface VehicleFinancialSnapshot {
-  grossProfit: number;
-  netProfit: number;
-  showroomProfitShare: number;
-  partnerProfitShare: number;
-  buyingCommission: number;
-  sellingCommission: number;
-  totalInvestment: number;
-  lockedAt: string;
+  note: string;
 }
 
 export interface Vehicle {
   id: number;
-  code: string;
   name: string;
-  year: number;
+  code: string;
+  license_plate?: string;
+  battery_type?: string;
+  show_on_landing?: boolean;
   status: VehicleStatus;
+  year: string;
+  odo?: number;
+  color?: string;
+  image_url: string;
+  images: string[] | null;
   purchase_price: number;
   purchase_date: string;
-  buyer: string; // Staff code (mã NV nhập xe, e.g. NV01 — không dùng email)
-  buyer_name?: string;
-  
-  sale_price?: number;
+  sale_price: number;
   sale_date?: string;
-  seller?: string; // Staff code (mã NV bán xe, e.g. NV02 — không dùng email)
+  expected_profit?: number;
+  profit?: number;
+  total_cost?: number;
+  days?: number;
+  is_pinned: boolean;
+  is_coinvested: boolean;
+  coinvestor_code?: string;
+  coinvest_amount?: number;
+  
+  cost_history: CostItem[] | null;
+  purchase_paid_amount?: number;
+  purchase_payment_history: PaymentItem[] | null;
+  received_amount?: number;
+  sale_payment_history: PaymentItem[] | null;
+  history: VehicleHistoryEntry[] | null;
+  notes?: string;
+  
+  buyer?: string;
+  buyer_name?: string;
+  customer_name?: string;
+  seller?: string;
   seller_name?: string;
   commission?: number;
   buying_commission?: number;
-  
-  total_cost: number;
-  cost_history: CostItem[];
-  
-  is_coinvested: boolean;
-  coinvestor_code?: string;
-  coinvest_amount: number;
-  
-  image_url?: string;
-  images?: string[];
-  notes?: string;
-  
-  // New fields for purchase lifecycle
-  purchase_paid_amount?: number;
-  purchase_payment_history?: PaymentItem[];
-  
-  // New fields for sale lifecycle
-  received_amount?: number;
-  sale_payment_history?: PaymentItem[];
-  
-  // History for status changes
-  history?: VehicleHistoryEntry[];
-  
-  // Additional vehicle details
-  odo?: number;
-  color?: string;
-  
-  // Derived fields (Calculate in Domain Logic)
-  profit?: number;
-  days?: number;
-  is_pinned?: boolean;
-  final_financials?: VehicleFinancialSnapshot;
+  buying_bonus?: number;
+  buying_bonus_paid?: boolean;
+
+  partner_capital_repaid?: boolean;
+  partner_profit_shared?: boolean;
+
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface OperatingExpense {
@@ -121,4 +124,31 @@ export interface OperatingExpense {
   amount: number;
   category: string;
   date: string;
+}
+
+export interface SalaryDetails {
+  base: number;
+  salesCommission: number;
+  buyingCommission: number;
+  buyingBonus: number;
+  coinvestProfitShare: number;
+  kpiBonusMultiplier: number;
+  totalCommission: number;
+  totalSalary: number;
+  soldCount: number;
+  boughtCount: number;
+  completionRate: number;
+  soldCars: Vehicle[];
+  boughtCars: Vehicle[];
+  coinvestedCars: Vehicle[];
+  totalReimbursements: number;
+  carryOverAdvances: number;
+  netSalary: number;
+  isPaid: boolean;
+  targetExpenseIds: string[];
+  targetVehicleIds: number[];
+}
+
+export interface StaffWithSalary extends Staff {
+  salaryDetails: SalaryDetails;
 }

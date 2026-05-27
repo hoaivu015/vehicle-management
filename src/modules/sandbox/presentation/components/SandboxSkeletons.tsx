@@ -1,5 +1,4 @@
-import React from 'react';
-import { Skeleton } from '@/src/components/Skeleton';
+import { Skeleton } from '@/src/shared/design-system/Skeleton';
 
 export const SandboxSkeletons = () => (
   <section className="section-card mt-8">

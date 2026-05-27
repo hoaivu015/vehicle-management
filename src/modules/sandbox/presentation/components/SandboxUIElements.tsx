@@ -1,8 +1,7 @@
-import React from 'react';
 import { Plus, Save, Trash2, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 
-export const SandboxButtons = () => (
+export const SandboxUIElements = () => (
   <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-8">
     <section className="section-card">
       <h2 className="text-xl font-black text-kraft-ink mb-8 flex items-center gap-2"><div className="w-2 h-6 bg-kraft-accent rounded-full" />Liquid Buttons</h2>

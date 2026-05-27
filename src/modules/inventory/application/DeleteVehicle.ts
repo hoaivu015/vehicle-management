@@ -1,5 +1,5 @@
 import { VehicleRepository } from '../domain/VehicleRepository';
-import { VehicleStorageRepository } from '../infrastructure/SupabaseVehicleStorageRepository';
+import { VehicleStorageRepository } from '../domain/VehicleStorageRepository';
 
 export class DeleteVehicle {
   constructor(

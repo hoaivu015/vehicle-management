@@ -1,7 +1,10 @@
-import React from 'react';
 import { Package, Search, Calendar, Plus, Filter, X } from 'lucide-react';
-import { cn } from '@/src/utils/cn';
+import { motion } from 'motion/react';
+import { cn } from '@/src/shared/utils/cn';
 import { PERMISSIONS } from '@/src/constants';
+import { INVENTORY_CONSTANTS } from '@/src/shared/domain/constants';
+import { BaseInput } from '@/src/shared/design-system/FormElements';
+import { SlidingPillSwitcher } from '@/src/shared/design-system/Buttons';
 
 interface InventoryHeaderProps {
   searchQuery: string;
@@ -15,7 +18,11 @@ interface InventoryHeaderProps {
   hasPermission: (p: string) => boolean;
   filterCriteria?: string;
   onClearFilter?: () => void;
+  isCompact?: boolean;
+  setIsCompact?: (val: boolean) => void;
 }
+
+
 
 export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
   searchQuery,
@@ -28,7 +35,9 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
   setIsAddOpen,
   hasPermission,
   filterCriteria = 'ALL',
-  onClearFilter
+  onClearFilter,
+  isCompact,
+  setIsCompact
 }) => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-8 border-b border-black/5 pb-8 md:pb-10 relative z-30">
@@ -39,16 +48,16 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
           </div>
           Kho xe
         </h2>
-        <p className="text-sub-label !text-kraft-ink/60 mt-3 flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-kraft-accent animate-pulse" />
-          Vòng đời: Cọc mua → Spa → Sẵn sàng kinh doanh
+        <p className="text-sub-label !text-kraft-ink/40 mt-3 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-income opacity-30" />
+          Hệ thống quản trị kho xe & dòng tiền tập trung
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 w-full md:w-auto justify-center lg:justify-end">
+      <div className="flex flex-wrap items-center gap-4 w-full md:w-auto justify-start lg:justify-end">
         {/* Search Bar */}
         <div className="relative group min-w-[220px] md:w-64">
-          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-kraft-accent/60 group-hover:text-kraft-accent transition-colors">
+          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-kraft-accent/60 group-focus-within:text-kraft-accent transition-colors">
             <Search size={16} />
           </div>
           <input
@@ -60,54 +69,85 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
               setSearchQuery(val);
               onSearch(val);
             }}
-            className="pl-12 pr-6 h-14 w-full bg-white/40 backdrop-blur-md rounded-2xl border border-white/60 text-[11px] font-black uppercase tracking-widest text-kraft-ink placeholder:text-kraft-ink/20 focus:border-kraft-accent/40 focus:ring-4 focus:ring-kraft-accent/5 transition-all outline-none shadow-sm"
+            className="pl-12 pr-6 h-14 w-full glass-surface !rounded-t2 text-[11px] font-black uppercase tracking-widest text-kraft-ink placeholder:text-kraft-ink/20 focus:border-kraft-accent/40 focus:ring-4 focus:ring-kraft-accent/5 transition-all outline-none"
           />
+        </div>
+
+        {/* Compact Toggle - Desktop Only */}
+        <div className="hidden md:flex">
+          <SlidingPillSwitcher isCompact={isCompact || false} onChange={setIsCompact || (() => {})} />
         </div>
 
         {/* Month Picker - ONLY SHOW FOR SOLD TAB */}
         {activeTab === 'SOLD' && (
-          <div className="relative group min-w-[220px] md:w-60 animate-in fade-in zoom-in slide-in-from-right-4 duration-500">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-kraft-accent/60 group-hover:text-kraft-accent transition-colors">
-              <Calendar size={16} />
-            </div>
-            <input
+          <div className="min-w-[220px] md:w-60 animate-in fade-in slide-in-from-right-4 duration-500">
+            <BaseInput
               type="month"
               value={soldMonth}
               onChange={(e) => setSoldMonth(e.target.value)}
-              className="pl-12 pr-6 h-14 w-full bg-white/40 backdrop-blur-md rounded-2xl border border-white/60 text-[11px] font-black uppercase tracking-widest text-kraft-ink focus:border-kraft-accent/40 focus:ring-4 focus:ring-kraft-accent/5 transition-all outline-none shadow-sm"
+              icon={Calendar}
             />
           </div>
         )}
 
-        <div className="flex bg-white/40 backdrop-blur-2xl p-1 rounded-full border border-white/60 shadow-lg scale-95 sm:scale-100">
-          <button
+        <div className="flex glass-surface p-1 !rounded-full shadow-kraft-deep relative">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={() => setActiveTab('AVAILABLE')}
             className={cn(
-              "px-4 md:px-6 py-2 rounded-full text-sub-label transition-all duration-500",
-              activeTab === 'AVAILABLE' ? "bg-black text-white shadow-xl scale-105" : "text-kraft-ink/60 hover:text-kraft-ink"
+              "relative px-4 md:px-6 py-2 rounded-full text-sub-label transition-all duration-500 cursor-pointer",
+              activeTab === 'AVAILABLE' ? "text-white font-black scale-105" : "text-kraft-ink/60 hover:text-kraft-ink"
             )}
           >
-            Trong kho
-          </button>
-          <button
+            {activeTab === 'AVAILABLE' && (
+              <motion.div 
+                layoutId="inventoryWebTabPill"
+                className="absolute inset-0 bg-black rounded-full shadow-xl z-0"
+                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">Trong kho</span>
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={() => setActiveTab('SOLD')}
             className={cn(
-              "px-4 md:px-6 py-2 rounded-full text-sub-label transition-all duration-500",
-              activeTab === 'SOLD' ? "bg-emerald-600 text-white shadow-2xl scale-105" : "text-kraft-ink/60 hover:text-kraft-ink"
+              "relative px-4 md:px-6 py-2 rounded-full text-sub-label transition-all duration-500 cursor-pointer",
+              activeTab === 'SOLD' ? "text-white font-black scale-105" : "text-kraft-ink/60 hover:text-kraft-ink"
             )}
           >
-            Đã bán
-          </button>
+            {activeTab === 'SOLD' && (
+              <motion.div 
+                layoutId="inventoryWebTabPill"
+                className="absolute inset-0 bg-income rounded-full shadow-2xl z-0"
+                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">Đã bán</span>
+          </motion.button>
         </div>
 
         {hasPermission(PERMISSIONS.EDIT_INVENTORY) && (
-          <button
-            onClick={() => setIsAddOpen(true)}
-            className="w-12 h-12 liquid-button-primary p-0 flex items-center justify-center shrink-0 rounded-full hover:rotate-90 transition-transform duration-500 shadow-xl"
-            title="Nhập xe mới"
-          >
-            <Plus size={24} strokeWidth={3} />
-          </button>
+          <>
+            {/* Desktop Button */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsAddOpen(true)}
+              className="hidden md:flex w-14 h-14 liquid-button-primary p-0 items-center justify-center shrink-0 rounded-full hover:rotate-90 transition-all duration-500 shadow-kraft-deep"
+              title="Nhập xe mới"
+            >
+              <Plus size={24} strokeWidth={3} />
+            </motion.button>
+
+            {/* Mobile FAB */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsAddOpen(true)}
+              className="md:hidden fixed bottom-28 right-6 w-16 h-16 bg-kraft-accent text-white flex items-center justify-center rounded-full shadow-kraft-deep z-[60] transition-all"
+            >
+              <Plus size={32} strokeWidth={3} />
+            </motion.button>
+          </>
         )}
       </div>
 
@@ -116,7 +156,7 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
         <div className="absolute -bottom-6 left-0 flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-kraft-accent/10 border border-kraft-accent/20 rounded-full text-[10px] font-black uppercase tracking-widest text-kraft-accent">
             <Filter size={12} strokeWidth={3} />
-            <span>Đang lọc: {filterCriteria === 'AGING_25' ? 'Xe tồn kho > 25 ngày' : filterCriteria}</span>
+            <span>Đang lọc: {filterCriteria === 'AGING_25' ? `Xe tồn kho > ${INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS} ngày` : filterCriteria}</span>
             <button 
               onClick={onClearFilter}
               className="ml-1 p-0.5 hover:bg-kraft-accent/20 rounded-full transition-colors"

@@ -1,14 +1,13 @@
-export interface UserProfile {
-  id: string;
-  docId?: string;
-  name: string;
-  email: string;
-  role: string;
-  code: string;
-  password?: string;
-  phone?: string;
-  join_date?: string;
-  department?: string;
+import { Database } from '@/src/shared/domain/database.types';
+
+type DBUser = Database['public']['Tables']['users']['Row'];
+
+/**
+ * UserProfile represents the domain model for a user, 
+ * strictly synced with the database 'users' table.
+ */
+export interface UserProfile extends DBUser {
+  docId?: string; // Legacy ID if needed
 }
 
 export interface UserRepository {

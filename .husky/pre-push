@@ -1,0 +1,7 @@
+#!/bin/sh
+
+echo "🛡️  Đang kiểm tra bảo mật dependencies (npm audit)..."
+npm audit --audit-level=high
+
+echo "🔍  Đang kiểm tra lệch pha Database (Migration Drift Check)..."
+node scripts/check-migration-drift.cjs

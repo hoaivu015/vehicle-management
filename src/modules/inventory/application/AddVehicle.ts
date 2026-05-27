@@ -1,100 +1,96 @@
-import { Vehicle, CostItem } from '../../../shared/domain/types';
+import { Vehicle } from '../../../shared/domain/types';
 import { VehicleRepository } from '../domain/VehicleRepository';
 import { VehicleStatus } from '../../../shared/domain/constants';
+import { CreateVehicleSchema, CreateVehicleInput } from '../domain/VehicleSchema';
+import { VehicleCodeGenerator } from '../domain/services/VehicleCodeGenerator';
 
-export interface AddVehicleRequest {
-  // code được hệ thống tự sinh — không nhận từ form
-  name: string;
-  year: number;
-  odo?: number;
-  color?: string;
-  purchase_price: number;
-  purchase_date: string;
-  buyer: string;
-  image_url?: string;
-  is_coinvested: boolean;
-  coinvestor_code?: string;
-  coinvest_amount?: number;
-  notes?: string;
-  buying_commission?: number;
-}
+export type AddVehicleRequest = CreateVehicleInput;
 
 export class AddVehicle {
-  constructor(private readonly repository: VehicleRepository) {}
+  constructor(
+    private readonly repository: VehicleRepository,
+    private readonly codeGenerator: VehicleCodeGenerator
+  ) {}
 
   async execute(request: AddVehicleRequest): Promise<Vehicle> {
-    // Validation
-    if (request.is_coinvested && (request.coinvest_amount || 0) > request.purchase_price) {
+    // L6: Zod Boundary - Validation
+    const validatedRequest = CreateVehicleSchema.parse(request);
+
+    if (validatedRequest.is_coinvested && (validatedRequest.coinvest_amount || 0) > validatedRequest.purchase_price) {
       throw new Error('Số tiền góp vốn không được lớn hơn giá mua xe.');
     }
 
-    let code: string | undefined = undefined;
+    let attempts = 0;
+    const maxAttempts = 3;
+    let lastError: any;
 
-    // 1. Tạo mã xe tự động nếu chưa có (Định dạng VH-YYMM-NN)
-    if (!code) {
-      const now = new Date();
-      const yy = now.getFullYear().toString().slice(-2);
-      const mm = (now.getMonth() + 1).toString().padStart(2, '0');
-      const prefix = `VH-${yy}${mm}-`;
+    while (attempts < maxAttempts) {
+      try {
+        const code = await this.codeGenerator.generate(new Date());
 
-      const allCars = await this.repository.getAll();
-      const codesInMonth = allCars
-        .map(c => c.code)
-        .filter(code => code?.startsWith(prefix));
+        const newVehicle: Omit<Vehicle, 'id'> = {
+          code,
+          name: validatedRequest.name,
+          year: validatedRequest.year,
+          status: VehicleStatus.DEPOSIT_BUY,
+          purchase_price: validatedRequest.purchase_price,
+          purchase_date: validatedRequest.purchase_date,
+          buyer: validatedRequest.buyer,
+          odo: validatedRequest.odo,
+          color: validatedRequest.color,
+          image_url: validatedRequest.image_url,
+          is_coinvested: validatedRequest.is_coinvested,
+          coinvestor_code: validatedRequest.coinvestor_code,
+          coinvest_amount: validatedRequest.coinvest_amount,
+          notes: validatedRequest.notes,
+          buying_commission: validatedRequest.buying_commission,
+          total_cost: 0,
+          cost_history: [],
+          purchase_paid_amount: 0,
+          purchase_payment_history: [],
+          buyer_name: '',
+          customer_name: '',
+          sale_price: 0,
+          sale_date: '',
+          seller: '',
+          seller_name: '',
+          commission: 0,
+          buying_bonus: 0,
+          buying_bonus_paid: false,
+          images: [],
+          received_amount: 0,
+          sale_payment_history: [],
+          history: [],
+          profit: 0,
+          days: 0,
+          is_pinned: false,
+          partner_capital_repaid: false,
+          partner_profit_shared: false
+        };
 
-      let nextNN = 1;
-      if (codesInMonth.length > 0) {
-        const numbers = codesInMonth
-          .map(code => {
-            const parts = code.split('-');
-            const lastPart = parts[parts.length - 1];
-            return parseInt(lastPart);
-          })
-          .filter(n => !isNaN(n));
-        
-        if (numbers.length > 0) {
-          nextNN = Math.max(...numbers) + 1;
+        const historyEntry = {
+          date: validatedRequest.purchase_date,
+          status: VehicleStatus.DEPOSIT_BUY,
+          user: 'Hệ thống',
+          note: 'Khởi tạo xe mới (Cọc mua)'
+        };
+
+        return await this.repository.create({
+          ...newVehicle,
+          history: [historyEntry]
+        });
+      } catch (error: any) {
+        lastError = error;
+        // Lỗi 23505 (Postgres) hoặc 409 (HTTP Conflict) là trùng mã xe
+        if (error.code === '23505' || error.status === 409 || error.code === '409') {
+          attempts++;
+          console.log(`[AddVehicle] Phát hiện trùng mã xe, đang thử lại lần ${attempts}...`);
+          continue;
         }
+        throw error;
       }
-      
-      code = `${prefix}${nextNN.toString().padStart(2, '0')}`;
     }
 
-    const newVehicle: Omit<Vehicle, 'id'> = {
-      code,
-      name: request.name,
-      year: request.year,
-      status: VehicleStatus.DEPOSIT_BUY, // Luôn bắt đầu từ Cọc mua theo yêu cầu
-      purchase_price: request.purchase_price,
-      purchase_date: request.purchase_date,
-      buyer: request.buyer,
-      odo: request.odo,
-      color: request.color,
-      image_url: request.image_url,
-      is_coinvested: request.is_coinvested,
-      coinvestor_code: request.coinvestor_code,
-      coinvest_amount: request.coinvest_amount || 0,
-      notes: request.notes,
-      buying_commission: request.buying_commission !== undefined ? request.buying_commission : 3000000,
-      total_cost: 0,
-      cost_history: [],
-      purchase_paid_amount: 0,
-      purchase_payment_history: [],
-    };
-
-    // Khởi tạo lịch sử
-    const historyEntry = {
-      date: request.purchase_date,
-      status: VehicleStatus.DEPOSIT_BUY,
-      user: 'Hệ thống',
-      note: 'Khởi tạo xe mới (Cọc mua)'
-    };
-
-    const savedVehicle = await this.repository.create({
-      ...newVehicle,
-      history: [historyEntry]
-    } as any);
-
-    return savedVehicle;
+    throw lastError;
   }
 }

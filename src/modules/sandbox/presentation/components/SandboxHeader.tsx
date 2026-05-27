@@ -1,4 +1,3 @@
-import React from 'react';
 import { Beaker, Plus } from 'lucide-react';
 
 export const SandboxHeader = ({ onOpenModal }: { onOpenModal: () => void }) => (

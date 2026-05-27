@@ -263,16 +263,7 @@ private async _applyStatusTransition(id, nextStatus, updates, historyEntry) {
     finalUpdates.seller_name = await this._getStaffName(updates.seller);
   }
 
-  // B6: Khóa snapshot tài chính khi xe chuyển sang SOLD
-  if (nextStatus === VehicleStatus.SOLD) {
-    updateData.final_financials = {
-      grossProfit, netProfit, showroomProfitShare, partnerProfitShare,
-      buyingCommission, sellingCommission, totalInvestment,
-      lockedAt: new Date().toISOString()  // Timestamp khóa vĩnh viễn
-    };
-  }
-
-  // B7: Ghi vào DB (gộp resets + updates + status + history + financials)
+  // B6: Ghi vào DB (gộp resets + updates + status + history)
   await supabase.from('vehicles').update({
     ...resets, ...finalUpdates,
     status: nextStatus,
@@ -310,24 +301,16 @@ Khi xe về `IN_STOCK`, `SPA`, hoặc `DEPOSIT_BUY`, các trường bán hàng b
 
 ---
 
-## 6. Snapshot Tài Chính Khi Bán (Final Financials)
+## 6. Lợi Nhuận Gộp & Ròng (Real-time Dynamic Calculation)
 
-Khi xe chuyển sang `SOLD`, hệ thống **khóa vĩnh viễn** một snapshot tài chính tại thời điểm đó vào trường `final_financials` (JSONB):
+Hệ thống Auto-28 **không** lưu trữ trạng thái tài chính tĩnh của xe. Thay vì dùng snapshot `final_financials` cũ, mọi chỉ số tài chính của xe đều được tính toán **động và nhất quán** theo thời gian thực tại `src/shared/utils/vehicle_calculations.ts`.
 
-```ts
-interface VehicleFinancialSnapshot {
-  grossProfit: number;          // Lãi gộp
-  netProfit: number;            // Lãi ròng
-  showroomProfitShare: number;  // Phần lợi nhuận showroom
-  partnerProfitShare: number;   // Phần lợi nhuận đối tác
-  buyingCommission: number;     // Hoa hồng mua
-  sellingCommission: number;    // Hoa hồng bán
-  totalInvestment: number;      // Tổng vốn đầu tư
-  lockedAt: string;             // ISO timestamp khi khóa
-}
-```
+Khi xe chuyển sang `SOLD`, lợi nhuận được tính toán động từ:
+- `sale_price` (Giá chốt bán)
+- `purchase_price` + `total_cost` (Giá nhập + Tổng chi phí Spa)
+- Các khoản hoa hồng (`buying_commission`, `commission`) và thưởng mua (`buying_bonus`).
 
-Snapshot này được dùng bởi module Finance và Staff để báo cáo chính xác, không bị thay đổi kể cả khi admin sửa giá sau đó.
+Lợi nhuận được dùng bởi module Finance và Staff để báo cáo luôn chính xác và nhất quán.
 
 ---
 

@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import { Repository } from '../domain/Repository';
 
-export abstract class SupabaseRepository<T extends { id: any }> implements Repository<T> {
+export abstract class SupabaseRepository<T extends { id: string | number }> implements Repository<T> {
   constructor(protected readonly tableName: string) {}
 
   async getAll(): Promise<T[]> {

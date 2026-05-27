@@ -1,0 +1,39 @@
+src/App.tsx(144,11): error TS2353: Object literal may only specify known properties, and 'titleClassName' does not exist in type 'ToastOptions'.
+src/modules/finance/presentation/FinancePresenter.ts(120,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '{ name: string; amount: number; date: string; type: "vehicle" | "operating"; category: string; staffId?: string | number | undefined; vehicleId?: string | number | undefined; note?: string | undefined; }'.
+src/modules/personal/presentation/PersonalMobileView.tsx(2,107): error TS6133: 'ArrowUpRight' is declared but its value is never read.
+src/modules/personal/presentation/PersonalMobileView.tsx(2,121): error TS6133: 'ArrowDownLeft' is declared but its value is never read.
+src/modules/personal/presentation/PersonalMobileView.tsx(222,108): error TS2322: Type 'Dispatch<SetStateAction<{ name: string; phone: string; department: string; }>>' is not assignable to type '(data: { name: string; phone: string; }) => void'.
+  Types of parameters 'value' and 'data' are incompatible.
+    Type '{ name: string; phone: string; }' is not assignable to type 'SetStateAction<{ name: string; phone: string; department: string; }>'.
+      Property 'department' is missing in type '{ name: string; phone: string; }' but required in type '{ name: string; phone: string; department: string; }'.
+src/modules/personal/presentation/PersonalMobileView.tsx(230,13): error TS2322: Type '(id: number, status: string, extra: Record<string, unknown>) => Promise<void | undefined>' is not assignable to type '(id: number, nextStatus: VehicleStatus, extra?: Record<string, unknown> | undefined) => Promise<void>'.
+  Types of parameters 'extra' and 'extra' are incompatible.
+    Type 'Record<string, unknown> | undefined' is not assignable to type 'Record<string, unknown>'.
+      Type 'undefined' is not assignable to type 'Record<string, unknown>'.
+src/modules/personal/presentation/PersonalMobileView.tsx(232,13): error TS2322: Type '(id: number, data: UpdateVehicleInput) => Promise<void | undefined>' is not assignable to type '(id: number, data: Partial<Vehicle>) => Promise<void>'.
+  Types of parameters 'data' and 'data' are incompatible.
+    Type 'Partial<Vehicle>' is not assignable to type '{ color?: string | undefined; history?: { date: string; status: VehicleStatus; user: string; note: string; }[] | undefined; name?: string | undefined; status?: VehicleStatus | undefined; ... 31 more ...; partner_profit_shared?: boolean | undefined; }'.
+      Types of property 'history' are incompatible.
+        Type 'VehicleHistoryEntry[] | null | undefined' is not assignable to type '{ date: string; status: VehicleStatus; user: string; note: string; }[] | undefined'.
+          Type 'null' is not assignable to type '{ date: string; status: VehicleStatus; user: string; note: string; }[] | undefined'.
+src/modules/personal/presentation/PersonalMobileView.tsx(256,58): error TS2345: Argument of type '{ amount: number; note: string; date: string; type: "vehicle" | "operating"; category: string; vehicleId?: string | number | undefined; vehicle_code?: string | undefined; }' is not assignable to parameter of type '{ id: string; amount?: number | undefined; note?: string | undefined; date?: string | undefined; type?: "vehicle" | "operating" | undefined; vehicleId?: string | number | undefined; vehicle_code?: string | undefined; category?: string | undefined; }'.
+  Property 'id' is missing in type '{ amount: number; note: string; date: string; type: "vehicle" | "operating"; category: string; vehicleId?: string | number | undefined; vehicle_code?: string | undefined; }' but required in type '{ id: string; amount?: number | undefined; note?: string | undefined; date?: string | undefined; type?: "vehicle" | "operating" | undefined; vehicleId?: string | number | undefined; vehicle_code?: string | undefined; category?: string | undefined; }'.
+src/modules/personal/presentation/PersonalMobileView.tsx(348,99): error TS2694: Namespace '"/Users/phanvu/Desktop/auto-28/src/shared/utils/finance"' has no exported member 'StaffSalaryDetails'.
+src/modules/personal/presentation/PersonalWebView.tsx(121,86): error TS2345: Argument of type '{ amount: number; note: string; date: string; type: "vehicle" | "operating"; category: string; vehicleId?: string | number | undefined; vehicle_code?: string | undefined; }' is not assignable to parameter of type '{ id: string; amount?: number | undefined; note?: string | undefined; date?: string | undefined; type?: "vehicle" | "operating" | undefined; vehicleId?: string | number | undefined; vehicle_code?: string | undefined; category?: string | undefined; }'.
+  Property 'id' is missing in type '{ amount: number; note: string; date: string; type: "vehicle" | "operating"; category: string; vehicleId?: string | number | undefined; vehicle_code?: string | undefined; }' but required in type '{ id: string; amount?: number | undefined; note?: string | undefined; date?: string | undefined; type?: "vehicle" | "operating" | undefined; vehicleId?: string | number | undefined; vehicle_code?: string | undefined; category?: string | undefined; }'.
+src/modules/personal/presentation/PersonalWebView.tsx(122,51): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
+src/modules/personal/presentation/PersonalWebView.tsx(134,13): error TS2322: Type '(id: number, status: string, extra: Record<string, unknown>) => Promise<void | undefined>' is not assignable to type '(id: number, nextStatus: VehicleStatus, extra?: Record<string, unknown> | undefined) => Promise<void>'.
+  Types of parameters 'extra' and 'extra' are incompatible.
+    Type 'Record<string, unknown> | undefined' is not assignable to type 'Record<string, unknown>'.
+      Type 'undefined' is not assignable to type 'Record<string, unknown>'.
+src/modules/personal/presentation/PersonalWebView.tsx(136,13): error TS2322: Type '(id: number, data: UpdateVehicleInput) => Promise<void | undefined>' is not assignable to type '(id: number, data: Partial<Vehicle>) => Promise<void>'.
+  Types of parameters 'data' and 'data' are incompatible.
+    Type 'Partial<Vehicle>' is not assignable to type '{ color?: string | undefined; history?: { date: string; status: VehicleStatus; user: string; note: string; }[] | undefined; name?: string | undefined; status?: VehicleStatus | undefined; ... 31 more ...; partner_profit_shared?: boolean | undefined; }'.
+      Types of property 'history' are incompatible.
+        Type 'VehicleHistoryEntry[] | null | undefined' is not assignable to type '{ date: string; status: VehicleStatus; user: string; note: string; }[] | undefined'.
+          Type 'null' is not assignable to type '{ date: string; status: VehicleStatus; user: string; note: string; }[] | undefined'.
+src/modules/personal/presentation/PersonalWebView.tsx(151,108): error TS2322: Type 'Dispatch<SetStateAction<{ name: string; phone: string; department: string; }>>' is not assignable to type '(data: { name: string; phone: string; }) => void'.
+  Types of parameters 'value' and 'data' are incompatible.
+    Type '{ name: string; phone: string; }' is not assignable to type 'SetStateAction<{ name: string; phone: string; department: string; }>'.
+      Property 'department' is missing in type '{ name: string; phone: string; }' but required in type '{ name: string; phone: string; department: string; }'.

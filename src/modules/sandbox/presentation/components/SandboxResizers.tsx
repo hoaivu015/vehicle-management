@@ -1,8 +1,8 @@
-import React from 'react';
 import { Sparkles, User } from 'lucide-react';
 import { motion } from 'motion/react';
-import { cn } from '@/src/utils/cn';
+import { cn } from '@/src/shared/utils/cn';
 import { CarCard } from '@/src/modules/inventory/presentation/components/CarCard';
+import { calculateVehicleFinancials } from '@/src/shared/utils/vehicle_calculations';
 import { StaffCard } from '@/src/modules/staff/presentation/components/StaffCard';
 import { toast } from 'sonner';
 
@@ -27,7 +27,14 @@ export const SandboxResizers = ({
         </div>
         <div className="lg:col-span-2 flex items-center justify-center bg-kraft-bg/20 rounded-[4rem] border border-dashed border-black/10 p-12 overflow-hidden min-h-[600px] relative">
           <motion.div animate={{ width: cardVariant === 'large' ? '100%' : cardWidth, maxWidth: cardVariant === 'large' ? cardWidth : 'none' }} className="shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-[3rem] overflow-hidden bg-white">
-            <CarCard car={mockVehicle} variant={cardVariant} onClick={() => toast.info('Click!')} onPin={() => toast.success('Pin!')} />
+            <CarCard 
+              car={mockVehicle} 
+              variant={cardVariant} 
+              financials={calculateVehicleFinancials(mockVehicle)}
+              canSeeFullInfo={true}
+              onClick={() => toast.info('Click!')} 
+              onPin={(_id, _pinned) => { toast.success('Pin!'); }} 
+            />
           </motion.div>
         </div>
       </div>

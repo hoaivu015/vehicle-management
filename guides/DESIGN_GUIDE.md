@@ -107,18 +107,14 @@ Hào quang Indigo là chữ ký thị giác của Auto 28, dùng để tạo đi
 | **Hiệu ứng** | `blur-3xl` | Tạo độ tỏa mịn màng |
 | **Vị trí** | `absolute -top-10 -right-10` | Nằm lệch ở góc trên bên phải |
 
-**Mẫu mã thực tế (JSX):**
-```tsx
-<div className="relative overflow-hidden ...">
-  {/* Lớp hào quang nằm dưới cùng */}
-  <div className="absolute -top-10 -right-10 w-32 h-32 bg-kraft-accent/20 rounded-full blur-3xl pointer-events-none" />
-  
-  {/* Nội dung phải có relative z-10 để nổi lên trên hào quang */}
-  <div className="relative z-10">
-     {/* Content here */}
-  </div>
-</div>
-```
+### 3.6 Enforcement Atoms (Lớp thực thi chuẩn hóa)
+
+Để tránh hiện tượng lệch lạc thiết kế (Design Drift), hệ thống cung cấp các utility class "bất biến" tại `src/index.css`. Mọi Developer **bắt buộc** sử dụng các class này thay vì viết inline Tailwind các giá trị tương đương.
+
+| Class | Thuộc tính CSS | Mục đích sử dụng |
+|:---|:---|:---|
+| `.text-liquid-label` | `text-[10px] font-black uppercase tracking-[0.2em]` | Mọi nhãn nhỏ, sub-title, thông số kỹ thuật (viết tắt của Rule #15) |
+| `.glass-purity-surface` | `bg-white/85 backdrop-blur-2xl border-white` | Các bề mặt chứa văn bản trên lớp L4 (PURITY) để đảm bảo độ tương phản |
 
 ---
 
@@ -340,17 +336,32 @@ animate={{ width: `${Math.min(completionRate, 100)}%` }}
 transition={{ duration: 1.5, ease: "circOut" }}
 ```
 
-### 6.4 Shimmer Loading Effect
+### 6.4 Shimmer Loading Effect (Skeleton Pattern)
+
+Để tránh hiện tượng nhảy bố cục (Layout Shift), Skeleton phải mô phỏng chính xác tỷ lệ của Card thực tế.
+
+**Quy tắc tính toán cho CarCard Skeleton:**
+- **Aspect Ratio**: Luôn dùng `aspect-[1.5/1]` cho vùng ảnh.
+- **Price Overlay**: Mô phỏng khối `absolute bottom-4 right-4` thay vì đặt ở giữa.
+- **Animation**: Sử dụng `animate-pulse` kết hợp với gradient shimmer để tạo cảm giác mượt mà.
+
+**Cấu trúc CSS chuẩn:**
 ```css
 .shimmer-wrapper {
   position: relative; overflow: hidden;
   background: rgba(0,0,0,0.03);
-  border-radius: 12px;
+  border-radius: var(--radius-t2);
 }
+
 .shimmer-effect {
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255,255,255,0.4) 50%, 
+    transparent 100%
+  );
   animation: shimmer 2s infinite;
 }
+
 @keyframes shimmer {
   0%   { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
@@ -427,36 +438,38 @@ Accent/Link:      text-kraft-accent (#6366f1)
 
 `/src/modules/inventory/presentation/components/CarCard.tsx`
 
-### 8.1 Cấu trúc 4 Zone
+### 8.1 Cấu trúc 4 Zone (V2.0 - Optimized)
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  Zone 1: IMAGE HEADER (aspect-[2/1])                    │
+│  Zone 1: IMAGE HEADER (aspect-[1.5/1])                  │
 │  ┌────────────────────────────────────────────────────┐ │
 │  │  [Status Badge]      [Aging Clock]  [Pin Button]   │ │
 │  │                                                    │ │
-│  │            ┌─────────────────────┐                 │ │
-│  │            │  Giá chào bán       │ (floating pill) │ │
-│  │            │  450,000,000 ₫      │                 │ │
-│  │            └─────────────────────┘                 │ │
+│  │                                 ┌──────────────────┐ │
+│  │                                 │ Giá chào bán     │ │
+│  │                                 │ 450,000,000 ₫    │ │
+│  │                                 └──────────────────┘ │
 │  └────────────────────────────────────────────────────┘ │
 │                                                         │
-│  Zone 2: PRIMARY DATA (p-8)                             │
-│  Car Name (text-2xl, uppercase, line-clamp-2)           │
-│  #CODE | 2021 | 50,000 km                              │
+│  Zone 2: PRIMARY DATA (p-6)                             │
+│  Car Name (text-xl, font-black, min-h-[2.5rem])         │
+│  #CODE | 2021 | 50,000 km (text-[11px])                 │
 │                                                         │
-│  Zone 3: FOOTER (mt-auto, border-t)                     │
-│  Thời gian lưu kho: X ngày    | Lợi nhuận ròng         │
+│  Zone 3: FOOTER (mt-auto, border-t pt-5)                │
+│  Lưu kho: X ngày    | Lợi nhuận dự tính (text-base)     │
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 8.2 Specs
-- **Kích thước fixed**: `w-full h-[450px]` (variant standard)
-- **Container class**: `liquid-glass-core overflow-hidden cursor-pointer flex flex-col bg-white rounded-t1`
-- **Shadow**: `shadow-[var(--shadow-card-industrial)]` → `hover:shadow-[var(--shadow-card-hover)]`
-- **Hover lift**: `whileHover={{ y: -12 }}` (Framer Motion)
-- **Image gradient overlay**: `bg-gradient-to-t from-black/60 via-transparent to-black/10 opacity-60`
-- **Price pill**: `bg-kraft-ink text-white rounded-full backdrop-blur-xl px-10 py-3`
+### 8.2 Specs (Updated)
+- **Kích thước**: Bỏ fixed height, tối ưu không gian tự nhiên (~380px - 410px).
+- **Aspect Ratio**: `aspect-[1.5/1]` (tăng diện tích hiển thị ảnh xe).
+- **Container class**: `liquid-glass-core overflow-hidden cursor-pointer flex flex-col bg-white rounded-t1`.
+- **Shadow**: `shadow-[var(--shadow-card-industrial)]` → `hover:shadow-[var(--shadow-card-hover)]`.
+- **Hover lift**: `whileHover={{ y: -12 }}`.
+- **Price Overlay**: Chuyển từ floating pill giữa ảnh sang **Bottom-right Overlay** để không che vật thể chính trong ảnh.
+  - Class: `px-6 py-2 bg-kraft-ink/90 backdrop-blur-md rounded-2xl`.
+- **Spacing**: Giảm padding từ `p-8` xuống `p-6` để card gọn gàng hơn.
 
 ### 8.3 Role-based Data Visibility
 Chỉ các role `ADMIN`, `ACCOUNTANT`, `MANAGER`, hoặc coinvestor mới thấy số lợi nhuận:
@@ -586,8 +599,9 @@ Dựa trên `UserRole` (từ `constants.ts`):
 5. **Physical Motion**: Nút bấm phải có `active:scale-[0.98]`. Card hover phải lift lên `y: -12`. **Không có element tĩnh hoàn toàn**.
 6. **GPU-first**: Mọi phần tử dùng `backdrop-filter` phải có `transform: translateZ(0)` và `will-change` để tránh repaint.
 7. **T1 cho container, T2 cho section, T3 cho action**: Không được đảo ngược thứ tự radius trong cùng một component.
-8. **Text contrast**: Sub-label sử dụng `opacity-60`, không được thấp hơn để đảm bảo độ sắc nét khi dùng font Mulish.
-9. **Purity Sharpness**: Mọi văn bản nằm trên lớp L4 (PURITY) phải có nền đủ đặc (`bg-white/80` trở lên) để tránh hiện tượng mờ chữ do hiệu ứng blur xuyên thấu.
+8. **Text contrast**: Sub-label sử dụng `opacity-60`, không được thấp hơn để đảm bảo độ sắc nét khi dùng font Mulish. Luôn ưu tiên dùng `.text-liquid-label`.
+9. **Purity Sharpness**: Mọi văn bản nằm trên lớp L4 (PURITY) phải có nền đủ đặc (`bg-white/85` trở lên) để tránh hiện tượng mờ chữ. Sử dụng ngay `.glass-purity-surface` cho các khối nội dung này.
+10. **Radius Enforcement**: Không sử dụng `!rounded-t1` để override Modal. Sử dụng prop `radiusTier="t1" | "t2" | "t3" | "t4"` trực tiếp trên component `<Modal>`.
 
 ---
 
@@ -599,13 +613,113 @@ Dựa trên `UserRole` (từ `constants.ts`):
 | `background: #ffffff` phẳng không blur | `bg-white/65 backdrop-blur-2xl` |
 | `font-bold` cho số liệu chính | `font-black tracking-tighter` |
 | `rounded-lg` cho Card chính | `rounded-[3rem]` (T1) |
-| `text-[9px]` cho sub-label | `text-[10px]` (Minimum Sharpness) |
-| `text-kraft-ink/30` cho nhãn | `text-kraft-ink/60` (Minimum Contrast) |
+| `text-[9px]` cho sub-label | `.text-liquid-label` (10px Sharpness) |
+| `text-kraft-ink/30` cho nhãn | `opacity-60` (Minimum Contrast) |
+| `bg-white/40` cho khối văn bản | `.glass-purity-surface` (Contrast Guard) |
 | Màu `green` thô cho lợi nhuận | `text-emerald-600` |
 | Thiếu `transition-all` trên interactive element | `transition-all duration-300` (tối thiểu) |
 | Hardcode shadow `box-shadow: 0 4px 6px #000` | `shadow-[var(--shadow-card-industrial)]` |
 
 ---
 
-*Cập nhật lần cuối: Đồng bộ từ codebase Auto28 — tháng 4/2026*
-*Phiên bản: Liquid Glass 2.0 | Tác giả: Auto28 Dev Team*
+## 16. Tiêu chuẩn Kỹ thuật (Engineering Standards)
+
+Để đảm bảo hệ thống vận hành bền vững (Resilience), mọi Developer phải tuân thủ các quy tắc lập trình sau:
+
+### 16.1 Ngăn chặn "Nút bấm chết" (No Silent Failures)
+
+Tuyệt đối **không sử dụng `any`** cho các thuộc tính (props) của Component, đặc biệt là các hàm xử lý hành động (Callback functions).
+
+*   **Quy tắc**: Mọi hàm xử lý như `onAdd`, `onUpdate`, `onDelete`, `onSubmit` phải được định nghĩa rõ ràng trong Interface và đánh dấu là **bắt buộc** (required).
+*   **Lý do**: Để TypeScript có thể cảnh báo ngay lập tức nếu bạn quên truyền hàm xử lý vào Modal, tránh tình trạng người dùng nhấn nút mà không có phản hồi.
+
+### 16.2 Bộ khung Modal chuẩn (Standard Modal Framework)
+
+Để đảm bảo mọi cửa sổ tương tác (Modal) đều có trải nghiệm đồng nhất, hãy sử dụng bộ khung được định nghĩa tại `src/components/Modal.tsx`.
+
+#### Cấu trúc chuẩn của một Modal:
+
+```tsx
+import { Modal, ModalBody, ModalFooter } from '@/src/components/Modal';
+
+export const MyActionModal = ({ isOpen, onClose, onSubmit, isSubmitting }) => (
+  <Modal isOpen={isOpen} onClose={onClose} title="Tiêu đề Modal" maxWidth="md">
+    <form onSubmit={onSubmit}>
+      <ModalBody>
+        {/* Nội dung form, các trường input nằm ở đây */}
+        <div className="space-y-4">
+           <label>Tên trường</label>
+           <input className="liquid-input" />
+        </div>
+      </ModalBody>
+      
+      <ModalFooter 
+        onCancel={onClose} 
+        onSubmit={onSubmit}
+        isSubmitting={isSubmitting}
+        submitLabel="Xác nhận"
+        error={null} // Truyền chuỗi thông báo lỗi nếu có
+      />
+    </form>
+  </Modal>
+);
+```
+
+#### Các thành phần chính:
+
+1.  **`ModalBody`**: Tự động quản lý Padding (`p-8 md:p-10`) và khoảng cách giữa các phần tử (`space-y-8`). Nó cũng hỗ trợ cuộn (scroll) nếu nội dung quá dài.
+2.  **`ModalFooter`**: Thành phần quan trọng nhất để chống "Nút bấm chết":
+    *   `onCancel`: Luôn bắt buộc để người dùng có thể thoát.
+    *   `onSubmit`: Tự động đi kèm với hiệu ứng **Spinner** khi `isSubmitting = true`.
+    *   `onDelete`: Nếu truyền vào, sẽ tự động hiển thị nút Xóa với màu đỏ cảnh báo.
+    *   `error`: Khi truyền vào một chuỗi (string), sẽ tự động hiển thị một Alert lỗi màu đỏ phía trên các nút bấm.
+
+### 16.3 Quản lý Phân lớp (Z-Index Hierarchy)
+
+Tuyệt đối không sử dụng các con số hardcode như `z-[9999]` hay `z-[100]`. Luôn sử dụng hệ thống hằng số tập trung tại `src/constants.ts`:
+
+*   **`Z_INDEX.HEADER`**: Dành cho thanh điều hướng chính.
+*   **`Z_INDEX.DROPDOWN`**: Các menu xổ xuống, gợi ý.
+*   **`Z_INDEX.MODAL`**: Lớp phủ Modal chuẩn.
+*   **`Z_INDEX.OVERLAY`**: Các lớp phủ lồng bên trong Modal (ví dụ: bộ chọn trạng thái xe).
+
+---
+
+## 17. Chính trực Dữ liệu & Tài chính (Financial Integrity)
+
+Hệ thống Auto 28 quản lý dòng tiền lớn, do đó tính chính xác của logic tài chính là ưu tiên hàng đầu. Chi tiết toàn bộ công thức được quy định tại [FINANCIAL_LOGIC_GUIDE.md](file:///Users/phanvu/Desktop/auto-28/guides/FINANCIAL_LOGIC_GUIDE.md).
+
+### 17.1 Quy tắc tính lương (Salary Calculation)
+
+Logic tính lương phải tuân thủ nghiêm ngặt mô hình bảo vệ quyền lợi nhân viên:
+*   **Công thức**: `Lương thực nhận = Lương cứng + Hoa hồng (Bán/Nhập/Góp vốn) + HOÀN ỨNG (Chi hộ)`.
+*   **Hoàn ứng**: Các khoản nhân viên chi tiền túi cho công ty (tiền Spa xe, dầu mỡ, cafe showroom...) phải được **CỘNG VÀO** lương thực nhận, không bao giờ được trừ đi. Logic này được thực thi tại `StaffSalaryService.ts`.
+
+### 17.2 Mô hình Báo cáo Lợi nhuận (Resilience Model)
+
+Để tránh sai lệch khi tính toán lợi nhuận tổng của công ty, phải tuân thủ quy tắc **Chống khấu trừ trùng (No Double-Counting)**:
+*   **Sales Income**: Được tính bằng `Gross Profit - Partner Profit Share` (Phần gộp thực hưởng của Showroom).
+*   **Company Net Profit**: `Sales Income - Tổng quỹ lương thực tế - Chi phí vận hành`.
+*   **Mục tiêu**: Đảm bảo các chi phí biến đổi như thưởng KPI (x1.2) được hạch toán chính xác vào lợi nhuận cuối cùng của công ty mà không bị trừ hai lần.
+
+### 17.3 Vòng đời Trạng thái Xe (Strict Status Workflow)
+
+Tuyệt đối không chuyển trạng thái xe sang **`SOLD`** nếu chưa nhập đầy đủ: *Giá bán thực tế, Lịch sử thu tiền, Hoa hồng và thưởng*. Hệ thống thực hiện "Chốt sổ" (Snapshot) ngay khi xe chuyển sang `SOLD` để bảo vệ tính lịch sử dữ liệu.
+
+---
+
+---
+
+## 18. Tham khảo (References)
+
+Để trau dồi thẩm mỹ và học hỏi các kỹ thuật UI cao cấp, hãy tham khảo các tài liệu thiết kế của các hệ sinh thái lớn:
+
+- [**Apple Web Design System**](../APPLE_DESIGN.md) — Bậc thầy về nhiếp ảnh sản phẩm và UI ẩn mình.
+- [**Meta Commerce Design System**](../META_DESIGN.md) — Hệ thống thương mại hiện đại, tối ưu cho phần cứng.
+- [**Clay.com Playful SaaS System**](../CLAY_DESIGN.md) — Thiết kế GTM vui nhộn với Claymation 3D và palette màu ấm.
+
+---
+
+*Cập nhật lần cuối: Đồng bộ từ codebase Auto28 — 02/05/2026*
+*Phiên bản: Liquid Glass 2.2 — "The Financial Integrity Update"*
+*Tác giả: Auto28 Dev Team & AI Architect*

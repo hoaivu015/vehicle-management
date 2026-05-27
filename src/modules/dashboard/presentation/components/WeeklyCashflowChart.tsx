@@ -6,12 +6,11 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer,
-  Legend
+  ResponsiveContainer
 } from 'recharts';
-import { formatCurrency } from '../../../../utils/currency';
+import { formatCurrency } from '@/src/shared/utils/currency';
 
-interface WeeklyData {
+export interface WeeklyData {
   name: string;
   thu: number;
   chi: number;
@@ -21,27 +20,34 @@ interface WeeklyCashflowChartProps {
   data: WeeklyData[];
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface ChartPayload {
+  value: number;
+  dataKey: string;
+  name: string;
+  payload: WeeklyData;
+}
+
+const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: ChartPayload[]; label?: string }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white/90 backdrop-blur-md p-4 border border-white/60 rounded-2xl shadow-xl">
-        <p className="text-[10px] font-black uppercase tracking-widest text-kraft-ink/40 mb-3">{label}</p>
-        <div className="space-y-2">
+      <div className="glass-surface backdrop-blur-2xl p-6 border border-white/40 rounded-t2 shadow-kraft-deep">
+        <p className="text-[10px] font-black uppercase tracking-widest text-kraft-ink/40 mb-4">{label}</p>
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <p className="text-sm font-black text-emerald-600">
+            <div className="w-2.5 h-2.5 rounded-full bg-income shadow-sm" />
+            <p className="text-xs font-black text-income uppercase tracking-tight">
               Thu: {formatCurrency(payload[0].value)}
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-kraft-accent" />
-            <p className="text-sm font-black text-kraft-accent">
+            <div className="w-2.5 h-2.5 rounded-full bg-expense shadow-sm" />
+            <p className="text-xs font-black text-expense uppercase tracking-tight">
               Chi: {formatCurrency(payload[1].value)}
             </p>
           </div>
-          <div className="pt-2 border-t border-black/5 mt-2">
-             <p className="text-[10px] font-bold uppercase text-kraft-ink/60">
-               Dòng tiền thuần: {formatCurrency(payload[0].value - payload[1].value)}
+          <div className="pt-3 border-t border-hairline-soft mt-3">
+             <p className="text-[10px] font-black uppercase tracking-widest text-kraft-ink/60">
+               Dòng tiền thuần: <span className="text-kraft-ink">{formatCurrency(payload[0].value - payload[1].value)}</span>
              </p>
           </div>
         </div>
@@ -83,7 +89,7 @@ export const WeeklyCashflowChart: React.FC<WeeklyCashflowChartProps> = ({ data }
             tick={{ fontSize: 10, fontWeight: 900, fill: '#1a1a1a66' }}
             tickFormatter={(value) => `${(value / 1000000).toFixed(0)}tr`}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0,0,0,0.05)', strokeWidth: 1 }} />
           <Area 
             type="monotone" 
             dataKey="thu" 
@@ -92,6 +98,7 @@ export const WeeklyCashflowChart: React.FC<WeeklyCashflowChartProps> = ({ data }
             fillOpacity={1} 
             fill="url(#colorThu)" 
             animationDuration={1500}
+            activeDot={{ r: 6, strokeWidth: 0, fill: '#10b981' }}
           />
           <Area 
             type="monotone" 
@@ -101,7 +108,7 @@ export const WeeklyCashflowChart: React.FC<WeeklyCashflowChartProps> = ({ data }
             fillOpacity={1} 
             fill="url(#colorChi)" 
             animationDuration={1500}
-            animationDelay={300}
+            activeDot={{ r: 6, strokeWidth: 0, fill: '#eb5e28' }}
           />
         </AreaChart>
       </ResponsiveContainer>

@@ -1,0 +1,38 @@
+# Node modules and build outputs
+node_modules
+dist
+build
+
+# Mobile platforms and native assets (prevents Vercel uploading Xcode DerivedData and Android Gradle files)
+ios/
+android/
+capacitor.config.ts
+
+# Agent-specific directories
+.agent/
+.agents/
+
+# Environment files
+.env
+.env.local
+.env*.local
+
+# Tests and reports
+test-results/
+playwright-report/
+coverage/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+ts_errors.txt
+tsc_output.txt
+*.csv
+*.xlsx
+.git/
+.github/
+.husky/
+.vercel/

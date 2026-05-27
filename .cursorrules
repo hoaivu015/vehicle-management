@@ -1,0 +1,195 @@
+# 🛡️ CẨM NĂNG SỬ DỤNG HỆ THỐNG SKILLS PHÁT TRIỂN CAO CẤP — AUTO 28 SHOWROOM MANAGER
+
+> [!IMPORTANT]
+> **💥 CHỈ THỊ KÍCH HOẠT ĐẶC BIỆT (`/0`)**: 
+> Khi người dùng bắt đầu hoặc kèm theo lệnh `/0` trong câu hỏi, tôi **BẮT BUỘC** phải chuyển sang **Chế độ Siêu Tư Duy & Phân Tích Hệ Thống Sâu**.
+> Ở chế độ này, tôi sẽ:
+> 1. Không viết code hoặc đưa ra câu trả lời vội vã ngay lập tức.
+> 2. Tự động kích hoạt chuỗi suy nghĩ mở rộng (Extended Thinking): Áp dụng `Thinking Protocol` để phân tích rủi ro & phân rã task nguyên tử, sử dụng `Counterfactual Reasoning` (lập luận phản thực) so sánh ít nhất 2 phương án, thực hiện `5 Whys` nếu có bug, thiết kế chuẩn `Clean Surgical NextJS` và tối ưu `Design System 2.0` cùng `iPhone Native UI`.
+> 3. Trình bày chi tiết tiến trình tư duy và phân tích hệ thống sâu sắc trước khi thực hiện hành động.
+
+Chào mừng bạn đến với **Cẩm nang Vận hành Kỹ thuật** của hệ sinh thái **Auto 28**. Tài liệu này được biên soạn dựa trên 10 core skills hiện có tại thư mục `.agent/skills/`, nhằm hướng dẫn chi tiết cách tôi (AI Assistant) phân tích, xử lý và phản hồi các câu hỏi hoặc nhiệm vụ lập trình của bạn một cách tối ưu nhất.
+
+
+Tài liệu này đóng vai trò như một **bản đồ hướng dẫn** giúp bạn biết cách đặt câu hỏi, ra lệnh (trigger) để tận dụng tối đa năng lực tư duy cấp cao, phân tích phản thực, chẩn đoán tận gốc và thiết kế giao diện chuẩn Apple Native của tôi.
+
+---
+
+## 🗺️ BẢN ĐỒ TỔNG QUAN 10 CORE SKILLS
+
+Hệ thống kỹ năng của tôi được chia thành 3 nhóm năng lực cốt lõi để bảo vệ tính toàn vẹn hệ thống (**System Integrity**):
+
+```mermaid
+graph TD
+    %% Nhóm Tư duy & Lập kế hoạch
+    subgraph "🧠 NHÓM TƯ DUY & LẬP KẾ HOẠCH"
+        TP["Thinking Protocol & Task Decomposition"]
+        CR["Counterfactual Reasoning (Lập luận phản thực)"]
+        RC["Deep Root Cause Analysis (5 Whys)"]
+        KP["Andrej Karpathy (Simplicity & Surgical Precision)"]
+    end
+
+    %% Nhóm Kiến trúc & Phát triển
+    subgraph "🏗️ NHÓM KIẾN TRÚC & PHÁT TRIỂN"
+        CS["Clean Surgical NextJS (Technical Constitution)"]
+        CA["Clean Architecture & MVP"]
+        DD["Domain-Driven Hexagon (DDD)"]
+        EA["Explicit Architecture"]
+    end
+
+    %% Nhóm Trải nghiệm & Thiết kế
+    subgraph "🎨 NHÓM TRẢI NGHIỆM & THIẾT KẾ"
+        DS["Design System Guide (Neural Expressive 2.0)"]
+        IP["iPhone Native UI Enforcer (Apple Standard)"]
+    end
+
+    %% Luồng phối hợp
+    TP --> CS
+    RC --> CR
+    CS --> DS
+    DS --> IP
+```
+
+---
+
+## 🛠️ CHI TIẾT TỪNG SKILL & CÚ PHÁP KÍCH HOẠT (TRIGGERS)
+
+Dưới đây là cẩm nang chi tiết cho từng skill, cách tôi tự động áp dụng và **cách bạn có thể chủ động kích hoạt** chúng để đạt hiệu quả cao nhất.
+
+### 1. 🧠 Thinking Protocol & Task Decomposition Engine
+* **Mục tiêu:** Mô phỏng tư duy mở rộng (Extended Thinking). Buộc AI phải phân tích rủi ro, phân loại độ phức tạp (Đơn giản / Trung bình / Phức tạp) và lập kế hoạch nguyên tử trước khi viết code.
+* **Quy trình hoạt động:** 
+  1. Đọc yêu cầu thực sự (ẩn ý của user).
+  2. Phân loại task $\rightarrow$ Khai báo mức độ chắc chắn (**Confidence Scale**).
+  3. Liệt kê 3 rủi ro lớn nhất.
+  4. Lên **Task Breakdown** nguyên tử (Atomic Execution - Mỗi bước chỉ chạy 1 tool đơn lẻ).
+* **Cách bạn kích hoạt:** 
+  > * Hãy phân tích rủi ro và lên kế hoạch chi tiết cho tính năng này trước khi code.
+  > * Sử dụng Thinking Protocol để bẻ nhỏ task này ra giúp tôi.
+
+---
+
+### 2. 🛡️ Clean Surgical NextJS (Unified Master Standard v4)
+* **Mục tiêu:** "Hiến pháp" kỹ thuật tối cao của Auto 28. Kết hợp kỷ luật Karpathy, Clean Architecture/MVP, Domain-Driven Hexagon, tiêu chuẩn iPhone Native, và tối ưu hóa Next.js App Router.
+* **Quy tắc bất khả xâm phạm:**
+  * **Zero Any:** Cấm tuyệt đối `any`, `as any`, `// @ts-ignore`.
+  * **Dumb UI:** File `.tsx` chỉ render JSX, logic tính toán tài chính/mutations phải nằm trong Presenter (Custom Hook).
+  * **Zod Boundary:** Mọi dữ liệu đi vào hệ thống phải được parse an toàn qua Zod.
+  * **State Machine Gateway:** Mọi thay đổi trạng thái xe bắt buộc qua `VehicleStateMachine.transition()`.
+  * **Linter Gate:** Vượt qua checklist 9 điểm trước khi phản hồi.
+* **Cách bạn kích hoạt:** 
+  > * Hãy viết tính năng này chuẩn kiến trúc Clean Surgical NextJS của dự án.
+  > * Kiểm tra xem đoạn code này có vi phạm luật Dumb UI hay Zod Boundary không.
+
+---
+
+### 3. ⚖️ Counterfactual Reasoning (Lập luận phản thực)
+* **Mục tiêu:** Ngăn chặn lỗi phổ biến nhất của AI: "chọn ngay giải pháp đầu tiên xuất hiện trong đầu". Buộc AI phải so sánh ít nhất 2-3 phương án kỹ thuật khác nhau, nêu rõ ưu/nhược điểm và lý do từ chối trước khi cam kết giải pháp.
+* **Quy trình hoạt động:**
+  * So sánh **Phương án A** (Ví dụ: Quick fix, viết thẳng vào UI) vs **Phương án B** (Tạo thêm Hook riêng) vs **Phương án C** (Giải pháp chuẩn Clean Architecture).
+  * Phân tích rủi ro và cách giảm thiểu cho phương án được chọn.
+* **Cách bạn kích hoạt:**
+  > * Đưa ra 2 phương án thiết kế kiến trúc cho tính năng này và so sánh phản thực giúp tôi.
+  > * Tại sao phương án này là tối ưu nhất? Hãy phản biện nó.
+
+---
+
+### 4. 🔍 Deep Root Cause Analysis & Fix Planning (5 Whys)
+* **Mục tiêu:** Tuyệt đối ngăn chặn hành vi "sửa lỗi bề mặt" (band-aid fixes). Khi gặp bug, AI phải áp dụng kỹ thuật **5 Whys** để chẩn đoán từ triệu chứng bề mặt xuống tận lỗi kiến trúc sâu nhất, lập **Fix Plan** chi tiết và chờ bạn duyệt mới được sửa code.
+* **Cách phản hồi chuẩn:**
+  1. Xác định triệu chứng lỗi (Symptoms).
+  2. Truy vấn chẩn đoán chuyên sâu (5 Whys).
+  3. Chỉ ra **Root Cause** thực sự.
+  4. Đề xuất **Fix Plan** từng bước và chờ xác nhận.
+* **Cách bạn kích hoạt:**
+  > * Tôi đang bị lỗi này [mô tả lỗi hoặc dán log]. Hãy chạy chẩn đoán 5 Whys và lên Fix Plan cho tôi.
+  > * Đừng sửa code vội, hãy tìm nguyên nhân gốc rễ (Root Cause) trước.
+
+---
+
+### 5. 🎨 Design System Code Guide (Neural Expressive 2.0)
+* **Mục tiêu:** Áp dụng đồng bộ ngôn ngữ thiết kế cao cấp của Auto 28: **Liquid Glassmorphism** (kính mờ đa tầng), **Spring Physics** (hoạt ảnh lò xo nảy), **Mobile Haptic Matrix** (rung vật lý di động).
+* **Quy tắc sử dụng:** Tuyệt đối không tự viết CSS inline hoặc Tailwind ad-hoc cho UI đã có component trong `src/shared/design-system/` (`BaseCard`, `BaseInput`, `DataDisplay`, `SmartAmountInput`, `BaseModal`).
+* **Cách bạn kích hoạt:**
+  > * Thiết kế form này chuẩn ngôn ngữ Neural Expressive 2.0 giúp tôi.
+  > * Hãy áp dụng các thành phần giao diện mẫu trong Design System để tạo màn hình này.
+
+---
+
+### 6. 🍎 iPhone Native UI Enforcer (Apple Standard V2.0)
+* **Mục tiêu:** Đảm bảo ứng dụng trên thiết bị di động mượt mà, trực quan như ứng dụng gốc của Apple.
+* **Tiêu chuẩn "Cứng":**
+  * **Safe Area Protection:** `env(safe-area-inset-top)` cho Notch và `env(safe-area-inset-bottom)` cho Home Indicator (không để dính chữ hay nút).
+  * **Touch Target:** Vùng chạm tương tác tối thiểu **44x44px** (`h-14` trên Tailwind).
+  * **Micro-interactions:** Hiệu ứng co giãn lò xo `active:scale-95` khi chạm.
+  * **Scoring Report:** Đánh giá UI trên thang điểm 10 sau khi hoàn thành.
+* **Cách bạn kích hoạt:**
+  > * Tối ưu hóa màn hình này cho thiết bị iPhone.
+  > * Chạy kiểm định 3 lớp iPhone Native UI và chấm điểm giao diện này.
+
+---
+
+### 7. 🚀 Andrej Karpathy Skill (Karpathy Mode)
+* **Mục tiêu:** Giảm thiểu tối đa sai sót lập trình bằng cách đề cao sự đơn giản, chính xác như phẫu thuật ngoại khoa (Surgical Precision) và chống over-engineering.
+* **Quy tắc:**
+  * **Simplicity First:** Không viết thêm tính năng hay cấu hình speculative (suy đoán) chưa được yêu cầu.
+  * **Surgical Changes:** Chỉ sửa đúng những dòng cần sửa, không lan man sang file bên cạnh. Match hoàn hảo style code hiện tại.
+* **Cách bạn kích hoạt:**
+  > * Hãy viết code theo phong cách tối giản nhất (Karpathy Mode).
+  > * Chỉ thực hiện thay đổi nội soi (surgical change) để sửa lỗi này thôi nhé.
+
+---
+
+### 8. 🏗️ Nhóm Kỹ Năng Kiến Trúc (Clean Architecture, Domain-Driven Hexagon, Explicit Architecture)
+* **Mục tiêu:** Phân tách hoàn toàn Business Logic (Domain) sạch sẽ, độc lập với DB, API, Framework, và UI.
+* **Cách áp dụng:**
+  * **Clean Architecture & MVP:** Tách luồng UI $\rightarrow$ Presenter $\rightarrow$ UseCase $\rightarrow$ Domain Entity $\rightarrow$ Repository implementation.
+  * **Hexagonal (DDD):** Sử dụng các Ports (Interface) tại tầng Application và Adapters (Supabase/Rest) tại tầng Infrastructure.
+* **Cách bạn kích hoạt:**
+  > * Thiết kế module mới này theo đúng kiến trúc Hexagonal (DDD).
+  > * Tạo Presenter và UseCase chuẩn MVP cho màn hình này.
+
+---
+
+## 🔄 LUỒNG PHỐI HỢP TOÀN DIỆN (MASTER WORKFLOW)
+
+Khi nhận được bất kỳ yêu cầu nào từ bạn, tôi sẽ tự động vận hành một **Guồng Máy Tư Duy Phối Hợp** khép kín qua các bước sau để đảm bảo chất lượng phản hồi cao nhất:
+
+```
+[Nhận Yêu Cầu] 
+      ↓
+[Phân tích Thinking Protocol] (Phân loại độ phức tạp & rủi ro)
+      ↓
+[Chẩn đoán chuyên sâu nếu có Bug] (Áp dụng 5 Whys & Xác định Root Cause)
+      ↓
+[Phân tích Phản Thực - Counterfactual] (So sánh ít nhất 2 phương án kỹ thuật)
+      ↓
+[Thiết kế giải pháp - Clean Surgical NextJS] (Phân tầng Domain -> Infra -> Presentation)
+      ↓
+[Áp dụng Design System & iPhone Native UI] (Tạo UI Squircle, mờ kính, an toàn Safe Area)
+      ↓
+[Sửa đổi Nội soi - Karpathy Mode] (Sửa code chính xác từng dòng, không lan man)
+      ↓
+[Hậu kiểm TypeScript - Linter Gate] (Chạy npx tsc --noEmit để xác minh 100% không lỗi)
+      ↓
+[Phản hồi & Báo cáo] (Trình bày tường minh bằng Tiếng Việt)
+```
+
+---
+
+## 💡 CẨM NĂNG GIAO TIẾP TỐI ƯU DÀNH CHO BẠN
+
+Để tối đa hóa sức mạnh của hệ thống kỹ năng này, dưới đây là một số mẹo nhỏ khi bạn chat với tôi:
+
+1. **Khi báo lỗi:** Hãy cung cấp log lỗi đầy đủ VÀ dán file code nghi ngờ lên chat. Sau đó gõ: `/diagnose` hoặc *"Hãy phân tích Root Cause lỗi này giúp tôi"*. Tôi sẽ tự động chạy quy trình **5 Whys** để tìm ra nguyên nhân kiến trúc gốc rễ.
+2. **Khi muốn thiết kế màn hình mới:** Hãy gõ: *"Thiết kế màn hình X theo chuẩn Neural Expressive 2.0 và tối ưu iPhone Native UI"*. Tôi sẽ tự động thiết kế giao diện lơ lửng mờ kính, nảy lò xo và an toàn safe area tuyệt đối.
+3. **Khi phân vân giải pháp:** Hãy gõ: *"Hãy so sánh phản thực (counterfactual reasoning) các phương án thiết kế cho tính năng này"*. Tôi sẽ phân tích các trade-offs kỹ lưỡng để bạn chọn lựa.
+4. **Khi cần làm việc tập trung cao độ:** Bạn có thể giới thiệu các slash commands có sẵn như:
+   - `/0`: Khi bạn muốn tôi **tự suy nghĩ và phân tích sâu** trước khi phản hồi để áp dụng toàn bộ hệ thống kỹ năng cao cấp của Auto 28.
+   - `/goal`: Khi bạn muốn tôi thực hiện một tác vụ dài hơi, tự động lập kế hoạch sâu và không dừng lại cho đến khi đạt mục tiêu 100%.
+   - `/grill-me`: Khi bạn muốn tôi "chất vấn" ngược lại bạn để làm sáng tỏ các điểm mờ trong thiết kế kiến trúc trước khi code.
+
+---
+
+> [!IMPORTANT]
+> **Tuyên ngôn Chất lượng:** Mọi dòng code được sinh ra từ guồng quay này đều phải đạt độ tin cậy tuyệt đối, nói không với code "rác" hay code chắp vá tạm thời. Hãy cùng tôi xây dựng một hệ thống **Auto 28** vững chắc và đẳng cấp!

@@ -1,0 +1,341 @@
+/* 
+    CAR SALE ESSENTIALS - PREMIER DESIGN SYSTEM 
+    Version: 1.0.0
+    Manifesto: iPhone Native, Zero-Noise, High-Density
+*/
+
+.showroom-root {
+    --primary: #003366;
+    --accent: #d32f2f;
+    --bg-main: #f4f7f6;
+    --text-main: #212121;
+    --border: #dee2e6;
+    --radius: 16px;
+    --grid-color: #e0e0e0;
+}
+
+.showroom-root * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+}
+
+.showroom-root {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    background-image: 
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 30px 30px;
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 80px 24px;
+}
+
+/* --- TYPOGRAPHY --- */
+h1, h2, h3 {
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--primary), #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* --- COMPONENTS --- */
+.glass {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    padding: 16px 32px;
+    border-radius: 100px;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 15px 30px -5px rgba(15, 23, 42, 0.4);
+}
+
+/* --- SECTIONS --- */
+
+/* HERO */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 24px 60px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.4)), url('assets/hero_guide.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.hero__content {
+    max-width: var(--container-width);
+    text-align: center;
+    animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+header {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+header h1 {
+    font-size: 3.5rem;
+    font-weight: 900;
+    margin-bottom: 24px;
+    color: var(--primary);
+    text-transform: none;
+}
+
+header p {
+    font-size: 1.5rem;
+    color: #444;
+}
+
+.doc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.original-card {
+    background: white;
+    border-radius: var(--radius);
+    border: 2px solid #000;
+    overflow: hidden;
+    box-shadow: 10px 10px 0px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    background: #e1f0ff;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 2px solid #000;
+}
+
+.card-header h2 {
+    font-size: 1.8rem;
+    color: #000;
+    margin: 0;
+}
+
+.card-content {
+    padding: 32px;
+}
+
+.card-content ul {
+    list-style: none;
+}
+
+.card-content li {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.card-content b {
+    color: #000;
+}
+
+.red-note {
+    background: #c62828;
+    color: white;
+    padding: 24px 40px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.red-note h3 {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.red-note p {
+    font-size: 1.1rem;
+    line-height: 1.4;
+}
+
+/* CLIPBOARD STYLE */
+.clipboard {
+    background: #fff;
+    max-width: 500px;
+    margin: 80px auto;
+    padding: 60px 40px;
+    border-radius: 20px;
+    border: 3px solid #333;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+}
+
+.clipboard::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 40px;
+    background: #555;
+    border-radius: 8px 8px 0 0;
+}
+
+.clip-title {
+    text-align: center;
+    font-size: 2.2rem;
+    margin-bottom: 40px;
+    color: var(--primary);
+}
+
+.clip-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 2px dashed #ddd;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #444;
+}
+
+.clip-row input {
+    width: 32px;
+    height: 32px;
+    accent-color: #f59e0b;
+}
+
+@media (max-width: 768px) {
+    .doc-grid {
+        grid-template-columns: 1fr;
+    }
+    header h1 {
+        font-size: 2.5rem;
+    }
+}
+
+.tag-original {
+    display: inline-block;
+    padding: 4px 10px;
+    background: oklch(90% 0.1 30); /* Reddish tag for importance */
+    color: oklch(40% 0.15 30);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+/* DETAILS SECTION */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.detail-box {
+    padding: 24px;
+    border-radius: var(--radius-md);
+    background: white;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.detail-box h4 {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.detail-box p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* CHECKLIST APP */
+.checklist-app {
+    margin-top: 60px;
+    padding: 40px;
+    background: var(--primary);
+    color: white;
+}
+
+.checklist-title {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.checklist-items {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.check-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer;
+}
+
+.check-row input {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    accent-color: var(--accent);
+}
+
+/* FOOTER */
+footer {
+    padding: 60px 24px;
+    text-align: center;
+    background: #0f172a;
+    color: white;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+    .hero {
+        padding-top: 80px;
+    }
+    
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+}

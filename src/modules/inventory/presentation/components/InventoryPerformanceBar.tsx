@@ -1,8 +1,8 @@
 import React from 'react';
-import { Package, Clock, DollarSign, AlertCircle } from 'lucide-react';
-import { Vehicle } from '../../../../shared/domain/types';
-import { formatCurrency } from '../../../../utils/currency';
-import { cn } from '../../../../utils/cn';
+import { Package, DollarSign, AlertCircle } from 'lucide-react';
+import { Vehicle } from '@/src/shared/domain/types';
+import { formatCurrency } from '@/src/shared/utils/currency';
+import { MetricCard } from '@/src/shared/design-system/DataDisplay';
 
 interface InventoryPerformanceBarProps {
   vehicles: Vehicle[];
@@ -30,18 +30,14 @@ export const InventoryPerformanceBar: React.FC<InventoryPerformanceBarProps> = (
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
       {stats.map((stat, i) => (
-        <div key={i} className="bg-white/40 backdrop-blur-xl border border-white/60 p-6 rounded-[2rem] shadow-sm flex items-center gap-6 group hover:bg-white/60 transition-all">
-          <div className={cn(
-            "w-14 h-14 rounded-2xl flex items-center justify-center border shadow-sm transition-transform group-hover:scale-110",
-            stat.isWarning ? "bg-red-50 border-red-100" : "bg-white border-black/5"
-          )}>
-            <stat.icon className={stat.color} size={24} />
-          </div>
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-kraft-ink/40 mb-1">{stat.label}</p>
-            <p className="text-2xl font-black text-kraft-ink tracking-tight">{stat.value}</p>
-          </div>
-        </div>
+        <MetricCard
+          key={i}
+          label={stat.label}
+          value={stat.value}
+          icon={stat.icon}
+          color={stat.color}
+          isWarning={stat.isWarning}
+        />
       ))}
     </div>
   );

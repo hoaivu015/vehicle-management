@@ -1,0 +1,11 @@
+# Connecting to Antigravity IDE...
+
+
+# Syncing...
+We're bridging the gap between your iPhone and Antigravity IDE.
+
+# Connection Required
+To continue, the Antigravity iOS App Connector must be installed in your Antigravity IDE.
+[Install Extension](https://open-vsx.org/extension/uladluch/antigravity-mobile-connector)
+[I have it installed, open IDE](antigravity://uladluch.antigravity-mobile-connector/connect?token=d9943536-11be-5e62-b682-7db217c1b5b7)
+[Having issues? Download .VSIX manually](https://open-vsx.org/extension/uladluch/antigravity-mobile-connector)

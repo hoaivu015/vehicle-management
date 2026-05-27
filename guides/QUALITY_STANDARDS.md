@@ -81,6 +81,7 @@
 ### Liquid Glass 2.0 — Component Rules
 
 - [ ] **Tuân thủ Design System:** Sử dụng chung bộ token màu sắc, typography, spacing, border-radius từ `DESIGN_GUIDE.md`. Không tự "chế" inline-css hay ad-hoc css.
+- [ ] **Enforcement Layer:** Luôn ưu tiên dùng `.text-liquid-label` cho nhãn nhỏ và `.glass-purity-surface` cho khối văn bản trên lớp L4 để đảm bảo tính nhất quán và độ sắc nét.
 - [ ] **Border-Radius Hierarchy (Golden Rule #7):**
   - Container ngoài cùng tối đa T1 (`rounded-[3rem]`).
   - Thẻ con không được vượt quá bán kính container. Không bao giờ để component con có `rounded` lớn hơn container.
@@ -96,6 +97,7 @@
 - [ ] **Motion & Micro-interaction:** Hover lift (`y: -12`), `active:scale-[0.98]` cho nút bấm, `transition-all duration-300` tối thiểu trên mọi element tương tác.
 - [ ] **Luồng thao tác minh bạch:** Người dùng biết "mình đang ở đâu, bước tiếp theo là gì".
 - [ ] **Responsive:** Không vỡ layout, không overflow-x trên màn hình nhỏ. Test tối thiểu 3 breakpoint: Mobile, Tablet, Desktop.
+- [ ] **Radius Tiering:** Sử dụng prop `radiusTier` trên `<Modal>` thay vì override CSS thủ công.
 
 ---
 

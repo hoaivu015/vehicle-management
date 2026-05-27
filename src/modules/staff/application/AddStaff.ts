@@ -1,11 +1,16 @@
 import { Staff } from '../../../shared/domain/types';
 import { StaffRepository } from '../domain/StaffRepository';
+import { AddStaffSchema, AddStaffInput } from '../domain/StaffValidation';
 
 export class AddStaff {
   constructor(private readonly repository: StaffRepository) {}
 
-  async execute(staff: Omit<Staff, 'id'> & { password?: string }): Promise<Staff> {
-    const { password, ...rest } = staff;
+  async execute(input: AddStaffInput): Promise<Staff> {
+    // L6: Zod Boundary Validation
+    const validatedData = AddStaffSchema.parse(input);
+    
+    const { password, ...rest } = validatedData;
+    
     // Helper to remove diacritics for clean staff codes
     const removeDiacritics = (str: string) => {
       return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
@@ -22,23 +27,27 @@ export class AddStaff {
       return `NV-${initials}${lastWord}`;
     };
 
-    const staffData = {
+    const staffData: Omit<Staff, 'id'> = {
       ...rest,
-      code: staff.code || generateStaffCode(staff.name),
-      status: staff.status || 'ACTIVE',
-      department: staff.department || 'Kinh doanh',
-      base_salary: staff.base_salary || 0,
-      commission_per_car: staff.commission_per_car || 0,
-      target: staff.target || 0
-    } as any;
+      email: rest.email || '',
+      code: validatedData.code || generateStaffCode(validatedData.name),
+      status: validatedData.status || 'ACTIVE',
+      department: validatedData.department || 'Kinh doanh',
+      base_salary: validatedData.base_salary || 0,
+      commission_per_car: validatedData.commission_per_car || 0,
+      target: validatedData.target || 0,
+      expenses: [],
+      paid_months: []
+    };
 
     const createdStaff = await this.repository.create(staffData);
 
     // Use system default password if not provided
     const passwordToUse = password || 'auto28';
     
-    if ((this.repository as any).registerUser) {
-      await (this.repository as any).registerUser({
+    // L1: No more 'as any' casting
+    if (this.repository.registerUser) {
+      await this.repository.registerUser({
         name: createdStaff.name,
         email: createdStaff.email,
         password: passwordToUse,

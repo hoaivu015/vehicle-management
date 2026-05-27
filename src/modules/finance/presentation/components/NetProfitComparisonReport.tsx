@@ -10,9 +10,9 @@ import {
   CircleDollarSign,
   Minus
 } from 'lucide-react';
-import { formatCurrency } from '../../../../utils/currency';
-import { cn } from '../../../../utils/cn';
-import { ProfitComparison } from '../../application/GetFinancialOverview';
+import { formatCurrency } from '@/src/shared/utils/currency';
+import { cn } from '@/src/shared/utils/cn';
+import { ProfitComparison } from '@/src/modules/finance/application/GetFinancialOverview';
 
 interface NetProfitComparisonReportProps {
   currentProfit: number;
@@ -32,12 +32,17 @@ export const NetProfitComparisonReport: React.FC<NetProfitComparisonReportProps>
   const currentMonthLabel = filterMonth.split('-')[1];
   const currentYearLabel = filterMonth.split('-')[0];
 
-  const renderComparisonItem = (label: string, data: ProfitComparison, icon: any) => {
+  const renderComparisonItem = (label: string, data: ProfitComparison, icon: React.ElementType, delay: number) => {
     const Icon = icon;
     const isNeutral = Math.abs(data.change) < 0.01;
 
     return (
-      <div className="relative group p-6 rounded-[2.5rem] bg-white/40 border border-white/60 hover:bg-white/60 transition-all duration-500 overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: 15, filter: 'blur(2px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={{ type: 'spring', stiffness: 120, damping: 18, delay }}
+        className="relative group p-6 rounded-[2.5rem] glass-purity-surface hover:bg-white/60 transition-all duration-500 overflow-hidden"
+      >
         <div className="absolute -top-6 -right-6 w-24 h-24 bg-kraft-accent/5 rounded-full blur-2xl group-hover:bg-kraft-accent/10 transition-all" />
         
         <div className="flex justify-between items-start mb-4">
@@ -45,7 +50,7 @@ export const NetProfitComparisonReport: React.FC<NetProfitComparisonReportProps>
             <Icon size={18} />
           </div>
           <div className={cn(
-            "flex items-center gap-1 px-3 py-1 rounded-full text-[9px] font-black tracking-widest uppercase",
+            "flex items-center gap-1 px-3 py-1 rounded-full text-liquid-label",
             isNeutral ? "bg-black/5 text-kraft-ink/40" : 
             data.isIncrease ? "bg-emerald-500/10 text-emerald-600" : "bg-red-500/10 text-red-600"
           )}>
@@ -55,7 +60,7 @@ export const NetProfitComparisonReport: React.FC<NetProfitComparisonReportProps>
         </div>
 
         <div className="space-y-1">
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-kraft-ink/30">{label}</p>
+          <p className="text-liquid-label">{label}</p>
           <p className={cn(
             "text-xl font-black tracking-tighter",
             data.value < 0 ? "text-red-600" : "text-kraft-ink"
@@ -63,7 +68,7 @@ export const NetProfitComparisonReport: React.FC<NetProfitComparisonReportProps>
             {formatCurrency(data.value)}
           </p>
         </div>
-      </div>
+      </motion.div>
     );
   };
 
@@ -104,11 +109,11 @@ export const NetProfitComparisonReport: React.FC<NetProfitComparisonReportProps>
              <div className="flex flex-wrap gap-4 pt-4 border-t border-black/5">
                 <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-black/5">
                   <Target size={14} className="text-kraft-accent" />
-                  <span className="text-[9px] font-black uppercase tracking-widest text-kraft-ink/60">Đã chốt sổ lương & thưởng</span>
+                  <span className="text-liquid-label">Đã chốt sổ lương & thưởng</span>
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-black/5">
                   <Layers size={14} className="text-emerald-500" />
-                  <span className="text-[9px] font-black uppercase tracking-widest text-kraft-ink/60">Dòng tiền thực thu</span>
+                  <span className="text-liquid-label">Dòng tiền thực thu</span>
                 </div>
              </div>
           </div>
@@ -122,9 +127,9 @@ export const NetProfitComparisonReport: React.FC<NetProfitComparisonReportProps>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-1 gap-6">
-            {renderComparisonItem('Tháng trước đó', comparisons.prevMonth, Calendar)}
-            {renderComparisonItem('Quý trước (3 tháng)', comparisons.prevQuarter, Layers)}
-            {renderComparisonItem('Cùng kỳ năm trước', comparisons.prevYear, History)}
+            {renderComparisonItem('Tháng trước đó', comparisons.prevMonth, Calendar, 0.35)}
+            {renderComparisonItem('Quý trước (3 tháng)', comparisons.prevQuarter, Layers, 0.45)}
+            {renderComparisonItem('Cùng kỳ năm trước', comparisons.prevYear, History, 0.55)}
           </div>
         </div>
       </div>

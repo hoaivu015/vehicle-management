@@ -4,7 +4,7 @@ import { StaffRepository } from '../domain/StaffRepository';
 export class ToggleStaffExpenseReimbursement {
   constructor(private readonly repository: StaffRepository) {}
 
-  async execute(staffId: string, expenseId: string): Promise<Staff> {
+  async execute(staffId: string | number, expenseId: string): Promise<Staff> {
     const staff = await this.repository.getById(staffId);
     if (!staff) throw new Error('Staff member not found');
 

@@ -28,7 +28,7 @@ describe('VehicleStateMachine', () => {
   describe('getFieldsToReset', () => {
     it('should return reset fields when transitioning back to IN_STOCK', () => {
       const resetFields = VehicleStateMachine.getFieldsToReset(VehicleStatus.IN_STOCK);
-      expect(resetFields).toHaveProperty('sale_date', null);
+      expect(resetFields).toHaveProperty('sale_date', undefined);
       expect(resetFields).toHaveProperty('received_amount', 0);
     });
 

@@ -1,17 +1,17 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
-import { Calendar, TrendingUp, Clock, DollarSign, CircleDollarSign, RefreshCw, X, Pin } from 'lucide-react';
+import { Calendar, Clock, CircleDollarSign, RefreshCw, Pin, Save, Edit2, TrendingUp, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Vehicle } from '@/src/shared/domain/types';
-import { VehicleStatus, UserRole } from '@/src/shared/domain/constants';
-import { cn } from '@/src/utils/cn';
-import { Z_INDEX } from '@/src/constants';
+import { Vehicle, Staff } from '@/src/shared/domain/types';
+import { VehicleStatus } from '@/src/shared/domain/constants';
+import { cn } from '@/src/shared/utils/cn';
+import { DESIGN_TOKENS } from '@/src/shared/design-system/tokens';
+import { BaseModal as Modal } from '@/src/shared/design-system/BaseModal';
+import { PermissionService } from '@/src/modules/auth/domain/PermissionService';
+import { haptics } from '@/src/shared/utils/haptics';
 
 import { VehicleSidebar } from './VehicleDetail/VehicleSidebar';
 import { InfoTab } from './VehicleDetail/InfoTab';
 import { FinancialsTab } from './VehicleDetail/FinancialsTab';
-import { PaymentsBuyTab } from './VehicleDetail/PaymentsBuyTab';
-import { PaymentsSaleTab } from './VehicleDetail/PaymentsSaleTab';
 import { HistoryTab } from './VehicleDetail/HistoryTab';
 import { StatusUpdateOverlay } from './VehicleDetail/StatusUpdateOverlay';
 import { useVehicleDetail } from './VehicleDetail/useVehicleDetail';
@@ -20,16 +20,16 @@ interface VehicleDetailModalProps {
    vehicle: Vehicle | null;
    isOpen: boolean;
    onClose: () => void;
-   onUpdateStatus: (id: number, nextStatus: VehicleStatus, extra?: any) => Promise<void>;
+   onUpdateStatus: (id: number, nextStatus: VehicleStatus, extra?: Record<string, unknown>) => Promise<void>;
    onDeleteVehicle: (id: number) => Promise<void>;
    onUpdateVehicle: (id: number, data: Partial<Vehicle>) => Promise<void>;
-   onAddCost: (vehicle: Vehicle, name: string, amount: number) => Promise<void>;
-   onDeleteCost: (vehicle: Vehicle, index: number) => Promise<void>;
-   onPin?: (id: number, isPinned: boolean) => Promise<void>;
+   onAddCost: (id: number, name: string, amount: number) => Promise<void>;
+   onDeleteCost: (id: number, index: number) => Promise<void>;
+   onPin: (id: number, isPinned: boolean) => Promise<void>;
    onAddPurchasePayment: (id: number, amount: number, note: string, receiver: string) => Promise<void>;
-   onAddSalePayment: (id: number, amount: number, note: string, receiver: string, nextStatus: VehicleStatus, seller: string, buyerName?: string, salePrice?: number, commission?: number) => Promise<void>;
+   onAddSalePayment: (id: number, amount: number, note: string, receiver: string, nextStatus: VehicleStatus, seller: string, buyerName?: string, salePrice?: number, commission?: number, buyingBonus?: number) => Promise<void>;
    onCancelSale: (id: number, userCode: string) => Promise<void>;
-   staffList: any[];
+   staffList: Staff[];
    userRole: string;
    userCode: string;
 }
@@ -38,73 +38,207 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = (props) => 
    const { vehicle, isOpen, onClose, userRole, userCode, staffList } = props;
    const {
       activeTab, setActiveTab, isUpdatingStatus, setIsUpdatingStatus, isEditing, setIsEditing,
-      editForm, setEditForm, costForm, setCostForm, paymentForm, setPaymentForm,
-      transitionStatus, setTransitionStatus, nextStatusInTab, setNextStatusInTab,
-      isSubmitting, showDeleteConfirm, setShowDeleteConfirm, showCancelSaleConfirm, setShowCancelSaleConfirm,
-      isUploadingImage, handleUpdateStatus, handleDeleteVehicle, handleUpdateVehicle, handleAddCost,
+      editForm, setEditForm, paymentForm, setPaymentForm,
+      transitionStatus, setTransitionStatus,
+      isSubmitting, showDeleteConfirm, setShowDeleteConfirm,
+      isUploadingImage, handleUpdateStatus, handleDeleteVehicle, handleAddCost,
       handleDeleteCost, handlePin, handleAddPurchasePayment, handleAddSalePayment, handleCancelSale,
       handleStartEdit, handleSaveEdit, handleImageUpload, financials
    } = useVehicleDetail(vehicle, userCode, props);
 
    if (!vehicle || !isOpen || !financials) return null;
 
-   const purchaseDebt = financials.purchasePrice - (vehicle.purchase_paid_amount || 0);
-   const saleDebt = (financials.salePrice || 0) - (vehicle.received_amount || 0);
-
-   const canSeeFullInfo = userRole === UserRole.ADMIN || userRole === UserRole.ACCOUNTANT || userRole === UserRole.MANAGER || (vehicle.is_coinvested && vehicle.coinvestor_code === userCode);
-   const isAdminOrAccountant = userRole === UserRole.ADMIN || userRole === UserRole.ACCOUNTANT;
-   const canSeeFinancials = isAdminOrAccountant || userRole === UserRole.MANAGER || (vehicle.is_coinvested && vehicle.coinvestor_code === userCode);
+   const canSeeFullInfo = PermissionService.canSeeFinancials(userRole, userCode, vehicle);
+   const isAdminOrAccountant = PermissionService.canManageVehicle(userRole);
+   const canSeeFinancials = PermissionService.canSeeFinancials(userRole, userCode, vehicle);
 
    const tabs = [
       { id: 'info', label: 'Thông số', icon: Calendar },
-      { id: 'financials', label: 'Chi phí', icon: CircleDollarSign, show: canSeeFullInfo },
-      { id: 'payments_buy', label: 'Tiền mua', icon: DollarSign, show: canSeeFullInfo && (vehicle.status === VehicleStatus.DEPOSIT_BUY || (vehicle.purchase_payment_history?.length || 0) > 0) },
-      { id: 'payments_sale', label: 'Tiền bán', icon: TrendingUp, show: canSeeFullInfo && ([VehicleStatus.DEPOSIT_SALE, VehicleStatus.BANK_DEPOSIT, VehicleStatus.BANK_CONFIRMED, VehicleStatus.SOLD].includes(vehicle.status as VehicleStatus) || (vehicle.sale_payment_history?.length || 0) > 0) },
+      { id: 'financials', label: 'Tài chính', icon: CircleDollarSign, show: canSeeFullInfo },
       { id: 'history', label: 'Lịch sử', icon: Clock }
    ].filter(t => t.show !== false);
 
+   const handleTabChange = (tabId: 'info' | 'financials' | 'history') => {
+      haptics.light();
+      setActiveTab(tabId);
+   };
+
    const renderTabContent = () => {
       switch (activeTab) {
-         case 'info': return <InfoTab vehicle={vehicle} isEditing={isEditing} editForm={editForm} setEditForm={setEditForm} staffList={staffList} userRole={userRole} canSeeFullInfo={canSeeFullInfo} isSubmitting={isSubmitting} handleDeleteVehicle={handleDeleteVehicle} showDeleteConfirm={showDeleteConfirm} setShowDeleteConfirm={setShowDeleteConfirm} />;
-         case 'financials': return <FinancialsTab vehicle={vehicle} financials={financials} costForm={costForm} setCostForm={setCostForm} handleAddCost={handleAddCost} handleDeleteCost={handleDeleteCost} isSubmitting={isSubmitting} canSeeFinancials={canSeeFinancials} isAdminOrAccountant={isAdminOrAccountant} />;
-         case 'payments_buy': return <PaymentsBuyTab vehicle={vehicle} financials={financials} purchaseDebt={purchaseDebt} paymentForm={paymentForm} setPaymentForm={setPaymentForm} handleAddPurchasePayment={handleAddPurchasePayment} isSubmitting={isSubmitting} />;
-         case 'payments_sale': return <PaymentsSaleTab vehicle={vehicle} saleDebt={saleDebt} paymentForm={paymentForm} setPaymentForm={setPaymentForm} nextStatusInTab={nextStatusInTab} setNextStatusInTab={setNextStatusInTab} staffList={staffList} userCode={userCode} userRole={userRole} handleAddSalePayment={handleAddSalePayment} handleCancelSale={handleCancelSale} isSubmitting={isSubmitting} showCancelSaleConfirm={showCancelSaleConfirm} setShowCancelSaleConfirm={setShowCancelSaleConfirm} />;
+         case 'info': return <InfoTab vehicle={vehicle} isEditing={isEditing} editForm={editForm} setEditForm={setEditForm} staffList={staffList} userRole={userRole} isSubmitting={isSubmitting} handleDeleteVehicle={handleDeleteVehicle} showDeleteConfirm={showDeleteConfirm} setShowDeleteConfirm={setShowDeleteConfirm} />;
+         case 'financials': return (
+            <FinancialsTab 
+               vehicle={vehicle} 
+               canSeeFinancials={canSeeFinancials} 
+               isAdminOrAccountant={isAdminOrAccountant} 
+               userCode={userCode}
+               staffList={staffList}
+               actions={{
+                  onAddCost: handleAddCost,
+                  onDeleteCost: handleDeleteCost,
+                  onAddPurchasePayment: handleAddPurchasePayment,
+                  onAddSalePayment: handleAddSalePayment,
+                  onCancelSale: handleCancelSale
+               }}
+            />
+         );
          case 'history': return <HistoryTab vehicle={vehicle} />;
          default: return null;
       }
    };
 
-   return typeof document !== 'undefined' ? createPortal(
-      <div className={`fixed inset-0 z-[${Z_INDEX.MODAL}] flex items-center justify-center p-2 sm:p-6 lg:p-8`}>
-         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-kraft-ink/60 backdrop-blur-md cursor-pointer" />
-         <motion.div initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 30 }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} className="relative w-full max-w-6xl bg-white/90 backdrop-blur-3xl rounded-t1 border border-white/50 shadow-[var(--shadow-kraft-deep)] overflow-hidden flex flex-col lg:flex-row h-[92vh] lg:h-[85vh] pointer-events-auto">
-            <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-[110] flex gap-2 sm:gap-3">
-               <button onClick={() => handlePin(vehicle.id, !vehicle.is_pinned)} disabled={isSubmitting} className={cn("p-2 sm:p-3 rounded-t3 border transition-all shadow-lg flex items-center justify-center active:scale-[0.98]", vehicle.is_pinned ? "bg-kraft-accent text-white border-white/20" : "bg-white/40 text-kraft-ink/40 border-white/60 hover:text-kraft-ink")}>
-                  {isSubmitting ? <RefreshCw className="animate-spin" size={20} /> : (vehicle.is_pinned ? <Pin size={20} fill="currentColor" /> : <Pin size={18} />)}
-               </button>
-               <button onClick={onClose} className="p-2 sm:p-3 bg-white/40 backdrop-blur-md border border-white/60 text-kraft-ink hover:bg-white/60 rounded-t3 transition-all shadow-lg active:scale-[0.98]"><X size={20} /></button>
-            </div>
-            <VehicleSidebar vehicle={vehicle} financials={financials} isEditing={isEditing} editForm={editForm} setEditForm={setEditForm} isSubmitting={isSubmitting} isUploadingImage={isUploadingImage} canSeeFullInfo={canSeeFullInfo} handleSaveEdit={handleSaveEdit} setIsUpdatingStatus={setIsUpdatingStatus} setIsEditing={setIsEditing} handleStartEdit={handleStartEdit} handleImageUpload={handleImageUpload} handlePin={handlePin} />
-            <div className="flex-1 flex flex-col bg-[var(--meta-step-2)] overflow-hidden pt-6">
-               <div className="ctab-bar px-8">
-                  {tabs.map(tab => (
-                     <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={cn("ctab", activeTab === tab.id && "ctab-active")}>
-                        <tab.icon size={14} className={cn("transition-all", activeTab === tab.id ? "text-kraft-accent scale-110" : "opacity-40")} />
-                        <span className={cn("text-[10px] uppercase tracking-[0.2em] transition-all", activeTab === tab.id ? "text-kraft-ink font-black" : "text-kraft-ink/30 font-bold")}>{tab.label}</span>
-                     </button>
-                  ))}
+   return (
+      <Modal 
+         isOpen={isOpen} 
+         onClose={onClose} 
+         maxWidth="6xl" 
+         title={vehicle.name}
+         subtitle={`Mã xe: ${vehicle.code}`}
+         mobileHideTitle={true}
+         className="h-[92vh] lg:h-[85vh]"
+      >
+         <div className="relative w-full h-full flex flex-col lg:flex-row overflow-hidden pointer-events-auto">
+            <VehicleSidebar 
+               vehicle={vehicle} 
+               financials={financials} 
+               isEditing={isEditing} 
+               editForm={editForm}
+               isSubmitting={isSubmitting} 
+               isUploadingImage={isUploadingImage} 
+               canSeeFullInfo={canSeeFullInfo} 
+               isAdminOrAccountant={isAdminOrAccountant}
+               handleSaveEdit={handleSaveEdit} 
+               setIsUpdatingStatus={setIsUpdatingStatus} 
+               setIsEditing={setIsEditing} 
+               handleStartEdit={handleStartEdit} 
+               handleImageUpload={handleImageUpload} 
+            />
+
+            {/* RIGHT SIDE / BOTTOM SIDE: Tabs & Content */}
+            <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
+               <div className="flex-1 flex flex-col bg-[var(--meta-step-2)] overflow-hidden min-h-0">
+                  <div className="px-4 md:px-8 py-5 shrink-0 flex items-center justify-between">
+                     <nav className="flex items-center gap-1 bg-kraft-ink/[0.04] p-1 rounded-full border border-black/[0.04] backdrop-blur-xl relative h-10 w-fit transition-all duration-300">
+                        {tabs.map(tab => {
+                           const isActive = activeTab === tab.id;
+                           const Icon = tab.icon;
+                           return (
+                              <button
+                                 key={tab.id}
+                                 onClick={() => handleTabChange(tab.id as any)}
+                                 className="relative flex items-center justify-center h-8 px-5 rounded-full transition-all active:scale-95 cursor-pointer z-10 group"
+                              >
+                                 {isActive && (
+                                    <motion.div
+                                       layoutId="vehicleDetailTabPill"
+                                       className="absolute inset-0 bg-white shadow-[0_3px_10px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.02)] rounded-full z-0 border border-black/5"
+                                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                                    />
+                                 )}
+                                 <div className="relative z-10 flex items-center gap-2">
+                                    <Icon size={13} className={cn("transition-all duration-300", isActive ? "scale-110 text-kraft-accent" : "text-kraft-ink/60 group-hover:text-kraft-ink/90")} />
+                                    <span className={cn("text-[10px] uppercase tracking-[0.12em] transition-all duration-300", isActive ? "text-kraft-ink font-black" : "text-kraft-ink/65 font-bold group-hover:text-kraft-ink/90")}>
+                                       {tab.label}
+                                    </span>
+                                 </div>
+                              </button>
+                           );
+                        })}
+                     </nav>
+
+                     {/* Premium Integrated Desktop Pin Button - Never cut off! */}
+                     <div className="hidden md:block">
+                        <motion.button 
+                           whileTap={{ scale: 0.9 }}
+                           onClick={async () => {
+                              haptics.medium();
+                              await handlePin(vehicle.id, !vehicle.is_pinned);
+                           }} 
+                           disabled={isSubmitting} 
+                           className={cn(
+                              "w-10 h-10 rounded-full transition-all shadow-md flex items-center justify-center", 
+                              vehicle.is_pinned ? "bg-kraft-accent text-white border-white/20" : "glass-purity-surface text-sub-label hover:text-kraft-ink"
+                           )}
+                        >
+                           {isSubmitting ? <RefreshCw className="animate-spin" size={14} /> : (vehicle.is_pinned ? <Pin size={14} fill="currentColor" strokeWidth={2.5} /> : <Pin size={14} strokeWidth={2.5} />)}
+                        </motion.button>
+                     </div>
+                  </div>
+                  <div className="flex-1 bg-white border border-hairline-soft rounded-t1 shadow-kraft-deep overflow-hidden mx-4 md:mx-6 mb-6 flex flex-col">
+                     <div className={cn("flex-1 overflow-y-auto custom-scrollbar pb-32 lg:pb-8", DESIGN_TOKENS.layout.content_padding)}>
+                        <AnimatePresence mode="wait">{renderTabContent()}</AnimatePresence>
+                     </div>
+                  </div>
                </div>
-               <div className="ctab-panel flex-1 flex flex-col overflow-hidden mx-1">
-                  <div className="ctab-content flex-1 overflow-y-auto p-4 sm:p-10 custom-scrollbar">
-                     <AnimatePresence mode="wait">{renderTabContent()}</AnimatePresence>
+
+               {/* Mobile Sticky Action Bar */}
+               <div className="lg:hidden absolute bottom-0 left-0 right-0 z-[120] px-4 py-3 bg-white/80 backdrop-blur-xl border-t border-hairline-soft safe-pb shadow-[0_-8px_32px_-12px_rgba(0,0,0,0.15)]">
+                  <div className="flex gap-3 items-center">
+                     {isAdminOrAccountant && (
+                        <>
+                           {isEditing ? (
+                              <motion.button
+                                 whileTap={{ scale: 0.95 }}
+                                 onClick={async () => {
+                                    haptics.medium();
+                                    await handleSaveEdit();
+                                 }}
+                                 disabled={isSubmitting}
+                                 className="h-12 flex-1 bg-income text-white rounded-full font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 shadow-lg shadow-income/20 active:scale-[0.98] transition-all"
+                              >
+                                 {isSubmitting ? <RefreshCw className="animate-spin" size={14} /> : <Save size={14} />}
+                                 <span>Lưu thay đổi</span>
+                              </motion.button>
+                           ) : (
+                              <motion.button
+                                 whileTap={{ scale: 0.95 }}
+                                 onClick={() => {
+                                    haptics.light();
+                                    setIsUpdatingStatus(true);
+                                 }}
+                                 className="h-12 flex-1 bg-kraft-ink text-white rounded-full font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 shadow-lg shadow-kraft-ink/20 active:scale-[0.98] transition-all"
+                              >
+                                 <TrendingUp size={14} />
+                                 <span>Trạng Thái</span>
+                              </motion.button>
+                           )}
+
+                           <motion.button
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => {
+                                 haptics.light();
+                                 if (isEditing) setIsEditing(false);
+                                 else handleStartEdit();
+                              }}
+                              className="w-12 h-12 bg-white border border-hairline-soft rounded-full flex items-center justify-center text-kraft-ink shadow-sm active:scale-[0.95] transition-all"
+                           >
+                              {isEditing ? <X size={18} strokeWidth={2.5} /> : <Edit2 size={18} strokeWidth={2.5} />}
+                           </motion.button>
+                        </>
+                     )}
                   </div>
                </div>
             </div>
-         </motion.div>
-         <AnimatePresence>
-            {isUpdatingStatus && <StatusUpdateOverlay vehicle={vehicle} staffList={staffList} userCode={userCode} isSubmitting={isSubmitting} transitionStatus={transitionStatus} setTransitionStatus={setTransitionStatus} paymentForm={paymentForm} setPaymentForm={setPaymentForm} handleUpdateStatus={handleUpdateStatus} handleCancelSale={handleCancelSale} handleAddSalePayment={handleAddSalePayment} setIsUpdatingStatus={setIsUpdatingStatus} />}
-         </AnimatePresence>
-      </div>,
-      document.body
-   ) : null;
+
+            <AnimatePresence>
+               {isUpdatingStatus && (
+                  <StatusUpdateOverlay 
+                     vehicle={vehicle} 
+                     staffList={staffList} 
+                     userCode={userCode} 
+                     isSubmitting={isSubmitting} 
+                     transitionStatus={transitionStatus} 
+                     setTransitionStatus={setTransitionStatus} 
+                     paymentForm={paymentForm} 
+                     setPaymentForm={setPaymentForm} 
+                     handleUpdateStatus={handleUpdateStatus} 
+                     handleCancelSale={handleCancelSale} 
+                     handleAddSalePayment={handleAddSalePayment} 
+                     setIsUpdatingStatus={setIsUpdatingStatus} 
+                  />
+               )}
+            </AnimatePresence>
+         </div>
+      </Modal>
+   );
 };

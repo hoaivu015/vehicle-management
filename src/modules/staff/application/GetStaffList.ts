@@ -1,7 +1,6 @@
 import { Staff } from '../../../shared/domain/types';
 import { StaffRepository } from '../domain/StaffRepository';
 import { StaffSalaryService, SalaryDetails } from '../domain/StaffSalaryService';
-import { Vehicle } from '../../../shared/domain/types';
 import { VehicleRepository } from '../../inventory/domain/VehicleRepository';
 
 export interface StaffWithSalary extends Staff {
@@ -26,8 +25,8 @@ export class GetStaffList {
     return staff.map(member => {
       // Auto-sync missing vehicle_codes for display
       const fixedExpenses = (member.expenses || []).map(exp => {
-        if (exp.type === 'vehicle' && !exp.vehicle_code && exp.vehicle_id) {
-          const car = cars.find(c => c.id === exp.vehicle_id);
+        if (exp.type === 'vehicle' && !exp.vehicle_code && exp.vehicleId) {
+          const car = cars.find(c => c.id === exp.vehicleId);
           if (car) return { ...exp, vehicle_code: car.code };
         }
         return exp;

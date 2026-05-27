@@ -1,19 +1,21 @@
-import { Vehicle } from '../../../shared/domain/types';
-import { FinanceService, Expense, SalaryCalculation } from '../domain/FinanceService';
-import { ExpenseRepository } from '../infrastructure/ExpenseRepository';
-import { VehicleRepository } from '../../inventory/domain/VehicleRepository';
-import { StaffRepository } from '../../staff/domain/StaffRepository';
+import { FinanceService, Expense, SalaryCalculation } from '@/src/modules/finance/domain/FinanceService';
+import { ExpenseRepository } from '@/src/modules/finance/domain/ExpenseRepository';
+import { VehicleRepository } from '@/src/modules/inventory/domain/VehicleRepository';
+import { StaffRepository } from '@/src/modules/staff/domain/StaffRepository';
 
 export interface MonthlyFinanceData {
   revenue: number;
   purchaseOutflow: number;
   carCosts: number;
   operatingExpenses: number;
+  partnerPayouts: number;
   salaries: number;
   salesProfit: number;
   netProfit: number;
   netCashflow: number;
+  totalOutflow: number;
   allExpenses: Expense[];
+  allCarCosts: { carName: string; carCode: string; note: string; amount: number; date: string }[];
   salaryCalculations: SalaryCalculation[];
 }
 
@@ -35,7 +37,15 @@ export class GetMonthlyFinance {
     const revenue = FinanceService.calculateMonthlyRevenue(vehicles, month);
     const purchaseOutflow = FinanceService.calculateMonthlyPurchaseOutflow(vehicles, month);
     const carCosts = FinanceService.calculateMonthlyCarCosts(vehicles, month);
-    const opExpensesTotal = monthlyOpExpenses.reduce((acc, e) => acc + (e.amount || 0), 0);
+    
+    // Split expenses: Partner payouts vs Regular operating expenses
+    const partnerPayouts = monthlyOpExpenses
+      .filter(e => e.category === 'Đối tác')
+      .reduce((acc, e) => acc + (e.amount || 0), 0);
+      
+    const opExpensesTotal = monthlyOpExpenses
+      .filter(e => e.category !== 'Đối tác')
+      .reduce((acc, e) => acc + (e.amount || 0), 0);
     
     const salaryCalculations = FinanceService.calculateMonthlySalaries(staff, vehicles, month);
     const salariesTotal = salaryCalculations.reduce((acc, s) => acc + s.totalIncome, 0);
@@ -43,19 +53,38 @@ export class GetMonthlyFinance {
     const salesProfit = FinanceService.calculateMonthlySalesProfit(vehicles, month);
     const netProfit = salesProfit - opExpensesTotal - salariesTotal;
     
-    const totalOutflow = purchaseOutflow + carCosts + opExpensesTotal + salariesTotal;
+    const totalOutflow = purchaseOutflow + carCosts + opExpensesTotal + salariesTotal + partnerPayouts;
     const netCashflow = revenue - totalOutflow;
+
+    // Extract all car costs for this month
+    const allCarCosts: MonthlyFinanceData['allCarCosts'] = [];
+    vehicles.forEach(car => {
+      const monthCosts = (car.cost_history || []).filter(c => c.date?.startsWith(month));
+      monthCosts.forEach(cost => {
+        allCarCosts.push({
+          carName: car.name,
+          carCode: car.code,
+          note: cost.note,
+          amount: cost.amount,
+          date: cost.date
+        });
+      });
+    });
+    allCarCosts.sort((a, b) => b.date.localeCompare(a.date));
 
     return {
       revenue,
       purchaseOutflow,
       carCosts,
       operatingExpenses: opExpensesTotal,
+      partnerPayouts,
       salaries: salariesTotal,
       salesProfit,
       netProfit,
       netCashflow,
+      totalOutflow,
       allExpenses: monthlyOpExpenses,
+      allCarCosts,
       salaryCalculations
     };
   }

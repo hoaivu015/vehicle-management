@@ -1,15 +1,12 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
-import { rateLimit } from 'express-rate-limit';
+// import { rateLimit } from 'express-rate-limit';
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = 3000;
@@ -20,15 +17,17 @@ app.use(helmet({
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
       "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Vite needs unsafe-eval/inline in dev
-      "connect-src": ["'self'", "*.supabase.co", "wss://*.supabase.co", "https://*.googleapis.com"],
+      "connect-src": ["'self'", "*.supabase.co", "wss://*.supabase.co", "https://*.googleapis.com", "https://*.cloudinary.com"],
       "img-src": ["'self'", "data:", "*.supabase.co", "https://*.cloudinary.com"],
       "font-src": ["'self'", "https://fonts.gstatic.com"],
+      "frame-src": ["'self'", "https://www.google.com", "https://*.google.com"],
     },
   },
   crossOriginEmbedderPolicy: false, // Required for some third-party assets
 }));
 
-// Rate Limiting
+// Rate Limiting (Disabled)
+/*
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 1000, // Limit each IP to 1000 requests per windowMs
@@ -37,6 +36,7 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 app.use(limiter);
+*/
 
 // Middleware
 app.use(express.json());
@@ -52,7 +52,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

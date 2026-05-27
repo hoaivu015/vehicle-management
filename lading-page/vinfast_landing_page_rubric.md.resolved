@@ -1,0 +1,48 @@
+# Tiêu Chuẩn Đánh Giá & Chấm Điểm Landing Page "Thu Mua VinFast"
+
+Bộ tiêu chuẩn này được thiết kế theo thang điểm **100**, dùng để đánh giá mức độ hoàn thiện của Landing Page sau khi lập trình, đảm bảo sản phẩm cuối cùng đạt chuẩn "Impeccable" và tối đa hóa tỷ lệ chuyển đổi.
+
+Mức độ đánh giá:
+*   **Xuất sắc (Ready to Launch):** 90 - 100 điểm
+*   **Đạt (Cần tinh chỉnh nhỏ):** 75 - 89 điểm
+*   **Chưa đạt (Cần làm lại):** Dưới 75 điểm
+
+---
+
+## 1. Giao Diện & Thẩm Mỹ UI/UX (30 Điểm)
+*Tiêu chí này đánh giá mức độ tuân thủ ngôn ngữ thiết kế "Zero-Noise" và "iPhone Native".*
+
+*   [ ] **(10đ) Hiệu ứng Glassmorphism:** Form định giá ở Hero Section có hiệu ứng kính mờ (backdrop-blur) tinh tế, sang trọng, không làm chìm nội dung text bên trên.
+*   [ ] **(5đ) Bảng màu (Color Palette):** Sử dụng đúng hệ màu: Nền Off-white/White tạo không gian rộng, Text Dark Navy (tránh đen tuyền `text-black` gây gắt mắt), và nút CTA màu VinFast Red/Orange để thu hút sự chú ý.
+*   [ ] **(5đ) Typography:** Sử dụng font Inter hoặc Montserrat. Phân cấp cỡ chữ rõ ràng giữa Headline (rất to, đậm) và Sub-headline. Không có văn bản bị dính rịt vào nhau.
+*   [ ] **(10đ) Spacing & Zero-Noise:** Padding và Margin giữa các phần (Sections) rộng rãi, thoáng mắt. Không có các chi tiết trang trí thừa thãi làm loãng sự chú ý khỏi Form định giá.
+
+## 2. Trải Nghiệm Tương Tác (Micro-interactions) & Chức Năng (30 Điểm)
+*Tiêu chí này đánh giá các "điểm chạm" khiến khách hàng WOW và cảm thấy hệ thống xịn xò.*
+
+*   [ ] **(15đ) Hero Background Swap:** Khi khách hàng chọn dòng xe (Fadil, VF8, VF9...) trong Dropdown, hình nền của Hero Section **bắt buộc phải thay đổi tương ứng** một cách mượt mà (sử dụng Framer Motion `AnimatePresence`, không bị giật hay flash trắng).
+*   [ ] **(5đ) Trạng thái Form (Form States):** Khi chạm vào (Focus) các trường nhập liệu, có viền highlight rõ ràng (Focus ring). Có hiệu ứng hover và active (nhấn xuống) cho nút "Xem giá thu mua dự kiến".
+*   [ ] **(5đ) Counter Animation:** Số lượng xe "Đã thu mua 1.245 xe" phải có hiệu ứng chạy số từ 0 lên 1245 khi cuộn chuột tới Section 2 (Social Proof).
+*   [ ] **(5đ) Accordion mượt mà:** Khối FAQ (Objection Handling) mở/đóng với hiệu ứng trượt (slide) mượt mà, icon thay đổi trạng thái (ví dụ: mũi tên xoay 180 độ hoặc dấu + thành dấu -).
+
+## 3. Cấu Trúc Bố Cục & Tâm Lý Chuyển Đổi (20 Điểm)
+*Tiêu chí này đánh giá độ trung thành với bản thiết kế chiến lược.*
+
+*   [ ] **(5đ) Độ ưu tiên của Form:** Form định giá nằm ngay màn hình đầu tiên (Above the fold), khách không cần cuộn trang vẫn thấy toàn bộ form.
+*   [ ] **(5đ) Sticky Footer (Mobile):** Thanh Bar chứa 2 nút [Gọi điện ngay] - [Chat Zalo] luôn dính ở dưới cùng màn hình khi xem trên điện thoại.
+*   [ ] **(5đ) Threaded Social Proof:** Carousel video và lời chứng thực hiển thị rõ ràng, chân thực, text ngắn gọn không bị che khuất.
+*   [ ] **(5đ) Trực quan hóa "3 Bước":** Giao diện hướng dẫn quy trình phải có đồ họa đường nối (connecting lines) hoặc mũi tên dẫn dắt mắt từ bước 1 sang bước 3.
+
+## 4. Tối Ưu Mobile & Hiệu Năng (20 Điểm)
+*Vì khách hàng chủ yếu lướt từ điện thoại, phần này là bắt buộc.*
+
+*   [ ] **(10đ) Mobile-First Layout:** Giao diện hiển thị hoàn hảo trên màn hình hẹp (iPhone SE đến iPhone 15 Pro Max). Không có phần tử nào tràn ra ngoài màn hình (gây ra thanh cuộn ngang). Nút bấm CTA phải đủ to (cao tối thiểu 48px) để ngón tay cái dễ bấm.
+*   [ ] **(5đ) Tối ưu hóa Hình ảnh (WebP):** Ảnh nền xe VinFast độ phân giải cao nhưng dung lượng phải nhẹ (dưới 300KB/ảnh), load ngay lập tức để không làm hỏng trải nghiệm "đổi ảnh nền".
+*   [ ] **(5đ) One-Action Focus:** Khi cuộn trang trên mobile, không có bất kỳ nút bấm phụ nào làm sao nhãng ngoài việc khuyến khích quay lại form định giá hoặc gọi Zalo.
+
+---
+
+### 💡 Cách Sử Dụng Bộ Tiêu Chuẩn Này:
+1. **Lập trình viên (Developer):** Dùng làm Checklist tự kiểm tra sau khi code xong mỗi Section.
+2. **Reviewer (QA/Lead):** Dùng để nghiệm thu (Acceptance Criteria) trước khi Push code lên môi trường Production.
+3. Nếu bất kỳ tiêu chí nào trong phần **Trải Nghiệm Tương Tác** (đặc biệt là mục *Hero Background Swap*) bị đánh trượt, toàn bộ Landing Page sẽ chưa được nghiệm thu cho đến khi sửa xong.

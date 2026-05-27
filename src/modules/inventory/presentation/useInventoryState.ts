@@ -1,26 +1,17 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { toast } from 'sonner';
-import { InventoryPresenter, InventoryView } from './InventoryPresenter';
-import { GetInventoryList } from '@/src/modules/inventory/application/GetInventoryList';
-import { UpdateVehicleStatus } from '@/src/modules/inventory/application/UpdateVehicleStatus';
-import { DeleteVehicle } from '@/src/modules/inventory/application/DeleteVehicle';
-import { AddVehicle, AddVehicleRequest } from '@/src/modules/inventory/application/AddVehicle';
-import { GetNextVehicleCode } from '@/src/modules/inventory/application/GetNextVehicleCode';
-import { AddVehicleCost } from '@/src/modules/inventory/application/AddVehicleCost';
-import { AddPurchasePayment } from '@/src/modules/inventory/application/AddPurchasePayment';
-import { AddSalePayment } from '@/src/modules/inventory/application/AddSalePayment';
-import { CancelSale } from '@/src/modules/inventory/application/CancelSale';
-import { UpdateVehicle } from '@/src/modules/inventory/application/UpdateVehicle';
-import { DeleteVehicleCost } from '@/src/modules/inventory/application/DeleteVehicleCost';
-import { SupabaseVehicleRepository } from '@/src/modules/inventory/infrastructure/SupabaseVehicleRepository';
-import { CloudinaryVehicleStorageRepository } from '@/src/modules/inventory/infrastructure/CloudinaryVehicleStorageRepository';
-import { SupabaseStaffRepository } from '@/src/modules/staff/infrastructure/SupabaseStaffRepository';
+import { useState, useMemo, useEffect } from 'react';
+import { useNotification } from '@/src/shared/presentation/useNotification';
+import { useActionResponse } from '@/src/shared/presentation/useActionResponse';
+import { InventoryView } from './InventoryPresenter';
 import { Vehicle } from '@/src/shared/domain/types';
-import { VehicleStatus, UserRole } from '@/src/shared/domain/constants';
+import { VehicleStatus, INVENTORY_CONSTANTS } from '@/src/shared/domain/constants';
+import { useDependencies } from '@/src/shared/ioc/DependencyContext';
+import { AddVehicleRequest } from '@/src/modules/inventory/application/AddVehicle';
+
+
 
 interface UseInventoryProps {
   userRole: string;
-  currentUser: any;
+  currentUser: import('@/src/shared/domain/types').Staff | null;
   initialSearch?: string;
   initialFilter?: string;
   initialAction?: string;
@@ -35,132 +26,55 @@ export const useInventoryState = ({
 }: UseInventoryProps) => {
   const [availableCars, setAvailableCars] = useState<Vehicle[]>([]);
   const [soldCars, setSoldCars] = useState<Vehicle[]>([]);
-  const [staffList, setStaffList] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [staffList, setStaffList] = useState<import('@/src/shared/domain/types').Staff[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'AVAILABLE' | 'SOLD'>('AVAILABLE');
   const [soldMonth, setSoldMonth] = useState(new Date().toISOString().slice(0, 7));
 
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { executeAction } = useActionResponse();
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [filterCriteria, setFilterCriteria] = useState(initialFilter);
   const [hasHandledAction, setHasHandledAction] = useState(false);
-
-  const withSubmitState = useCallback((fn: Function) => async (...args: any[]) => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    try {
-      await fn(...args);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [isSubmitting]);
+  const { inventory, createInventoryPresenter } = useDependencies();
+  const notification = useNotification();
 
   // Dependency Injection
-  const { presenter, addVehicleUseCase, repository } = useMemo(() => {
-    const repository = new SupabaseVehicleRepository();
-    const storageRepo = new CloudinaryVehicleStorageRepository();
-    const getListUseCase = new GetInventoryList(repository);
-    const updateUseCase = new UpdateVehicleStatus(repository);
-    const deleteUseCase = new DeleteVehicle(repository, storageRepo);
-    const addUseCase = new AddVehicle(repository);
-    const nextCodeUseCase = new GetNextVehicleCode(repository);
-    const addCostUseCase = new AddVehicleCost(repository);
-    const addPurchasePaymentUseCase = new AddPurchasePayment(repository);
-    const addSalePaymentUseCase = new AddSalePayment(repository);
-    const cancelSaleUseCase = new CancelSale(repository);
-    const updateVehicleUseCase = new UpdateVehicle(repository);
-    const deleteVehicleCostUseCase = new DeleteVehicleCost(repository, new SupabaseStaffRepository());
+  const { presenter, addVehicleUseCase } = useMemo(() => ({
+    presenter: createInventoryPresenter(),
+    addVehicleUseCase: inventory.addVehicle
+  }), [createInventoryPresenter, inventory.addVehicle]);
 
-    return {
-      presenter: new InventoryPresenter(
-        getListUseCase, 
-        updateUseCase, 
-        deleteUseCase, 
-        nextCodeUseCase,
-        addCostUseCase,
-        addPurchasePaymentUseCase,
-        addSalePaymentUseCase,
-        cancelSaleUseCase,
-        updateVehicleUseCase,
-        deleteVehicleCostUseCase
-      ),
-      addVehicleUseCase: addUseCase,
-      repository
-    };
-  }, []);
 
-  const sortVehicles = useCallback((cars: Vehicle[]) => {
-    return [...cars].sort((a, b) => {
-      if (a.is_pinned && !b.is_pinned) return -1;
-      if (!a.is_pinned && b.is_pinned) return 1;
-      const dateA = a.purchase_date ? new Date(a.purchase_date).getTime() : 0;
-      const dateB = b.purchase_date ? new Date(b.purchase_date).getTime() : 0;
-      return dateB - dateA;
-    });
-  }, []);
 
-  // View Implementation
   const view: InventoryView = useMemo(() => ({
-    showAvailableCars: (cars) => setAvailableCars(sortVehicles(cars)),
-    showSoldCars: (cars) => setSoldCars(sortVehicles(cars)),
+    showAvailableCars: (cars) => setAvailableCars(cars),
+    showSoldCars: (cars) => setSoldCars(cars),
     showLoading: () => setLoading(true),
     hideLoading: () => setLoading(false),
-    showError: (msg) => toast.error(msg),
+    showError: (msg) => notification.error(msg),
     onStatusUpdated: () => {
-      toast.success('Cập nhật thành công!');
       presenter.loadAvailable();
     },
-    onVehicleUpdated: (vehicle: Vehicle) => setSelectedVehicle(vehicle),
-  }), [presenter, sortVehicles]);
+    onVehicleUpdated: (vehicle: Vehicle) => {
+      setSelectedVehicle(vehicle);
+    },
+    setStaffList: setStaffList,
+  }), [presenter]);
 
   useEffect(() => {
     presenter.attachView(view);
-    const staffRepo = new SupabaseStaffRepository();
-    staffRepo.getAll().then(list => {
-      setStaffList(list.filter(s => s.role !== UserRole.ADMIN));
-    });
-
     const loadData = async () => {
-      const isAdmin = userRole === UserRole.ADMIN || userRole === UserRole.ACCOUNTANT;
-      const isManager = userRole === UserRole.MANAGER;
+      await presenter.loadInventory(userRole, currentUser?.code || null, soldMonth);
 
-      let carsForAction: Vehicle[] = [];
-
-      if (isAdmin) {
-        await presenter.loadAvailable();
-        carsForAction = await repository.getAvailableVehicles();
-        if (activeTab === 'SOLD') {
-          await presenter.loadSold(soldMonth);
-        }
-      } else if (isManager) {
-        if (currentUser?.department) {
-          const codes = await staffRepo.getCodesByDepartment(currentUser.department);
-          await presenter.loadDepartment(codes, soldMonth);
-          const deptCars = await repository.getVehiclesByCodes(codes);
-          carsForAction = deptCars.filter(c => c.status !== VehicleStatus.SOLD);
-        } else {
-          await presenter.loadAvailable();
-          carsForAction = await repository.getAvailableVehicles();
-          if (activeTab === 'SOLD') await presenter.loadSold(soldMonth);
-        }
-      } else {
-        if (currentUser?.code) {
-          await presenter.loadPersonal(currentUser.code, soldMonth);
-          const personalCars = await repository.getVehiclesByStaff(currentUser.code);
-          carsForAction = personalCars.filter(c => c.status !== VehicleStatus.SOLD);
-        } else {
-          await presenter.loadAvailable();
-          carsForAction = await repository.getAvailableVehicles();
-          if (activeTab === 'SOLD') await presenter.loadSold(soldMonth);
-        }
-      }
-
-      if (initialFilter && initialFilter !== 'ALL') {
+      if (initialFilter) {
         presenter.filter(initialFilter);
         setFilterCriteria(initialFilter);
+        if (initialFilter === 'AGING_25') {
+          setActiveTab('AVAILABLE');
+        }
       }
       if (initialSearch) {
         presenter.search(initialSearch);
@@ -170,9 +84,9 @@ export const useInventoryState = ({
     loadData();
     return () => {
       presenter.detachView();
-      setHasHandledAction(false); // Reset on unmount
+      setHasHandledAction(false);
     };
-  }, [presenter, view, activeTab, soldMonth, initialFilter, userRole, currentUser, initialSearch, repository]);
+  }, [presenter, view, activeTab, soldMonth, initialFilter, userRole, currentUser, initialSearch]);
 
   // Separate effect for post-load actions to ensure data is ready in state
   useEffect(() => {
@@ -180,7 +94,7 @@ export const useInventoryState = ({
       let targetCar: Vehicle | undefined;
       
       if (initialFilter === 'AGING_25') {
-        const limit = new Date(); limit.setDate(limit.getDate() - 25);
+        const limit = new Date(); limit.setDate(limit.getDate() - INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS);
         targetCar = availableCars.find(c => c.purchase_date && new Date(c.purchase_date) <= limit);
       } else {
         targetCar = availableCars[0];
@@ -194,6 +108,24 @@ export const useInventoryState = ({
     }
   }, [availableCars, initialAction, initialFilter, hasHandledAction]);
 
+  // Effect to automatically open vehicle details if initialAction is 'view_vehicle'
+  useEffect(() => {
+    if (initialAction === 'view_vehicle' && (availableCars.length > 0 || soldCars.length > 0) && !hasHandledAction) {
+      const allCars = [...availableCars, ...soldCars];
+      const targetCar = allCars.find(c => c.code === initialSearch || c.name === initialSearch);
+      if (targetCar) {
+        setSelectedVehicle(targetCar);
+        setIsDetailOpen(true);
+        if (soldCars.includes(targetCar)) {
+          setActiveTab('SOLD');
+        } else {
+          setActiveTab('AVAILABLE');
+        }
+        setHasHandledAction(true);
+      }
+    }
+  }, [availableCars, soldCars, initialAction, initialSearch, hasHandledAction]);
+
   useEffect(() => {
     setSelectedVehicle(current => {
       if (!current) return current;
@@ -206,46 +138,46 @@ export const useInventoryState = ({
     setSearchQuery(initialSearch);
   }, [initialSearch]);
 
-  const handleAddVehicle = withSubmitState(async (data: AddVehicleRequest) => {
-    try {
+  const handleAddVehicle = (data: AddVehicleRequest) => 
+    executeAction(async () => {
       await addVehicleUseCase.execute(data);
-      toast.success('Nhập xe mới thành công!');
       presenter.loadAvailable();
-    } catch (error: any) {
-      toast.error(error.message || 'Lỗi khi nhập xe');
-      throw error;
-    }
-  });
+    }, { successMessage: 'Nhập xe mới thành công!' });
 
-  const handleUpdateStatus = withSubmitState(async (id: number, nextStatus: VehicleStatus, extra?: any) => {
-    await presenter.updateVehicleStatus({
+  const handleUpdateStatus = (id: number, nextStatus: VehicleStatus, extra?: Record<string, unknown>) => 
+    executeAction(() => presenter.updateVehicleStatus({
       id,
       nextStatus,
       user: currentUser?.code || 'SYSTEM',
       ...extra
-    });
-  });
+    }, userRole), { successMessage: 'Cập nhật trạng thái thành công!' });
 
-  const handleDeleteVehicle = withSubmitState(async (id: number) => {
-    await presenter.deleteVehicle(id);
-    setIsDetailOpen(false);
-  });
+   const handleDeleteVehicle = (id: number) => 
+    executeAction(async () => {
+      await presenter.deleteVehicle(id, userRole);
+      setIsDetailOpen(false);
+    }, { successMessage: 'Đã xóa xe thành công!' });
 
-  const handlePin = async (id: number, isPinned: boolean) => {
-    await presenter.togglePin(id, isPinned);
-  };
+  const handleUpdateVehicle = (id: number, data: Partial<Vehicle>) => 
+    executeAction(() => presenter.updateVehicle(id, data, userRole), { successMessage: 'Cập nhật thông tin thành công!' });
 
-  const handleAddPurchasePayment = async (id: number, amount: number, note: string, receiver: string) => {
-    await presenter.addPurchasePayment(id, amount, note, receiver);
-  };
+  const handleAddCost = (id: number, name: string, amount: number) => 
+    executeAction(() => presenter.addVehicleCost(id, name, amount, currentUser?.id, userRole), { successMessage: 'Đã thêm chi phí thành công!' });
 
-  const handleAddSalePayment = async (id: number, amount: number, note: string, receiver: string, nextStatus: VehicleStatus, seller: string, buyerName?: string, salePrice?: number, commission?: number) => {
-    await presenter.addSalePayment(id, amount, note, receiver, nextStatus, seller, buyerName, salePrice, commission);
-  };
+  const handleDeleteCost = (id: number, costIndex: number) => 
+    executeAction(() => presenter.deleteVehicleCost(id, costIndex, userRole), { successMessage: 'Đã xóa chi phí!' });
 
-  const handleCancelSale = withSubmitState(async (id: number, userCode: string) => {
-    await presenter.cancelSale(id, userCode);
-  });
+   const handlePin = (id: number, isPinned: boolean) => 
+    executeAction(() => presenter.togglePin(id, isPinned), { successMessage: isPinned ? 'Đã ghim xe!' : 'Đã bỏ ghim xe!' });
+
+  const handleAddPurchasePayment = (id: number, amount: number, note: string, receiver: string) => 
+    executeAction(() => presenter.addPurchasePayment(id, amount, note, receiver, userRole), { successMessage: 'Thanh toán thành công!' });
+
+  const handleAddSalePayment = (id: number, amount: number, note: string, receiver: string, nextStatus: VehicleStatus, seller: string, buyerName?: string, salePrice?: number, commission?: number, buyingBonus?: number) => 
+    executeAction(() => presenter.addSalePayment(id, amount, note, receiver, nextStatus, seller, buyerName, salePrice, commission, buyingBonus, userRole), { successMessage: 'Giao dịch thành công!' });
+
+  const handleCancelSale = (id: number, userCode: string) => 
+    executeAction(() => presenter.cancelSale(id, userCode, userRole), { successMessage: 'Đã hủy giao dịch!' });
 
   return {
     availableCars,
@@ -273,6 +205,9 @@ export const useInventoryState = ({
     handleAddVehicle,
     handleUpdateStatus,
     handleDeleteVehicle,
+    handleUpdateVehicle,
+    handleAddCost,
+    handleDeleteCost,
     handlePin,
     handleAddPurchasePayment,
     handleAddSalePayment,

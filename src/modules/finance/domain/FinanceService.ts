@@ -1,15 +1,10 @@
-import { VehicleStatus } from '../../../shared/domain/constants';
-import { Vehicle } from '../../../shared/domain/types';
-import { StaffSalaryService } from '../../staff/domain/StaffSalaryService';
-import { calculateVehicleFinancials } from '../../../shared/utils/vehicle_calculations';
+import { VehicleStatus } from '@/src/shared/domain/constants';
+import { Vehicle } from '@/src/shared/domain/types';
+import { StaffSalaryService } from '@/src/modules/staff/domain/StaffSalaryService';
+import { calculateVehicleFinancials } from '@/src/shared/utils/vehicle_calculations';
 
-export interface Expense {
-  id: string | number;
-  name: string;
-  amount: number;
-  category: string;
-  date: string;
-}
+import { Expense } from './ExpenseRepository';
+export type { Expense };
 
 export interface SalaryCalculation {
   staffId: string;
@@ -28,7 +23,7 @@ export class FinanceService {
    * Tính toán lương và hoa hồng cho nhân viên trong một tháng.
    */
   static calculateMonthlySalaries(
-    staff: any[],
+    staff: import('../../../shared/domain/types').Staff[],
     vehicles: Vehicle[],
     month: string
   ): SalaryCalculation[] {
@@ -36,7 +31,7 @@ export class FinanceService {
       const details = StaffSalaryService.calculateMonthlySalary(s, vehicles, month);
       
       return {
-        staffId: s.id,
+        staffId: String(s.id),
         staffName: s.name,
         baseSalary: details.base,
         salesCommission: details.salesCommission,
@@ -68,7 +63,11 @@ export class FinanceService {
   static calculateMonthlySalesProfit(vehicles: Vehicle[], month: string): number {
     return vehicles
       .filter(v => v.status === VehicleStatus.SOLD && v.sale_date?.startsWith(month))
-      .reduce((acc, v) => acc + (calculateVehicleFinancials(v).showroomProfitShare || 0), 0);
+      .reduce((acc, v) => {
+        const fin = calculateVehicleFinancials(v as any);
+        // Doanh thu gộp của Showroom = Lợi nhuận gộp - Phần chia cho đối tác
+        return acc + (fin.grossProfit - (fin.partnerProfitShare || 0));
+      }, 0);
   }
 
   /**
@@ -96,8 +95,24 @@ export class FinanceService {
   }
 
   /**
+   * Tính toán tổng chi trả cho đối tác trong tháng (Vốn + Lợi nhuận)
+   */
+  static calculateMonthlyPartnerPayouts(vehicles: Vehicle[], month: string): number {
+     return vehicles
+        .filter(v => v.status === VehicleStatus.SOLD && v.is_coinvested)
+        .reduce((acc, v) => {
+           const fin = calculateVehicleFinancials(v as any);
+           let payout = 0;
+           if (v.sale_date?.startsWith(month)) {
+              if (v.partner_capital_repaid) payout += fin.coinvestAmount;
+              if (v.partner_profit_shared) payout += fin.partnerProfitShare;
+           }
+           return acc + payout;
+        }, 0);
+  }
+
+  /**
    * Tính toán dữ liệu biểu đồ tuần dựa trên dòng tiền thực tế (Cash-basis).
-   * Bổ sung fallback cho dữ liệu cũ chưa có payment_history.
    */
   static calculateWeeklyCashflow(
     vehicles: Vehicle[], 
@@ -112,7 +127,6 @@ export class FinanceService {
     ];
 
     vehicles.forEach(v => {
-      // Incomes from Sale Payments
       if (v.sale_payment_history && v.sale_payment_history.length > 0) {
         v.sale_payment_history
           .filter(p => p.date?.startsWith(month))
@@ -121,14 +135,8 @@ export class FinanceService {
             const week = weeks.find(w => day >= w.start && day <= w.end) || weeks[3];
             week.thu += (p.amount || 0);
           });
-      } else if (v.status === VehicleStatus.SOLD && v.sale_date?.startsWith(month)) {
-        // Fallback for legacy sold cars: consider full sale price as income on sale_date
-        const day = parseInt(v.sale_date.split('-')[2]);
-        const week = weeks.find(w => day >= w.start && day <= w.end) || weeks[3];
-        week.thu += (v.sale_price || 0);
       }
 
-      // Outflows from Purchase Payments
       if (v.purchase_payment_history && v.purchase_payment_history.length > 0) {
         v.purchase_payment_history
           .filter(p => p.date?.startsWith(month))
@@ -137,14 +145,8 @@ export class FinanceService {
             const week = weeks.find(w => day >= w.start && day <= w.end) || weeks[3];
             week.chi += (p.amount || 0);
           });
-      } else if (v.purchase_date?.startsWith(month)) {
-        // Fallback for legacy purchased cars: consider full purchase price as outflow on purchase_date
-        const day = parseInt(v.purchase_date.split('-')[2]);
-        const week = weeks.find(w => day >= w.start && day <= w.end) || weeks[3];
-        week.chi += (v.purchase_price || 0);
       }
 
-      // Outflows from Car Costs
       (v.cost_history || [])
         .filter(c => c.date?.startsWith(month))
         .forEach(c => {
@@ -154,7 +156,6 @@ export class FinanceService {
         });
     });
 
-    // Outflows from Operating Expenses
     expenses
       .filter(e => e.date?.startsWith(month))
       .forEach(e => {
@@ -172,58 +173,32 @@ export class FinanceService {
   static calculateTotalCashBalance(
     totalCapital: number,
     vehicles: Vehicle[],
-    allExpenses: Expense[],
-    allStaff: any[]
+    allExpenses: Expense[]
   ): number {
-    // 1. All-time Incomes
+    // 1. All-time Incomes (Bao gồm cọc và thanh toán từ khách)
     const totalIncomes = vehicles.reduce((acc, v) => {
-      let income = 0;
-      if (v.sale_payment_history && v.sale_payment_history.length > 0) {
-        income = v.sale_payment_history.reduce((sum, p) => sum + (p.amount || 0), 0);
-      } else if (v.status === VehicleStatus.SOLD) {
-        income = (v.sale_price || 0);
-      }
+      const income = (v.sale_payment_history || []).reduce((sum, p) => sum + (p.amount || 0), 0);
       return acc + income;
     }, 0);
 
-    // 2. All-time Outflows (Purchase)
+    // 2. All-time Outflows (Tiền showroom thực chi để mua xe)
     const totalPurchaseOutflow = vehicles.reduce((acc, v) => {
-      let outflow = 0;
-      if (v.purchase_payment_history && v.purchase_payment_history.length > 0) {
-        // Assume purchase_payment_history records only showroom payments
-        outflow = v.purchase_payment_history.reduce((sum, p) => sum + (p.amount || 0), 0);
-      } else {
-        // Fallback: Showroom only paid the part it owns
-        outflow = Math.max(0, (v.purchase_price || 0) - (v.coinvest_amount || 0));
-      }
+      const outflow = (v.purchase_payment_history || []).reduce((sum, p) => sum + (p.amount || 0), 0);
       return acc + outflow;
     }, 0);
 
-    // 3. All-time Car Costs
+    // 3. All-time Car Costs (Chi phí spa, sửa chữa thực tế đã chi)
     const totalCarCosts = vehicles.reduce((acc, v) => {
       const vehicleCosts = (v.cost_history || []).reduce((sum, c) => sum + (c.amount || 0), 0);
       return acc + vehicleCosts;
     }, 0);
 
-    // 4. All-time Operating Expenses
+    // 4. All-time Operating Expenses (Chi phí vận hành showroom)
     const totalOpExpenses = allExpenses.reduce((acc, e) => acc + (e.amount || 0), 0);
 
-    // 5. All-time Commissions (Actually paid)
-    const totalCommissions = vehicles.reduce((acc, v) => {
-      const buyingComm = v.buying_commission || 0;
-      const sellingComm = v.status === VehicleStatus.SOLD ? (v.commission || 0) : 0;
-      return acc + buyingComm + sellingComm;
-    }, 0);
-
-    // 6. All-time Partner ROI Payouts (Investment + Profit Share)
-    // Only occurs for SOLD vehicles where partner paid directly
-    const totalPartnerPayouts = vehicles
-      .filter(v => v.status === VehicleStatus.SOLD && v.is_coinvested)
-      .reduce((acc, v) => {
-        const fin = calculateVehicleFinancials(v);
-        return acc + fin.coinvestAmount + fin.partnerProfitShare;
-      }, 0);
+    // 5. Staff payments are now tracked via Operating Expenses ('Lương nhân sự')
+    // We no longer subtract commissions directly from vehicles to avoid double-counting.
     
-    return totalCapital + totalIncomes - totalPurchaseOutflow - totalCarCosts - totalOpExpenses - totalCommissions - totalPartnerPayouts;
+    return Math.round(totalCapital + totalIncomes - totalPurchaseOutflow - totalCarCosts - totalOpExpenses);
   }
 }

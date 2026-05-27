@@ -11,6 +11,7 @@ export interface AddSalePaymentRequest {
   buyerName?: string;
   salePrice?: number;
   commission?: number;
+  buyingBonus?: number;
   date?: string;
 }
 
@@ -22,7 +23,9 @@ export class AddSalePayment {
       amount: request.amount,
       note: request.note,
       date: request.date || new Date().toISOString().split('T')[0],
-      receiver: request.receiver
+      receiver: request.receiver,
+      staff_id: '',
+      staff_expense_id: ''
     };
 
     // Chỉ cho phép amount = 0 nếu đây là bước cập nhật trạng thái mà không phát sinh dòng tiền
@@ -38,7 +41,8 @@ export class AddSalePayment {
       request.seller,
       request.buyerName,
       request.salePrice,
-      request.commission
+      request.commission,
+      request.buyingBonus
     );
   }
 }

@@ -1,45 +1,34 @@
+import { createValidatedRepository } from '@/src/shared/infrastructure/RepositoryFactory';
 import { supabase } from '@/src/shared/infrastructure/supabase';
-import { Expense } from '../domain/FinanceService';
-import { ExpenseRepository } from './ExpenseRepository';
+import { ExpenseSchema, ExpenseDTO } from '@/src/modules/finance/domain/ExpenseSchema';
+import { Expense, ExpenseRepository } from '@/src/modules/finance/domain/ExpenseRepository';
 
 export class SupabaseExpenseRepository implements ExpenseRepository {
   private readonly TABLE = 'operating_expenses';
+  private readonly baseRepo = createValidatedRepository<Expense, ExpenseDTO>(this.TABLE, ExpenseSchema);
 
   async getAll(): Promise<Expense[]> {
-    const { data, error } = await supabase
-      .from(this.TABLE)
-      .select('*')
-      .order('date', { ascending: false });
-
-    if (error) throw error;
-    return data || [];
+    return this.baseRepo.getAll();
   }
 
-  async add(expense: Omit<Expense, 'id'>): Promise<Expense> {
-    const { data, error } = await supabase
-      .from(this.TABLE)
-      .insert([expense])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+  async add(expense: Omit<Expense, 'id'>): Promise<void> {
+    await this.baseRepo.create(expense);
   }
 
   async update(id: string | number, expense: Partial<Expense>): Promise<void> {
-    const { error } = await supabase
-      .from(this.TABLE)
-      .update(expense)
-      .eq('id', id);
-
-    if (error) throw error;
+    await this.baseRepo.update(id, expense);
   }
 
   async delete(id: string | number): Promise<void> {
+    await this.baseRepo.delete(id);
+  }
+
+  async deleteByNameAndCategory(name: string, category: string): Promise<void> {
     const { error } = await supabase
       .from(this.TABLE)
       .delete()
-      .eq('id', id);
+      .eq('name', name)
+      .eq('category', category);
 
     if (error) throw error;
   }
@@ -56,7 +45,6 @@ export class SupabaseExpenseRepository implements ExpenseRepository {
   }
 
   async updateCapital(amount: number): Promise<void> {
-    // 1. Fetch current settings to get the actual ID
     const { data: settings } = await supabase
       .from('company_settings')
       .select('id')
@@ -65,7 +53,6 @@ export class SupabaseExpenseRepository implements ExpenseRepository {
 
     const settingsId = settings?.id || 1;
 
-    // 2. Perform update
     const { error } = await supabase
       .from('company_settings')
       .update({ total_capital: amount })

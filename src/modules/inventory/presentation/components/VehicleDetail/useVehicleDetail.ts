@@ -1,93 +1,114 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Vehicle } from '@/src/shared/domain/types';
 import { VehicleStatus, STAFF_CONSTANTS } from '@/src/shared/domain/constants';
-import { calculateVehicleFinancials } from '@/src/shared/utils/vehicle_calculations';
-import { CloudinaryVehicleStorageRepository } from '@/src/modules/inventory/infrastructure/CloudinaryVehicleStorageRepository';
-import { VehicleStateMachine } from '@/src/modules/inventory/domain/VehicleStateMachine';
+import { useNotification } from '@/src/shared/presentation/useNotification';
+import { useDependencies } from '@/src/shared/ioc/DependencyContext';
+import { useVehicleFinancials, PaymentFormState } from './useVehicleFinancials';
+import { haptics } from '@/src/shared/utils/haptics';
+
+interface VehicleDetailActions {
+  onUpdateStatus: (id: number, status: VehicleStatus, extra?: Record<string, unknown>) => Promise<void>;
+  onDeleteVehicle: (id: number) => Promise<void>;
+  onUpdateVehicle: (id: number, data: Partial<Vehicle>) => Promise<void>;
+  onAddCost: (id: number, name: string, amount: number) => Promise<void>;
+  onDeleteCost: (id: number, costIndex: number) => Promise<void>;
+  onPin: (id: number, isPinned: boolean) => Promise<void>;
+  onAddPurchasePayment: (id: number, amount: number, note: string, receiver: string) => Promise<void>;
+  onAddSalePayment: (id: number, amount: number, note: string, receiver: string, nextStatus: VehicleStatus, seller: string, buyerName?: string, salePrice?: number, commission?: number, buyingBonus?: number) => Promise<void>;
+  onCancelSale: (id: number, code: string) => Promise<void>;
+}
+
+export type { PaymentFormState };
 
 export const useVehicleDetail = (
   vehicle: Vehicle | null,
   userCode: string,
-  actions: {
-    onUpdateStatus: any;
-    onDeleteVehicle: any;
-    onUpdateVehicle: any;
-    onAddCost: any;
-    onDeleteCost: any;
-    onPin: any;
-    onAddPurchasePayment: any;
-    onAddSalePayment: any;
-    onCancelSale: any;
-  }
+  actions: VehicleDetailActions
 ) => {
-  const [activeTab, setActiveTab] = useState<'info' | 'financials' | 'history' | 'payments_buy' | 'payments_sale'>('info');
+  const { storageRepo } = useDependencies();
+  const notification = useNotification();
+  const [activeTab, setActiveTab] = useState<'info' | 'financials' | 'history'>('info');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Vehicle>>({});
-  const [costForm, setCostForm] = useState({ name: '', amount: 0 });
-  const [paymentForm, setPaymentForm] = useState<any>({
-    amount: 0,
-    note: '',
-    receiver: userCode,
-    seller: userCode,
-    buyerName: '',
-    commission: vehicle?.commission || 0
-  });
   const [transitionStatus, setTransitionStatus] = useState<VehicleStatus | null>(null);
-  const [nextStatusInTab, setNextStatusInTab] = useState<VehicleStatus | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showCancelSaleConfirm, setShowCancelSaleConfirm] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  
+  const [isSubmittingDetail, setIsSubmittingDetail] = useState(false);
 
-  const storageRepo = new CloudinaryVehicleStorageRepository();
+  // Hook composition: delegate financials and transactions to useVehicleFinancials hook
+  const {
+    financials,
+    purchaseDebt,
+    saleDebt,
+    isSubmitting: isSubmittingFinancials,
+    paymentForm,
+    setPaymentForm,
+    nextStatusInTab,
+    setNextStatusInTab,
+    showCancelSaleConfirm,
+    setShowCancelSaleConfirm,
+    handleAddCost,
+    handleDeleteCost,
+    handleAddPurchasePayment,
+    handleAddSalePayment,
+    handleCancelSale
+  } = useVehicleFinancials({
+    vehicle,
+    userCode,
+    onAddCost: actions.onAddCost,
+    onDeleteCost: actions.onDeleteCost,
+    onAddPurchasePayment: actions.onAddPurchasePayment,
+    onAddSalePayment: actions.onAddSalePayment,
+    onCancelSale: actions.onCancelSale
+  });
 
-  const withSubmitState = (fn: Function) => async (...args: any[]) => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
+  const isSubmitting = isSubmittingDetail || isSubmittingFinancials;
+
+  const handleUpdateStatus = async (id: number, status: VehicleStatus, extra?: Record<string, unknown>) => {
+    setIsSubmittingDetail(true);
     try {
-      await fn(...args);
-    } catch (error) {
-      console.error("Action error:", error);
+      await actions.onUpdateStatus(id, status, extra);
+      haptics.success();
     } finally {
-      setIsSubmitting(false);
+      setIsSubmittingDetail(false);
     }
   };
 
-  const handleUpdateStatus = withSubmitState(actions.onUpdateStatus);
-  const handleDeleteVehicle = withSubmitState(actions.onDeleteVehicle);
-  const handleUpdateVehicle = withSubmitState(actions.onUpdateVehicle);
-  const handleAddCost = withSubmitState(actions.onAddCost);
-  const handleDeleteCost = withSubmitState(actions.onDeleteCost);
-  const handlePin = withSubmitState(actions.onPin || (() => Promise.resolve()));
-  const handleAddPurchasePayment = withSubmitState(actions.onAddPurchasePayment);
-  const handleAddSalePayment = withSubmitState(actions.onAddSalePayment);
-  const handleCancelSale = withSubmitState(actions.onCancelSale);
-
-  useEffect(() => {
-    if (!vehicle) return;
-    if (activeTab === 'payments_sale') {
-      const validNext = VehicleStateMachine.getValidNextStatuses(vehicle.status as VehicleStatus)
-        .filter(s => s !== VehicleStatus.IN_STOCK);
-      if (validNext.length > 0 && !nextStatusInTab) {
-        setNextStatusInTab(validNext[0] as VehicleStatus);
-      }
-      if (!paymentForm.salePrice && vehicle.sale_price) {
-        setPaymentForm((prev: any) => ({ 
-          ...prev, 
-          salePrice: vehicle.sale_price || 0,
-          seller: vehicle.seller || userCode,
-          receiver: vehicle.seller || userCode
-        }));
-      } else if (vehicle.seller && (paymentForm.seller === userCode || !paymentForm.seller)) {
-        setPaymentForm((prev: any) => ({ 
-          ...prev, 
-          seller: vehicle.seller,
-          receiver: vehicle.seller
-        }));
-      }
+  const handleDeleteVehicle = async (id: number) => {
+    setIsSubmittingDetail(true);
+    try {
+      await actions.onDeleteVehicle(id);
+      haptics.success();
+    } finally {
+      setIsSubmittingDetail(false);
     }
-  }, [activeTab, vehicle, userCode]);
+  };
+
+  const handleUpdateVehicle = async (id: number, data: Partial<Vehicle>) => {
+    setIsSubmittingDetail(true);
+    try {
+      await actions.onUpdateVehicle(id, data);
+      haptics.success();
+    } finally {
+      setIsSubmittingDetail(false);
+    }
+  };
+
+  const handlePin = async (id: number, isPinned: boolean) => {
+    setIsSubmittingDetail(true);
+    try {
+      await (actions.onPin || (() => Promise.resolve()))(id, isPinned);
+      haptics.success();
+    } finally {
+      setIsSubmittingDetail(false);
+    }
+  };
+
+  const handleTabChange = (tab: 'info' | 'financials' | 'history') => {
+    setActiveTab(tab);
+  };
 
   const handleStartEdit = () => {
     if (!vehicle) return;
@@ -104,7 +125,9 @@ export const useVehicleDetail = (
       coinvestor_code: vehicle.coinvestor_code,
       notes: vehicle.notes,
       image_url: vehicle.image_url,
-      seller: vehicle.seller
+      seller: vehicle.seller,
+      buying_bonus: vehicle.buying_bonus,
+      buying_bonus_paid: vehicle.buying_bonus_paid,
     });
     setIsEditing(true);
   };
@@ -122,21 +145,22 @@ export const useVehicleDetail = (
     try {
       const publicUrl = await storageRepo.uploadImage(file);
       setEditForm(prev => ({ ...prev, image_url: publicUrl }));
-    } catch (err: any) {
+      haptics.success();
+    } catch (err: unknown) {
+      notification.error('Tải ảnh thất bại');
       console.error('Image upload failed:', err);
     } finally {
       setIsUploadingImage(false);
     }
   };
 
-  const financials = vehicle ? calculateVehicleFinancials(vehicle) : null;
-
   return {
-    activeTab, setActiveTab,
+    activeTab, setActiveTab: handleTabChange,
     isUpdatingStatus, setIsUpdatingStatus,
     isEditing, setIsEditing,
     editForm, setEditForm,
-    costForm, setCostForm,
+    costForm: { name: '', amount: 0 }, // Backwards compatibility placeholder
+    setCostForm: () => {}, // Backwards compatibility placeholder
     paymentForm, setPaymentForm,
     transitionStatus, setTransitionStatus,
     nextStatusInTab, setNextStatusInTab,
@@ -156,6 +180,8 @@ export const useVehicleDetail = (
     handleStartEdit,
     handleSaveEdit,
     handleImageUpload,
-    financials
+    financials,
+    purchaseDebt,
+    saleDebt
   };
 };

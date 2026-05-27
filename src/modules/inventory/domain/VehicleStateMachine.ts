@@ -1,4 +1,5 @@
 import { VehicleStatus } from '../../../shared/domain/constants';
+import { VehicleDTO } from './VehicleSchema';
 
 export class VehicleStateMachine {
   /**
@@ -33,12 +34,12 @@ export class VehicleStateMachine {
   /**
    * Trả về danh sách các trường cần xóa (null/0) khi chuyển đến trạng thái mới.
    */
-  static getFieldsToReset(next: VehicleStatus): Partial<Record<string, any>> {
-    const saleFields = {
-      sale_date: null,
-      seller: null,
-      buyer_name: null, 
-      commission: null,
+  static getFieldsToReset(next: VehicleStatus): Partial<VehicleDTO> {
+    const saleFields: Partial<VehicleDTO> = {
+      sale_date: undefined,
+      seller: undefined,
+      customer_name: undefined, 
+      commission: undefined,
       received_amount: 0,
       sale_payment_history: []
     };
@@ -49,5 +50,17 @@ export class VehicleStateMachine {
     }
 
     return {};
+  }
+
+  /**
+   * Kiểm tra xem trạng thái hiện tại có thuộc nhánh đang thực hiện giao dịch BÁN hay không.
+   */
+  static isSalePhase(status: VehicleStatus): boolean {
+    return [
+      VehicleStatus.DEPOSIT_SALE, 
+      VehicleStatus.BANK_DEPOSIT, 
+      VehicleStatus.BANK_CONFIRMED, 
+      VehicleStatus.SOLD
+    ].includes(status);
   }
 }

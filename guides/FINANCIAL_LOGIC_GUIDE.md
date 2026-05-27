@@ -1,18 +1,19 @@
-# 📘 Auto28 — Financial & Salary Logic Guide v2.0
+# 📘 Auto28 — Financial & Salary Logic Guide v2.3
 
-> **Mục đích**: Tài liệu này là **nguồn sự thật duy nhất (Single Source of Truth)** về logic tài chính và tính lương. Mọi thay đổi chính sách phải được cập nhật tại đây trước khi viết code.
+> **Mục đích**: Tài liệu này là **nguồn sự thật duy nhất (Single Source of Truth - SSoT)** về logic tài chính, tính lương, và quản lý dòng tiền của hệ sinh thái Auto-28. Mọi thay đổi nghiệp vụ phải được phản ánh tại đây trước khi thực hiện viết mã nguồn.
 
 ---
 
 ## Mục lục
-1. [Kiến trúc tổng quan](#kiến-trúc)
-2. [Logic Tài chính Xe](#phần-i-logic-tài-chính-xe)
-3. [Logic Chia sẻ Lợi nhuận Đối tác](#phần-ii-chia-sẻ-lợi-nhuận-đối-tác)
-4. [Logic Tính lương & KPI](#phần-iii-logic-tính-lương--kpi)
-5. [Logic Báo cáo Tài chính Công ty](#phần-iv-báo-cáo-tài-chính-công-ty)
-6. [Quy tắc Bất biến (Golden Rules)](#phần-v-quy-tắc-bất-biến)
-7. [Bảng tra cứu hàm](#phần-vi-bảng-tra-cứu-hàm)
-8. [Lỗi phổ biến & Cách tránh](#phần-vii-lỗi-phổ-biến)
+1. [Kiến trúc Tổng quan & SSoT](#kiến-trúc)
+2. [Phần I: Logic Tài chính Xe](#phần-i-logic-tài-chính-xe)
+3. [Phần II: Chia sẻ Lợi nhuận Đối tác (Co-investment)](#phần-ii-chia-sẻ-lợi-nhuận-đối-tác)
+4. [Phần III: Logic Tính lương & KPI Nhân sự](#phần-iii-logic-tính-lương--kpi-nhân-sự)
+5. [Phần IV: Báo cáo Tài chính Công ty (GetFinancialOverview)](#phần-iv-báo-cáo-tài-chính-công-ty)
+6. [Phần V: Quy tắc Bất biến (Golden Rules)](#phần-v-quy-tắc-bất-biến)
+7. [Phần VI: Bảng Tra cứu Hàm Core](#phần-vi-bảng-tra-cứu-hàm-core)
+8. [Phần VIII: Cơ chế Tự động hóa ở Tầng Database Triggers](#phần-viii-cơ-chế-tự-động-hóa-ở-tầng-database-triggers)
+9. [Phần IX: Lỗi Phổ biến & Cách Khắc phục](#phần-ix-lỗi-phổ-biến--cách-khắc-phục)
 
 ---
 
@@ -47,64 +48,60 @@
 
 ## Phần I: Logic Tài chính Xe
 
-### 1.1 Cơ chế Chốt Sổ (Snapshot)
+### 1.1 Cơ chế Tính toán Động (Dynamic Calculations)
 
-Khi xe chuyển sang trạng thái **`SOLD`**, hệ thống tự động ghi lại toàn bộ số liệu vào trường `final_financials` (bất biến). Điều này ngăn dữ liệu bị thay đổi hồi tố.
+> [!NOTE]
+> Hệ thống Auto-28 **không** lưu trữ trạng thái tài chính tĩnh của xe (không dùng trường `final_financials` cũ). Mọi chỉ số tài chính của xe đều được tính toán **động và nhất quán** theo thời gian thực (Real-time Dynamic Calculation) tại [vehicle_calculations.ts](file:///Users/phanvu/Desktop/auto-28/src/shared/utils/vehicle_calculations.ts).
 
-**Thứ tự ưu tiên khi tính toán:**
-```
-Priority 1: vehicle.final_financials (đã chốt sổ, không thể thay đổi)
-     ↓ (chỉ dùng nếu P1 không có)
-Priority 2: Tính động từ dữ liệu xe hiện tại (isEstimated = true)
-```
+Hệ thống tính toán chi phí dọn dẹp xe (`totalCost`) tự động bằng cách cộng dồn lịch sử các khoản chi trong mảng `cost_history`. Nếu mảng này trống, hệ thống sẽ tự động sử dụng trường dự phòng `total_cost` được đồng bộ từ cơ sở dữ liệu.
 
 ```typescript
-// vehicle_calculations.ts — Coordinator Function
-export function calculateVehicleFinancials(vehicle: Vehicle): VehicleFinancials {
-  // ✅ Ưu tiên 1: Snapshot đã khóa
-  if (vehicle.final_financials) {
-    const s = vehicle.final_financials;
-    return {
-      ...
-      partnerProfitShare: s.partnerProfitShare || (s.netProfit - s.showroomProfitShare),
-      isEstimated: false // ← Số thật, không phải ước tính
-    };
-  }
-
-  // ✅ Ưu tiên 2: Tính động
-  const grossProfit = calcGrossProfit(salePrice, purchasePrice, totalCost);
-  const netProfit = calcNetProfit(grossProfit, buyingCommission, sellingCommission);
-  ...
-  return { ..., isEstimated: vehicle.status !== VehicleStatus.SOLD };
-}
+// Trích xuất từ src/shared/utils/vehicle_calculations.ts
+const costHistory = vehicle.cost_history || [];
+const totalCost = costHistory.length > 0
+  ? costHistory.reduce((sum, item) => sum + (item.amount || 0), 0)
+  : (vehicle.total_cost || 0);
 ```
 
-### 1.2 Công thức Cơ bản
+### 1.2 Công thức Tài chính Xe
 
-| Hạng mục | Công thức | File định nghĩa |
-| :--- | :--- | :--- |
-| **Lợi nhuận Gộp** | `Giá bán − (Giá nhập + Phí Spa)` | `financial_formulas.ts` → `calcGrossProfit` |
-| **Lợi nhuận Ròng** | `Lợi nhuận Gộp − HH Mua − HH Bán` | `financial_formulas.ts` → `calcNetProfit` |
-| **Tổng vốn đầu tư** | `Giá nhập + Phí Spa + HH Mua + (HH Bán nếu đã bán)` | `vehicle_calculations.ts` → `totalInvestment` |
+| Chỉ số | Công thức Toán học | File Định nghĩa | Database Field |
+| :--- | :--- | :--- | :--- |
+| **Tổng Vốn Xe** | `Giá nhập + Phí Spa/Dọn` | [vehicle_calculations.ts](file:///Users/phanvu/Desktop/auto-28/src/shared/utils/vehicle_calculations.ts) | `purchase_price` + `total_cost` (hoặc `cost_history` sum) |
+| **Lợi nhuận Gộp** (Gross) | Nếu xe đã bán (`salePrice > 0`): `Giá bán − Tổng Vốn Xe`<br>Nếu xe chưa bán (`salePrice <= 0`): `0` | [financial_formulas.ts](file:///Users/phanvu/Desktop/auto-28/src/shared/utils/financial_formulas.ts) → `calcGrossProfit` | `sale_price` - (`purchase_price` + `total_cost`) |
+| **Lợi nhuận Ròng** (Net) | Nếu xe đã bán (`salePrice > 0`): `Lợi nhuận Gộp − HH Mua − Thưởng Mua − HH Bán`<br>Nếu xe chưa bán: `0` | [financial_formulas.ts](file:///Users/phanvu/Desktop/auto-28/src/shared/utils/financial_formulas.ts) → `calcNetProfit` | `grossProfit` - (`buying_commission` + `buying_bonus` + `commission`) |
 
 ```typescript
-// ✅ financial_formulas.ts — Pure Math (không phụ thuộc Object)
-
-export const calcGrossProfit = (
-  salePrice: number, purchasePrice: number, totalCost: number
-): number => {
+// ✅ financial_formulas.ts — Pure Math Core (không phụ thuộc Object phức tạp)
+export const calcGrossProfit = (salePrice: number, purchasePrice: number, totalCost: number): number => {
   if (salePrice <= 0) return 0;
-  return salePrice - (purchasePrice + totalCost);
+  return Math.round(salePrice - (purchasePrice + totalCost));
 };
 
-export const calcNetProfit = (
-  grossProfit: number, buyingComm: number, sellingComm: number
-): number => {
-  return grossProfit - (buyingComm + sellingComm);
+export const calcNetProfit = (grossProfit: number, buyingComm: number, buyingBonus: number, sellingComm: number): number => {
+  return Math.round(grossProfit - (buyingComm + buyingBonus + sellingComm));
 };
 ```
 
-> **⚠️ Lưu ý**: Nếu `salePrice <= 0` (xe chưa bán), `calcGrossProfit` trả về **0** — thiết kế có chủ đích để tránh hiển thị lợi nhuận âm tưởng tượng cho xe còn trong kho.
+> [!WARNING]
+> Mọi hoa hồng và thưởng mua (`buying_commission`, `buying_bonus`) cũng như hoa hồng bán (`commission` của xe) phải được trừ hoàn toàn khỏi Lợi nhuận Gộp trước khi tính Lợi nhuận Ròng để phục vụ việc chia sẻ lợi nhuận cho đối tác. Điều này đảm bảo showroom không bị gánh chịu chi phí hoa hồng một mình.
+
+### 1.3 Logic Xe Tồn Kho Lâu Ngày (Aging Days)
+
+Mỗi xe trong kho được tính số ngày tồn kho (`Aging Days`) dựa trên ngày nhập xe (`purchase_date`) so với ngày hiện tại.
+
+```typescript
+export const calculateAgingDays = (purchaseDate: string | null | undefined): number => {
+  if (!purchaseDate) return 0;
+  const start = new Date(purchaseDate);
+  const now = new Date();
+  const diffTime = now.getTime() - start.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays >= 0 ? diffDays : 0;
+};
+```
+*   **Ngưỡng Xe Tồn Kho Lâu (Aging Threshold)**: **25 ngày** (định nghĩa tại `INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS` trong [constants.ts](file:///Users/phanvu/Desktop/auto-28/src/shared/domain/constants.ts)).
+*   Nếu `calculateAgingDays(purchase_date) >= 25`, xe sẽ được gắn cờ cảnh báo tồn kho lâu ngày trên giao diện quản trị.
 
 ---
 
@@ -112,191 +109,272 @@ export const calcNetProfit = (
 
 ### 2.1 Nguyên tắc
 
-Lợi nhuận chia cho đối tác dựa trên **tỷ lệ vốn góp thực tế** so với **Tổng vốn đầu tư** (`Giá nhập + Phí Spa`).
+Showroom và Đối tác góp vốn đầu tư chung cho một chiếc xe dựa trên cơ chế đồng đầu tư (`is_coinvested = true`).
 
-> **🔴 QUAN TRỌNG**: Luôn tính tỷ lệ trên **Lợi nhuận Ròng** (đã trừ hết hoa hồng). Không bao giờ tính trên Lợi nhuận Gộp.
+*   **Tổng Vốn Đầu Tư Cần Thiết**: `Giá nhập + Phí Spa/Dọn` (`totalInvestment`).
+*   **Vốn Góp Của Showroom**: `Tổng Vốn - Vốn Đối Tác Góp` (`totalInvestment - coinvestAmount`).
+*   **Chia sẻ Lợi nhuận**: Dựa trên **tỷ lệ góp vốn thực tế** nhân với **Lợi nhuận Ròng** (Lợi nhuận sau khi đã trừ hết hoa hồng mua, bán và thưởng).
 
-### 2.2 Công thức
+### 2.2 Công thức Toán học
 
 ```typescript
-// ✅ financial_formulas.ts
-export const calcProfitShare = (
-  netProfit: number,
-  capital: number,     // Vốn của bên cần tính (showroom hoặc đối tác)
-  totalNeeded: number  // Tổng vốn = Giá nhập + Phí Spa
-): number => {
-  if (totalNeeded <= 0) return netProfit; // Tránh chia cho 0
+// Trích xuất từ src/shared/utils/financial_formulas.ts
+export const calcProfitShare = (netProfit: number, capital: number, totalNeeded: number): number => {
+  if (totalNeeded <= 0) return Math.round(netProfit);
   const ratio = capital / totalNeeded;
-  return netProfit * ratio;
+  return Math.round(netProfit * ratio);
 };
 
-// ✅ Cách gọi trong vehicle_calculations.ts
-const totalCapitalNeeded = purchasePrice + totalCost;           // Giá nhập + Spa
-const showroomCapital = Math.max(0, totalCapitalNeeded - coinvestAmount);
-
-const showroomProfitShare = calcProfitShare(netProfit, showroomCapital, totalCapitalNeeded);
-const partnerProfitShare  = netProfit - showroomProfitShare;    // Phần còn lại cho đối tác
+// Điều phối tính toán trong vehicle_calculations.ts
+if (isCoinvested && totalInvestment > 0) {
+  showroomCapital = totalInvestment - coinvestAmount;
+  partnerProfitShare = calcProfitShare(netProfit, coinvestAmount, totalInvestment);
+  showroomProfitShare = netProfit - partnerProfitShare;
+}
 ```
 
-### 2.3 Ví dụ minh họa (VF6 PLUS)
+### 2.3 Ví dụ Thực tế Minh họa (VF6 PLUS)
 
 ```
-Đầu vào:
-  Giá nhập:        567.000.000đ
-  Phí Spa:           6.220.000đ
-  Vốn đối tác góp: 143.000.000đ
-  Giá bán:         640.000.000đ
-  Hoa hồng bán:     10.000.000đ
+[ĐẦU VÀO]
+  Giá nhập xe:     567.000.000 đ
+  Chi phí Spa/Dọn:   6.220.000 đ
+  Vốn đối tác góp: 143.000.000 đ (coinvest_amount)
+  Giá bán xe:      640.000.000 đ (sale_price)
+  Hoa hồng bán:     10.000.000 đ (commission)
 
-Tính toán:
-  [1] Tổng vốn    = 567 + 6,22           = 573,22 Tr
-  [2] LN Gộp      = 640 - 573,22         = 66,78 Tr
-  [3] LN Ròng     = 66,78 - 10           = 56,78 Tr
-  [4] Tỷ lệ ĐT    = 1 - (143 / 573,22)  = 75,06% (showroom)
-                    143 / 573,22          = 24,94% (đối tác)
-  [5] LN ĐT nhận  = 56,78 × 24,94%      = 14,16 Tr ✅
-  [6] LN Showroom = 56,78 × 75,06%      = 42,62 Tr ✅
+[TÍNH TOÁN]
+  1. Tổng vốn xe   = 567.000.000 + 6.220.000 = 573.220.000 đ
+  2. LN Gộp        = 640.000.000 - 573.220.000 = 66.780.000 đ
+  3. LN Ròng       = 66.780.000 - 10.000.000 = 56.780.000 đ (Đã trừ hoa hồng bán)
+  4. Tỷ lệ Đối tác = 143.000.000 / 573.220.000 = 24.9471%
+  5. Tỷ lệ Showroom= 1 - 24.9471% = 75.0529%
+  
+  6. LN Đối tác nhận = 56.780.000 * 24.9471% = 14.164.981 đ ✅
+  7. LN Showroom nhận= 56.780.000 * 75.0529% = 42.615.019 đ ✅
 ```
 
 ---
 
-## Phần III: Logic Tính lương & KPI
+## Phần III: Logic Tính lương & KPI Nhân sự
 
-### 3.1 Chỉ số KPI
+Hệ thống quản lý lương nhân viên sử dụng một cơ chế tính toán tập trung tại [StaffSalaryService.ts](file:///Users/phanvu/Desktop/auto-28/src/modules/staff/domain/StaffSalaryService.ts) để đảm bảo tính nhất quán trên cả Web và Mobile.
+
+### 3.1 Chỉ số Hoàn thành KPI
+
+Mỗi nhân viên tư vấn có một chỉ tiêu bán hàng tháng (`target` - ví dụ: 3 xe/tháng). Tỷ lệ hoàn thành KPI được tính dựa trên số xe đã bán thực tế trong tháng so với chỉ tiêu.
 
 ```typescript
-// ✅ financial_formulas.ts
 export const calcKPICompletion = (actualSales: number, target: number): number => {
-  if (target <= 0) return 100; // Nếu chỉ tiêu = 0 → mặc định đạt 100%
-  return (actualSales / target) * 100;
+  if (target <= 0) return 100;
+  return Math.round((actualSales / target) * 100);
 };
 ```
 
-### 3.2 Hệ số Thưởng KPI (từ STAFF_CONSTANTS trong constants.ts)
+### 3.2 Hệ số Thưởng KPI (STAFF_CONSTANTS)
 
-| Điều kiện | Hệ số | Hằng số trong code |
-| :---: | :---: | :--- |
-| Hoàn thành **≥ 100%** chỉ tiêu | **1.0x** | `BONUS_MULTIPLIER_FULL = 1.0` |
-| Hoàn thành **< 100%** chỉ tiêu | **0.7x** | `BONUS_MULTIPLIER_REDUCED = 0.7` |
-| Ngưỡng kích hoạt thưởng đầy đủ | **100%** | `BONUS_THRESHOLD_PERCENT = 100` |
+Hệ số KPI được áp dụng **trực tiếp và duy nhất** lên Hoa hồng Bán xe (`salesCommission`). Các khoản hoa hồng mua xe hay góp vốn không bị ảnh hưởng bởi hệ số này.
+
+*   **Hoàn thành ≥ 100% chỉ tiêu**: Hệ số **1.0x** (`STAFF_CONSTANTS.BONUS_MULTIPLIER_FULL`)
+*   **Hoàn thành < 100% chỉ tiêu**: Phạt hệ số còn **0.7x** (`STAFF_CONSTANTS.BONUS_MULTIPLIER_REDUCED`)
 
 ```typescript
-// ✅ financial_formulas.ts
 export const calcKPIMultiplier = (
-  completionRate: number,
+  completionRate: number, 
   threshold = STAFF_CONSTANTS.BONUS_THRESHOLD_PERCENT, // 100
-  full      = STAFF_CONSTANTS.BONUS_MULTIPLIER_FULL,   // 1.0
-  reduced   = STAFF_CONSTANTS.BONUS_MULTIPLIER_REDUCED // 0.7
+  full = STAFF_CONSTANTS.BONUS_MULTIPLIER_FULL,       // 1.0
+  reduced = STAFF_CONSTANTS.BONUS_MULTIPLIER_REDUCED  // 0.7
 ): number => {
   return completionRate >= threshold ? full : reduced;
 };
 ```
 
-### 3.3 Cấu trúc Thu nhập
+### 3.3 Cấu trúc Thu nhập Chi tiết
 
 ```
-Tổng thu nhập = Lương cứng
-              + (HH Bán × Hệ số KPI)   ← HH Bán bị phạt nếu <100% chỉ tiêu
-              + HH Mua                  ← KHÔNG bị ảnh hưởng bởi KPI
-              + Lợi nhuận góp vốn       ← KHÔNG bị ảnh hưởng bởi KPI
+Tổng Thu Nhập Lương (totalSalary) = Lương cứng (base_salary)
+                                  + (Tổng Hoa hồng Bán xe × Hệ số Thưởng KPI)
+                                  + Tổng Hoa hồng Nhập xe (buying_commission)
+                                  + Tổng Thưởng Mua xe (buying_bonus)
+                                  + Tổng Chia sẻ Lợi nhuận Góp vốn (coinvestProfitShare)
 ```
 
 ```typescript
 // ✅ financial_formulas.ts
 export const calcTotalSalary = (
-  baseSalary: number,
-  salesCommissions: number, // ← sẽ bị nhân với kpiMultiplier
-  kpiMultiplier: number,
-  profitShare: number = 0   // buyingComm + coinvestProfit, không bị ảnh hưởng KPI
+  baseSalary: number, 
+  salesCommissions: number, 
+  kpiMultiplier: number, 
+  otherCommissions: number = 0 // buyingComm + buyingBonus + profitShare
 ): number => {
-  return baseSalary + (salesCommissions * kpiMultiplier) + profitShare;
+  return Math.round(baseSalary + (salesCommissions * kpiMultiplier) + otherCommissions);
 };
 ```
+
+### 3.4 Cơ chế Chi hộ & Hoàn ứng (Reimbursements)
+
+Nhân viên có thể chi hộ công ty các khoản phí ngoài (chi phí spa, đi lại...) thông qua việc tạo phiếu chi trong danh sách `expenses`.
+
+*   **Khoản hoàn ứng hợp lệ**: Các khoản chi chưa được hoàn tiền (`is_reimbursed = false`) phát sinh trong tháng hiện tại hoặc dồn tích từ các tháng trước (`carryOverExpenses`).
+*   **Tổng Hoàn ứng**: `totalReimbursements = currentMonthExpenses + carryOverExpenses`.
+*   **Thực nhận (Net Salary)**: `netSalary = totalSalary + totalReimbursements`.
+
+### 3.5 Cơ chế Chuyển tiếp Số liệu Chưa chi (Carry-Over Bonuses)
+
+Để tránh thất thoát dòng tiền của nhân viên khi các giao dịch được thanh toán muộn:
+1.  **Thưởng mua xe chưa chi từ tháng trước**: Các xe do nhân viên thu mua nhưng chưa được thanh toán thưởng (`buying_bonus_paid = false`) ở các tháng trước sẽ tự động được gom và chi trả trong bảng lương tháng hiện tại.
+2.  **Lợi nhuận góp vốn chưa chi từ tháng trước**: Các xe nhân viên tham gia góp vốn đã bán ở tháng trước nhưng chưa được showroom tất toán (`partner_profit_shared = false`) sẽ được cộng dồn vào bảng lương tháng này.
 
 ---
 
 ## Phần IV: Báo cáo Tài chính Công ty
 
+Tầng điều phối báo cáo tài chính nằm tại [GetFinancialOverview.ts](file:///Users/phanvu/Desktop/auto-28/src/modules/finance/application/GetFinancialOverview.ts), sử dụng các phương thức xử lý tĩnh trong [FinanceService.ts](file:///Users/phanvu/Desktop/auto-28/src/modules/finance/domain/FinanceService.ts).
+
+### 4.1 Doanh thu Bán hàng Công ty (Monthly Sales Profit)
+
+Doanh thu thực tế của showroom từ hoạt động kinh doanh xe được tính bằng tổng chênh lệch lợi nhuận gộp của showroom sau khi trừ đi phần chia cho đối tác góp vốn (Realized Showroom's Gross Profit).
+
+```typescript
+// FinanceService.ts
+static calculateMonthlySalesProfit(vehicles: Vehicle[], month: string): number {
+  return vehicles
+    .filter(v => v.status === VehicleStatus.SOLD && v.sale_date?.startsWith(month))
+    .reduce((acc, v) => {
+      const fin = calculateVehicleFinancials(v as any);
+      return acc + (fin.grossProfit - (fin.partnerProfitShare || 0));
+    }, 0);
+}
 ```
-Lợi nhuận ròng cuối cùng = Tổng LN từ xe bán trong tháng
-                          − Chi phí vận hành (điện, nước, mặt bằng...)
-                          − Tổng lương cứng nhân sự
+
+### 4.2 Lợi nhuận Ròng Công ty (Company Net Profit)
+
+Lợi nhuận ròng cuối cùng của công ty trong tháng được tính bằng cách khấu trừ các chi phí vận hành showroom và tổng quỹ lương thực tế đã thanh toán cho nhân viên.
+
+```typescript
+Lợi nhuận Ròng Tháng = Doanh thu Bán hàng Tháng (monthlySalesProfit)
+                      - Chi phí Vận hành Showroom (operationalExpenses)
+                      - Tổng Quỹ lương Nhân sự đã chi (totalStaffSalaries)
 ```
 
 ```typescript
-// ✅ financial_formulas.ts
+// financial_formulas.ts
 export const calcCompanyMonthlyNetProfit = (
-  monthlySalesProfit: number,  // LN Showroom từ tất cả xe bán trong tháng
-  operationalExpenses: number, // Chi phí cố định vận hành
-  staffBaseSalaries: number    // Chỉ tính lương cứng (HH đã trừ trong LN xe)
+  monthlySalesProfit: number, 
+  operationalExpenses: number, 
+  totalStaffSalaries: number
 ): number => {
-  return monthlySalesProfit - operationalExpenses - staffBaseSalaries;
+  return Math.round(monthlySalesProfit - operationalExpenses - totalStaffSalaries);
 };
 ```
 
-> **📝 Lưu ý**: `monthlySalesProfit` = tổng `showroomProfitShare` của các xe bán trong tháng (không phải toàn bộ lợi nhuận ròng, vì phần đối tác không thuộc showroom).
+### 4.3 Quản lý Số dư Tiền mặt Thực tế (Cash Balance / Available Cash)
+
+Để đảm bảo số dư tiền hiển thị trên Dashboard khớp chính xác 100% với số dư tài khoản ngân hàng, hệ thống sử dụng phương pháp hạch toán dòng tiền thực thu/thực chi (Cash-basis cumulative calculations):
+
+```
+Số dư Tiền mặt = Vốn Điều lệ Ban đầu (totalCapital)
+                + Tổng Tiền bán xe thực thu từ khách (All-time Sale Payments)
+                - Tổng Tiền thực chi mua xe cho chủ cũ (All-time Purchase Payments)
+                - Tổng Tiền thực chi Spa/Dọn xe (All-time Car Costs)
+                - Tổng Chi phí Vận hành & Lương đã chi trả (All-time Operating Expenses)
+```
+
+```typescript
+// Trích xuất từ FinanceService.ts
+static calculateTotalCashBalance(
+  totalCapital: number,
+  vehicles: Vehicle[],
+  allExpenses: Expense[]
+): number {
+  const totalIncomes = vehicles.reduce((acc, v) => {
+    return acc + (v.sale_payment_history || []).reduce((sum, p) => sum + (p.amount || 0), 0);
+  }, 0);
+
+  const totalPurchaseOutflow = vehicles.reduce((acc, v) => {
+    return acc + (v.purchase_payment_history || []).reduce((sum, p) => sum + (p.amount || 0), 0);
+  }, 0);
+
+  const totalCarCosts = vehicles.reduce((acc, v) => {
+    return acc + (v.cost_history || []).reduce((sum, c) => sum + (c.amount || 0), 0);
+  }, 0);
+
+  const totalOpExpenses = allExpenses.reduce((acc, e) => acc + (e.amount || 0), 0);
+  
+  return Math.round(totalCapital + totalIncomes - totalPurchaseOutflow - totalCarCosts - totalOpExpenses);
+}
+```
+
+> [!IMPORTANT]
+> **Nguyên tắc Chống Khấu trừ Trùng lặp (Double-Counting Prevention)**:
+> Lương nhân viên và hoa hồng bán xe sau khi chi trả sẽ được hạch toán trực tiếp vào mục Chi phí Vận hành (`Expenses` thuộc danh mục "Lương nhân sự"). Vì vậy, trong công thức tính số dư tiền mặt thực tế, hệ thống **không** trừ hoa hồng trực tiếp từ xe để tránh việc khấu trừ hai lần làm thâm hụt số dư tiền mặt công ty.
 
 ---
 
-## Phần V: Quy tắc Bất biến
+## Phần V: Quy tắc Bất biến (Golden Rules)
 
-### ✅ ĐÚNG
-```typescript
-// Luôn lấy dữ liệu từ calculateVehicleFinancials()
-const fin = calculateVehicleFinancials(car);
-displayProfit(fin.partnerProfitShare); // ← lấy giá trị đã tính sẵn
-```
-
-### ❌ SAI — Tuyệt đối không làm
-```typescript
-// ❌ Tính lại tỷ lệ trong UI
-const ratio = car.coinvest_amount / car.purchase_price; // Sai công thức
-const profit = car.profit * ratio;
-
-// ❌ Dùng hoa hồng mặc định
-const comm = car.commission ?? 5_000_000; // "Hoa hồng ma"
-
-// ❌ Tính toán trực tiếp trong JSX
-<span>{(car.sale_price - car.purchase_price) * 0.25}</span>
-```
-
-### Bảng Quy tắc
-
-| # | Quy tắc | Lý do |
+| # | Quy tắc Vàng | Lý do kỹ thuật |
 | :---: | :--- | :--- |
-| **R1** | Mọi công thức PHẢI nằm trong `financial_formulas.ts` | Một chỗ thay đổi → toàn app cập nhật |
-| **R2** | UI chỉ được **đọc** kết quả từ `calculateVehicleFinancials()` | Tránh tính sai ở lớp hiển thị |
-| **R3** | Hoa hồng mặc định = **0**, không phải 3tr hay 5tr | Tránh "hoa hồng ma" gây sai số |
-| **R4** | Khi xe `SOLD` → luôn có `final_financials` được chốt sổ | Đảm bảo tính lịch sử bất biến |
-| **R5** | Chia lợi nhuận đối tác dựa trên **LN Ròng**, không phải LN Gộp | Đảm bảo công bằng cho showroom |
+| **R1** | Mọi công thức tính toán toán học PHẢI nằm tập trung trong [financial_formulas.ts](file:///Users/phanvu/Desktop/auto-28/src/shared/utils/financial_formulas.ts) | Tránh phân mảnh logic; đảm bảo khi sửa đổi quy định tài chính chỉ cần sửa tại một nơi duy nhất. |
+| **R2** | Các thành phần giao diện (UI Components) tuyệt đối không được tự ý thực hiện tính toán. | Phải gọi qua hook điều phối [useVehicleFinancials.ts](file:///Users/phanvu/Desktop/auto-28/src/modules/inventory/presentation/components/VehicleDetail/useVehicleFinancials.ts) hoặc [calculateVehicleFinancials](file:///Users/phanvu/Desktop/auto-28/src/shared/utils/vehicle_calculations.ts). |
+| **R3** | Giá trị mặc định của hoa hồng và thưởng khi nhập xe mới luôn luôn là **0**. | Loại bỏ hoàn toàn sai số từ "hoa hồng ma" do fallback giá trị mặc định gây ra. |
+| **R4** | Hoa hồng đối tác chỉ được trích xuất từ **Lợi nhuận Ròng (Net)** của xe, không bao giờ được trích xuất từ Lợi nhuận Gộp. | Bảo vệ lợi ích kinh tế tối đa cho showroom Auto28. |
+| **R5** | Hoàn ứng chi phí cho nhân viên (`Reimbursements`) **phải** được cộng vào thực nhận (`netSalary`) nhưng **không** được tính vào lương chi phí gốc (`totalSalary`) để tránh sai lệch quỹ lương. | Đảm bảo tính minh bạch và công bằng cho chi phí vận hành showroom. |
+| **R6** | Tuyệt đối không sử dụng các kiểu dữ liệu `any`, `as any` hoặc `@ts-ignore` trong bất kỳ mã nguồn tài chính nào. | Bảo vệ tính toàn vẹn của kiểu dữ liệu, ngăn ngừa lỗi runtime sập hệ thống. |
+| **R7** | Toàn bộ dữ liệu bên ngoài từ Database hoặc API phải được xác thực qua **Zod Schemas** trước khi đưa vào các hàm tài chính. | Đảm bảo dữ liệu đầu vào luôn sạch sẽ, không chứa giá trị `null` hoặc `undefined` gây lỗi tính toán. |
 
 ---
 
-## Phần VI: Bảng tra cứu hàm
+## Phần VI: Bảng Tra cứu Hàm Core
 
-| Hàm | File | Input | Output | Dùng khi nào |
-| :--- | :--- | :--- | :--- | :--- |
-| `calcGrossProfit` | `financial_formulas.ts` | `sale, purchase, spa` | `number` | Tính LN trước hoa hồng |
-| `calcNetProfit` | `financial_formulas.ts` | `gross, buyComm, sellComm` | `number` | Tính LN sau hoa hồng |
-| `calcProfitShare` | `financial_formulas.ts` | `net, capital, total` | `number` | Chia LN theo tỷ lệ vốn |
-| `calcKPICompletion` | `financial_formulas.ts` | `actual, target` | `number (%)` | Hiển thị % KPI |
-| `calcKPIMultiplier` | `financial_formulas.ts` | `rate` | `1.0 or 0.7` | Tính hệ số thưởng |
-| `calcTotalSalary` | `financial_formulas.ts` | `base, sales, kpi, share` | `number` | Tổng thu nhập nhân viên |
-| `calcCompanyMonthlyNetProfit` | `financial_formulas.ts` | `sales, opex, salary` | `number` | Lợi nhuận ròng tháng |
-| `calculateVehicleFinancials` | `vehicle_calculations.ts` | `Vehicle` | `VehicleFinancials` | **Điểm vào duy nhất cho UI** |
+| Tên hàm | File định nghĩa | Vai trò nghiệp vụ | Đầu vào / Đầu ra |
+| :--- | :--- | :--- | :--- |
+| `calculateVehicleFinancials` | [vehicle_calculations.ts](file:///Users/phanvu/Desktop/auto-28/src/shared/utils/vehicle_calculations.ts) | Điểm truy cập duy nhất để lấy thông tin tài chính của xe | In: `FinancialInput` <br>Out: `VehicleFinancials` |
+| `calculateMonthlySalary` | [StaffSalaryService.ts](file:///Users/phanvu/Desktop/auto-28/src/modules/staff/domain/StaffSalaryService.ts) | Tính toán chi tiết bảng lương nhân sự trong tháng | In: `Staff`, `Vehicle[]`, `monthStr` <br>Out: `SalaryDetails` |
+| `calculateTotalCashBalance` | [FinanceService.ts](file:///Users/phanvu/Desktop/auto-28/src/modules/finance/domain/FinanceService.ts) | Tính toán số dư tiền mặt thực tế dồn tích của showroom | In: `totalCapital`, `Vehicle[]`, `Expense[]`<br>Out: `number` |
+| `calculateMonthlySalesProfit` | [FinanceService.ts](file:///Users/phanvu/Desktop/auto-28/src/modules/finance/domain/FinanceService.ts) | Tính lợi nhuận gộp từ bán xe của showroom trong tháng | In: `Vehicle[]`, `monthStr` <br>Out: `number` |
+| `calcCompanyMonthlyNetProfit` | [financial_formulas.ts](file:///Users/phanvu/Desktop/auto-28/src/shared/utils/financial_formulas.ts) | Tính lợi nhuận ròng cuối cùng của công ty trong tháng | In: `salesProfit`, `opExpenses`, `salaries`<br>Out: `number` |
 
 ---
 
-## Phần VII: Lỗi Phổ biến
+## Phần VIII: Cơ chế Tự động hóa ở Tầng Database Triggers
 
-| Triệu chứng | Nguyên nhân gốc rễ | Cách khắc phục |
-| :--- | :--- | :--- |
-| LN đối tác hiển thị khác nhau giữa hai màn hình | UI đang tự tính lại, không dùng `fin.partnerProfitShare` | Xóa logic tính trong UI, chỉ đọc `fin.partnerProfitShare` |
-| Hoa hồng tự nhiên xuất hiện 3tr/5tr | Code dùng `?? DEFAULT_COMMISSION` khi field trống | Đổi fallback về `?? 0` |
-| Snapshot cũ bị sai số | Xe chốt sổ trước khi logic mới áp dụng | Chạy script cập nhật lại `final_financials` cho xe đó |
-| Lương nhân viên sai dù công thức đúng | `commission` hoặc `coinvest_amount` trên xe bị null | Đảm bảo DB chuẩn hóa trường này về `0` thay vì `null` |
+Hệ thống Auto-28 tích hợp các **PostgreSQL Triggers** ở mức cơ sở dữ liệu làm chốt chặn cuối cùng bảo vệ tính toàn vẹn của dữ liệu tài chính.
+
+### 8.1 Tự động chuyển trạng thái Đã bán & Lợi nhuận (`trigger_vehicle_status_sync`)
+*   **Sự kiện**: Chạy trước khi dòng dữ liệu trong bảng `vehicles` được cập nhật (`BEFORE UPDATE`).
+*   **Logic xử lý**:
+    1.  Tự động cập nhật trường `profit = sale_price - purchase_price - total_cost` trực tiếp trong database.
+    2.  Nếu số tiền khách thanh toán thực tế đạt hoặc vượt giá chốt bán (`received_amount >= sale_price` với điều kiện `sale_price > 0`), trigger sẽ tự động cập nhật trạng thái xe thành **`SOLD`** và ghi nhận ngày bán `sale_date = NOW()`.
+*   **Vai trò**: Đảm bảo báo cáo lợi nhuận xe luôn chính xác tuyệt đối ngay cả khi dữ liệu được sửa trực tiếp bằng các công cụ quản trị database (như Table Editor).
+
+### 8.2 Tự động đồng bộ hoàn ứng chi phí (`trigger_salary_expense_sync`)
+*   **Sự kiện**: Chạy sau khi bản ghi lương mới được tạo trong bảng `salary_payouts` (`AFTER INSERT`).
+*   **Logic xử lý**:
+    1.  Tự động quét cột chứa mảng chi phí `expenses` (được lưu dạng JSONB) của nhân viên tương ứng.
+    2.  Tự động cập nhật trạng thái `isReimbursed = true` cho tất cả các khoản chi có tháng trùng với tháng thanh toán lương.
+    3.  Tự động đẩy tháng vừa thanh toán vào mảng `paid_months` của nhân viên để khóa dữ liệu lương của tháng đó.
+*   **Vai trò**: Đơn giản hóa mã nguồn Frontend (chỉ cần tạo một bản ghi payout duy nhất), database sẽ tự động thực hiện các side-effects đồng bộ phức tạp để đảm bảo tính toàn vẹn giao dịch.
 
 ---
 
-*Phiên bản: 2.0 — Cập nhật ngày: 21/04/2026*
-*Nguồn thật: `src/shared/utils/financial_formulas.ts` & `src/shared/utils/vehicle_calculations.ts`*
+## Phần IX: Lỗi Phổ biến & Cách Khắc phục
+
+### 9.1 Sai lệch số liệu lợi nhuận giữa màn hình Web và Mobile
+*   **Nguyên nhân gốc rễ**: Từng có hiện tượng màn hình Mobile tự viết công thức tính tay thô (ví dụ: hiển thị lợi nhuận đối tác bằng `(c.commission || 0) * 0.1`) thay vì gọi qua hàm dùng chung [calculateVehicleFinancials](file:///Users/phanvu/Desktop/auto-28/src/shared/utils/vehicle_calculations.ts).
+*   **Cách khắc phục**: Đã chuẩn hóa mã nguồn trên Mobile tại [PersonalMobileView.tsx](file:///Users/phanvu/Desktop/auto-28/src/modules/personal/presentation/PersonalMobileView.tsx) bằng cách import và sử dụng trực tiếp hàm `calculateVehicleFinancials(c).partnerProfitShare`. 
+*   **Nguyên tắc**: Luôn sử dụng hàm dùng chung để đảm bảo tính nhất quán hiển thị.
+
+### 9.2 Xuất hiện "Hoa hồng ma" 3.000.000đ hoặc 5.000.000đ khi tạo xe mới
+*   **Nguyên nhân gốc rễ**: Code cũ sử dụng toán tử fallback mặc định `?? DEFAULT_COMMISSION` khi các trường hoa hồng trống.
+*   **Cách khắc phục**: Thay đổi toàn bộ giá trị mặc định trong `STAFF_CONSTANTS` và các hàm sang `?? 0`. Nếu không nhập hoa hồng, giá trị bắt buộc phải bằng **0**.
+
+### 9.3 Lương thực nhận của nhân viên bị sai lệch khi có xe đối tác góp vốn
+*   **Nguyên nhân gốc rễ**: Các cột `commission`, `coinvest_amount` bị lưu giá trị `null` thay vì `0` trong database khiến các phép toán cộng dồn bị lỗi trả về `NaN` hoặc `null`.
+*   **Cách khắc phục**: Đã cấu hình giá trị mặc định là `0` và thuộc tính `NOT NULL` cho tất cả các cột tài chính trong PostgreSQL, đồng thời sử dụng toán tử `|| 0` trong mã nguồn TypeScript làm lớp phòng ngự thứ hai.
+
+---
+
+*Phiên bản hướng dẫn: 2.3 — Cập nhật ngày: 18/05/2026*
+*Tác giả: AI Architect & Auto28 Principal Engineering Team*
+*Nguồn kiểm chứng thực tế: [financial_formulas.ts](file:///Users/phanvu/Desktop/auto-28/src/shared/utils/financial_formulas.ts) & [vehicle_calculations.ts](file:///Users/phanvu/Desktop/auto-28/src/shared/utils/vehicle_calculations.ts)*

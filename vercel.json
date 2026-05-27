@@ -1,6 +1,26 @@
 {
   "rewrites": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "auto28.com.vn"
+        }
+      ],
+      "destination": "/lading-page/:path*"
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.auto28.com.vn"
+        }
+      ],
+      "destination": "/lading-page/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

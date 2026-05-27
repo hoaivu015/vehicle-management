@@ -3,7 +3,7 @@ import { StaffRepository } from '../domain/StaffRepository';
 export class DeleteStaff {
   constructor(private readonly repository: StaffRepository) {}
 
-  async execute(id: string): Promise<void> {
+  async execute(id: string | number): Promise<void> {
     // Step 1: Get staff code before deletion
     const staff = await this.repository.getById(id);
     if (staff && staff.code) {

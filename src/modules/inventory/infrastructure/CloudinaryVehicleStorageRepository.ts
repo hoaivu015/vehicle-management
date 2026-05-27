@@ -1,4 +1,4 @@
-import { VehicleStorageRepository } from './SupabaseVehicleStorageRepository';
+import { VehicleStorageRepository } from '../domain/VehicleStorageRepository';
 import { supabase } from '../../../shared/infrastructure/supabase';
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
@@ -44,9 +44,10 @@ export class CloudinaryVehicleStorageRepository implements VehicleStorageReposit
       }
 
       return data.secure_url;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Cloudinary Upload Exception:', error);
-      throw new Error(error.message || 'Không thể kết nối đến máy chủ Cloudinary. Vui lòng kiểm tra kết nối mạng.');
+      const message = error instanceof Error ? error.message : 'Không thể kết nối đến máy chủ Cloudinary. Vui lòng kiểm tra kết nối mạng.';
+      throw new Error(message);
     }
   }
 
