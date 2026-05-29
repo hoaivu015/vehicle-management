@@ -11,9 +11,9 @@
     })(window,document,'script','dataLayer','GTM-PPKRWBPC');</script>
     <!-- End Google Tag Manager -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AUTO 28 - Hệ thống Xe VinFast Cũ Công Nghệ & Minh Bạch</title>
+    <title>Auto 28 - Mua Bán Xe VinFast Lướt Uy Tín Tại TP.HCM & Lân Cận</title>
     <meta name="description"
-        content="Hệ thống mua bán xe VinFast cũ Fadil, Lux A, Lux SA, VF3, VF5, VF6, VF7, VF8, VF9 chính hãng giá tốt nhất. Định giá AI, Check hãng 176 hạng mục, bàn giao tận hầm.">
+        content="Auto 28 là hệ thống kinh doanh xe VinFast lướt uy tín hàng đầu tại khu vực TP. Hồ Chí Minh và các tỉnh lân cận (Bình Dương, Đồng Nai, Long An...). Định giá AI nhanh chóng, check hãng 176 hạng mục, bàn giao tận nhà.">
     
     <!-- Google Fonts: Plus Jakarta Sans for Headers & Be Vietnam Pro for Vietnamese diacritics readability -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,8 +30,8 @@
     {
       "@context": "https://schema.org",
       "@type": "AutoDealer",
-      "name": "Auto28 - Hệ thống Xe VinFast Cũ Công Nghệ & Minh Bạch",
-      "description": "Chuyên thu mua và bán xe VinFast cũ Fadil, Lux A, VF3, VF5, VF6, VF7, VF8, VF9 chính hãng giá tốt. Định giá AI, check hãng 176 hạng mục.",
+      "name": "Auto28 - Hệ thống Xe VinFast Lướt Uy Tín TP.HCM & Lân Cận",
+      "description": "Auto28 là hệ thống kinh doanh xe VinFast lướt uy tín hàng đầu tại khu vực TP. Hồ Chí Minh và các tỉnh lân cận (Bình Dương, Đồng Nai, Long An...). Định giá AI, check hãng 176 hạng mục.",
       "telephone": "0888813838",
       "url": "https://www.auto28.com.vn",
       "address": {
@@ -40,7 +40,33 @@
         "addressLocality": "Tăng Nhơn Phú",
         "addressRegion": "Quận 9, TP. Hồ Chí Minh",
         "addressCountry": "VN"
-      }
+      },
+      "areaServed": [
+        {
+          "@type": "AdministrativeArea",
+          "name": "Thành phố Hồ Chí Minh"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Bình Dương"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Đồng Nai"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Long An"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Tây Ninh"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Bà Rịa - Vũng Tàu"
+        }
+      ]
     }
     </script>
     <!-- Facebook Pixel Code -->
@@ -54,6 +80,7 @@
         s.parentNode.insertBefore(t,s)}(window, document,'script',
         'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '537471081061777');
+        fbq('track', 'PageView');
     </script>
     <!-- End Facebook Pixel Code -->
     <!-- TikTok Pixel Code Start -->
@@ -69,19 +96,10 @@
         }(window, document, 'ttq');
     </script>
     <!-- TikTok Pixel Code End -->
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PM7K9CB73D"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18153153954"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', 'G-PM7K9CB73D');
-        gtag('config', 'AW-18153153954');
-    </script>
+    <!-- Google tag được quản lý tập trung bởi GTM-PPKRWBPC -->
+    <!-- GA4 (G-PM7K9CB73D) và Google Ads (AW-18153153954) cấu hình trong GTM Dashboard -->
     <!-- Supabase CDN for Real-time Inventory Data Connection -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -142,7 +160,7 @@
                 <div class="hero-car-glow"></div>
                 
                 <!-- Ảnh xe lướt đã tách nền hoặc hòa trộn nền trắng -->
-                <img src="./assets/cars/hero-vf7.png" alt="VinFast VF7 Plus Premium lướt chính hãng" class="hero-car-img">
+                <img src="./assets/cars/hero-vf7.png" alt="VinFast VF7 Plus Premium lướt chính hãng" class="hero-car-img" fetchpriority="high" decoding="sync">
                 
                 <!-- Bóng đổ gầm xe (Contact Shadow) dạng elip mờ mềm mại -->
                 <div class="hero-car-shadow"></div>
@@ -162,7 +180,11 @@
                         <option value="vf8">VinFast VF 8</option>
                         <option value="vf9">VinFast VF 9</option>
                         <option value="vfe34">VinFast VF e34</option>
+                        <option value="limo">VinFast LIMO</option>
+                        <option value="mpv">VinFast MPV 7</option>
                         <option value="lux-a">VinFast Lux A 2.0</option>
+                        <option value="lux-sa">VinFast Lux SA 2.0</option>
+                        <option value="president">VinFast President</option>
                         <option value="fadil">VinFast Fadil</option>
                     </select>
                 </div>
@@ -441,8 +463,14 @@
 
     <!-- 📱 STICKY FOOTER MOBILE -->
     <div class="sticky-footer" id="sticky-cta">
-        <a href="tel:0888813838" class="btn-sticky btn-call">📞 Gọi ngay</a>
-        <a href="https://zalo.me/0888813838" class="btn-sticky btn-zalo" target="_blank">💬 Chat Zalo</a>
+        <a href="tel:0888813838" class="btn-sticky btn-call">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 2px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Hotline
+        </a>
+        <a href="https://zalo.me/0888813838" class="btn-sticky btn-zalo" target="_blank">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 2px;"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+            Zalo
+        </a>
     </div>
 
     <!-- 📍 SECTION 7: MAP & ADDRESS SHOWROOM -->
@@ -452,8 +480,7 @@
             <p>Đón tiếp trực tiếp khách hàng lái thử xe và hoàn tất hồ sơ trực tiếp tại showroom.</p>
         </div>
         <div class="map-container" style="max-width: 1000px; margin: 0 auto; border-radius: 2rem; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.6); line-height: 0; border: 1px solid rgba(255,255,255,0.05);">
-            <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.5784249693193!2d106.77618710000002!3d10.843538899999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317527b0785d11ab%3A0x8437185ef2074ae3!2sAuto28!5e0!3m2!1svi!2sus!4v1778383502219!5m2!1svi!2sus" 
+            <iframe                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.578425109371!2d106.77361217593324!3d10.843538889309341!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317527b0785d11ab%3A0x8437185ef2074ae3!2sAuto28!5e0!3m2!1svi!2s!4v1779961633757!5m2!1svi!2s" 
                 width="100%" 
                 height="450" 
                 style="border:0;" 
@@ -468,6 +495,7 @@
     <div class="expressive-modal" id="car-modal-view">
         <div class="modal-overlay" id="modal-overlay"></div>
         <div class="modal-wrapper">
+            <div class="modal-drag-indicator"></div>
             <button class="modal-close" id="modal-close-btn">&times;</button>
             <div class="modal-content-inner">
                 
@@ -475,7 +503,7 @@
                 <div class="modal-visual-panel">
                     <div class="modal-image-wrapper">
                         <!-- Loaded target vehicle image -->
-                        <img src="./assets/cars/vf8.jpg" alt="Car Detail" class="modal-active-img" id="modal-display-img">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 10'%3E%3C/svg%3E" alt="Car Detail" class="modal-active-img" id="modal-display-img">
                     </div>
                     
                     <!-- 360° View Pill Container at the bottom of the image -->
@@ -527,7 +555,7 @@
                             <input type="tel" id="modal-phone" placeholder="Số điện thoại liên hệ" class="modal-tel-input">
                             <button class="btn-modal-submit" id="btn-modal-action-submit">NHẬN ƯU ĐÃI NGAY ➜</button>
                         </div>
-                        <p class="action-box-note" style="text-align: center; margin-top: 0.5rem;">✓ Auto28 cam kết tư vấn miễn phí, không ép giá.</p>
+                        <p class="action-box-note" style="text-align: center; margin-top: 0.5rem;">✓ Auto28 cam kết tư vấn miễn phí.</p>
                     </div>
                 </div>
 
