@@ -30,5 +30,5 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
   },
-  "exclude": ["node_modules", "supabase"]
+  "exclude": ["node_modules", "supabase", "lading-page"]
 }
