@@ -26,9 +26,9 @@ describe('UpdateVehicle Use Case', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useCase = new UpdateVehicle(
-      mockVehicleRepo as any,
-      mockExpenseRepo as any,
-      mockStaffRepo as any
+      mockVehicleRepo as unknown as import('../../domain/VehicleRepository').VehicleRepository,
+      mockExpenseRepo as unknown as import('../../../finance/domain/ExpenseRepository').ExpenseRepository,
+      mockStaffRepo as unknown as import('../../../staff/domain/StaffRepository').StaffRepository
     );
   });
 

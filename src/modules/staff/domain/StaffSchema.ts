@@ -11,12 +11,13 @@ export const StaffExpenseSchema = z.object({
   vehicle_code: zString,
   category: zString,
   is_reimbursed: z.boolean().default(false),
-}).passthrough().transform((data: any) => {
+}).passthrough().transform((data: Record<string, unknown>) => {
   // Backward compatibility: If vehicle_id exists but vehicleId doesn't, map it
-  if (data.vehicle_id && !data.vehicleId) {
-    data.vehicleId = Number(data.vehicle_id);
-  }
-  return data;
+  const vehicleId = data.vehicleId ?? (data.vehicle_id ? Number(data.vehicle_id) : undefined);
+  return {
+    ...data,
+    vehicleId: vehicleId as number | string | null | undefined,
+  };
 });
 
 export const StaffSchema = z.object({

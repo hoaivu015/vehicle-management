@@ -252,7 +252,16 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
   );
 };
 
-const StatCard = ({ label, value, icon: Icon, color, isWarning, onClick }: any) => (
+interface StatCardProps {
+  label: string;
+  value: string | number;
+  icon: React.ElementType;
+  color?: string;
+  isWarning?: boolean;
+  onClick?: () => void;
+}
+
+const StatCard = ({ label, value, icon: Icon, color = 'blue', isWarning, onClick }: StatCardProps) => (
   <button 
     onClick={onClick}
     className={cn(

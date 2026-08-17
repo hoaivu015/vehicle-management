@@ -9,7 +9,7 @@ export interface UpdateStatusRequest {
   user: string;
   note?: string;
   updates?: Partial<import('../../../shared/domain/types').Vehicle>;
-  extra?: Record<string, any>;
+  extra?: Record<string, unknown>;
 }
 
 export class UpdateVehicleStatus {

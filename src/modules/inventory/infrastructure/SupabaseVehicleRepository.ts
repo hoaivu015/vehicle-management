@@ -20,10 +20,10 @@ export class SupabaseVehicleRepository implements VehicleRepository {
         const result = VehicleRowSchema.partial().safeParse(domain);
         if (!result.success) return domain as Partial<VehicleDTO>;
 
-        const sanitized: any = {};
+        const sanitized: Record<string, unknown> = {};
         for (const key of Object.keys(domain)) {
           if (key in result.data) {
-            sanitized[key] = (result.data as any)[key];
+            sanitized[key] = (result.data as Record<string, unknown>)[key];
           }
         }
         return sanitized as Partial<VehicleDTO>;
@@ -137,15 +137,15 @@ export class SupabaseVehicleRepository implements VehicleRepository {
     await this._applyStatusTransition(id, VehicleStatus.IN_STOCK, { sale_payment_history: updatedHistory }, history);
   }
 
-  private _sanitize(data: Partial<Vehicle>): any {
+  private _sanitize(data: Partial<Vehicle>): Record<string, unknown> {
     const result = VehicleRowSchema.partial().safeParse(data);
-    if (!result.success) return data;
+    if (!result.success) return data as Record<string, unknown>;
     
     // Chỉ giữ lại các trường thực sự có trong data đầu vào để tránh việc Zod tự điền default/transformer cho các trường thiếu
-    const sanitized: any = {};
+    const sanitized: Record<string, unknown> = {};
     for (const key of Object.keys(data)) {
       if (key in result.data) {
-        sanitized[key] = (result.data as any)[key];
+        sanitized[key] = (result.data as Record<string, unknown>)[key];
       }
     }
     return sanitized;

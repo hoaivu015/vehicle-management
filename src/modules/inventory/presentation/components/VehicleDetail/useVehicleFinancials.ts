@@ -93,6 +93,7 @@ export const useVehicleFinancials = ({
     const validNext = VehicleStateMachine.getValidNextStatuses(vehicle.status)
       .filter(s => s !== VehicleStatus.IN_STOCK);
     if (validNext.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNextStatusInTab(validNext[0]);
     }
 
@@ -105,7 +106,7 @@ export const useVehicleFinancials = ({
       buying_bonus: vehicle.buying_bonus || 0,
       buyerName: vehicle.customer_name || ''
     }));
-  }, [vehicle?.status, vehicle?.sale_price, vehicle?.seller, vehicle?.commission, vehicle?.buying_bonus, vehicle?.customer_name, userCode]);
+  }, [vehicle, userCode]);
 
   const financials = vehicle ? calculateVehicleFinancials(vehicle) : null;
   const purchaseDebt = vehicle && financials ? financials.purchasePrice - (vehicle.purchase_paid_amount || 0) : 0;

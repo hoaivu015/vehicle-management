@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Plus, Filter } from 'lucide-react';
 import { Skeleton } from '@/src/shared/design-system/Skeleton';
 import { cn } from '@/src/shared/utils/cn';
 
 import { InventoryGrid } from './components/InventoryGrid';
-import { VehicleDetailModal } from './components/VehicleDetailModal';
-import { AddVehicleModal } from './components/AddVehicleModal';
 import { useInventoryState, InventoryState } from './useInventoryState';
 import { NativePage, NativeHeader } from '@/src/shared/design-system/native/NativePage';
 import { LargeTitle, SecondaryLabel } from '@/src/shared/design-system/native/NativeTypography';
+
+const VehicleDetailModal = React.lazy(() => import('./components/VehicleDetailModal').then(m => ({ default: m.VehicleDetailModal })));
+const AddVehicleModal = React.lazy(() => import('./components/AddVehicleModal').then(m => ({ default: m.AddVehicleModal })));
 
 const InventoryMobileSkeleton = () => (
   <NativePage className="bg-kraft-folder px-4 py-6 space-y-6">
@@ -202,34 +203,38 @@ export const InventoryMobileView: React.FC<InventoryMobileViewProps> = ({
       {/* Modals */}
       <AnimatePresence>
         {isDetailOpen && (
-          <VehicleDetailModal
-            isOpen={isDetailOpen}
-            vehicle={selectedVehicle}
-            onClose={() => setIsDetailOpen(false)}
-            onUpdateStatus={handleUpdateStatus}
-            onDeleteVehicle={handleDeleteVehicle}
-            onUpdateVehicle={handleUpdateVehicle}
-            onAddCost={handleAddCost}
-            onDeleteCost={handleDeleteCost}
-            onPin={handlePin}
-            onAddPurchasePayment={handleAddPurchasePayment}
-            onAddSalePayment={handleAddSalePayment}
-            onCancelSale={handleCancelSale}
-            staffList={staffList}
-            userRole={userRole}
-            userCode={currentUser?.code || 'SYSTEM'}
-          />
+          <Suspense fallback={null}>
+            <VehicleDetailModal
+              isOpen={isDetailOpen}
+              vehicle={selectedVehicle}
+              onClose={() => setIsDetailOpen(false)}
+              onUpdateStatus={handleUpdateStatus}
+              onDeleteVehicle={handleDeleteVehicle}
+              onUpdateVehicle={handleUpdateVehicle}
+              onAddCost={handleAddCost}
+              onDeleteCost={handleDeleteCost}
+              onPin={handlePin}
+              onAddPurchasePayment={handleAddPurchasePayment}
+              onAddSalePayment={handleAddSalePayment}
+              onCancelSale={handleCancelSale}
+              staffList={staffList}
+              userRole={userRole}
+              userCode={currentUser?.code || 'SYSTEM'}
+            />
+          </Suspense>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {isAddOpen && (
-          <AddVehicleModal
-            isOpen={isAddOpen}
-            onClose={() => setIsAddOpen(false)}
-            onSubmit={handleAddVehicle}
-            staffList={staffList}
-          />
+          <Suspense fallback={null}>
+            <AddVehicleModal
+              isOpen={isAddOpen}
+              onClose={() => setIsAddOpen(false)}
+              onSubmit={handleAddVehicle}
+              staffList={staffList}
+            />
+          </Suspense>
         )}
       </AnimatePresence>
     </NativePage>

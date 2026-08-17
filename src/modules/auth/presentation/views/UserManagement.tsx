@@ -1,8 +1,11 @@
+import React from 'react';
 import { Shield, UserPlus, Mail, Trash2, Edit2, Check, X, Key, Copy } from 'lucide-react';
 import { motion } from 'motion/react';
 import { UserRole } from '@/src/shared/domain/constants';
 import { useUserManagement } from '../hooks/useUserManagement';
 import { BaseModal } from '@/src/shared/design-system';
+
+import { UserProfile } from '@/src/modules/user/domain/UserRepository';
 
 export const UserManagement = () => {
   const { uniqueUsers, showAddModal, setShowAddModal, editingId, setEditingId, formData, setFormData, handleSubmit, handleUpdate, presenter } = useUserManagement();
@@ -18,19 +21,22 @@ export const UserManagement = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-10">
-        {uniqueUsers.map((user) => (
-          <UserCard 
-            key={user.docId} 
-            user={user} 
-            isEditing={editingId === user.docId} 
-            onEdit={() => { setEditingId(user.docId); setFormData({ ...formData, role: user.role, password: user.password || '' }); }} 
-            onCancel={() => setEditingId(null)} 
-            onUpdate={() => handleUpdate(user.docId, user.email)} 
-            onDelete={() => presenter.deleteUser(user.id)} 
-            formData={formData} 
-            setFormData={setFormData} 
-          />
-        ))}
+        {uniqueUsers.map((user) => {
+          const userId = user.docId || user.id;
+          return (
+            <UserCard 
+              key={userId} 
+              user={user} 
+              isEditing={editingId === userId} 
+              onEdit={() => { setEditingId(userId); setFormData({ ...formData, role: (user.role as UserRole) || UserRole.STAFF, password: user.password || '' }); }} 
+              onCancel={() => setEditingId(null)} 
+              onUpdate={() => handleUpdate(userId, user.email || '')} 
+              onDelete={() => presenter.deleteUser(user.id)} 
+              formData={formData} 
+              setFormData={setFormData} 
+            />
+          );
+        })}
       </div>
 
       <BaseModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Thêm tài khoản mới" maxWidth="md">
@@ -56,17 +62,15 @@ export const UserManagement = () => {
   );
 };
 
-import { Staff } from '@/src/shared/domain/types';
-
 interface UserCardProps {
-  user: Staff & { docId: string; password?: string };
+  user: UserProfile;
   isEditing: boolean;
   onEdit: () => void;
   onCancel: () => void;
   onUpdate: () => void;
   onDelete: () => void;
-  formData: { role: string; password?: string };
-  setFormData: (data: any) => void;
+  formData: { name: string; email: string; role: UserRole; password: string };
+  setFormData: React.Dispatch<React.SetStateAction<{ name: string; email: string; role: UserRole; password: string }>>;
 }
 
 const UserCard = ({ user, isEditing, onEdit, onCancel, onUpdate, onDelete, formData, setFormData }: UserCardProps) => (
@@ -91,7 +95,7 @@ const UserCard = ({ user, isEditing, onEdit, onCancel, onUpdate, onDelete, formD
       <div className="flex items-center justify-between p-4 bg-kraft-bg rounded-t3 border border-kraft-accent/5">
         <span className="text-liquid-label opacity-40">Quyền hạn</span>
         {isEditing ? (
-          <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} className="bg-white border rounded-xl px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+          <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })} className="bg-white border rounded-xl px-3 py-1 text-[10px] font-black uppercase tracking-widest">
             {Object.values(UserRole).filter(r => r !== UserRole.ADMIN).map(role => <option key={role} value={role}>{role}</option>)}
           </select>
         ) : <span className="px-3 py-1 bg-kraft-accent text-white text-[10px] font-black rounded-lg uppercase tracking-widest">{user.role}</span>}

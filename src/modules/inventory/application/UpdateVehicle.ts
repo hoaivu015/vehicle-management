@@ -26,7 +26,7 @@ export class UpdateVehicle {
     const updated = await this.repository.update(request.id.toString(), request.data);
 
     // 3. Handle Side Effects (Financial Records)
-    const financials = calculateVehicleFinancials(updated as any);
+    const financials = calculateVehicleFinancials(updated);
     const today = new Date().toISOString().split('T')[0];
 
     // --- Side Effect Logic for Co-investment ---
@@ -65,7 +65,7 @@ export class UpdateVehicle {
         amount: financials.coinvestAmount,
         category: 'Đối tác',
         date: today
-      } as any);
+      });
       await syncStaffExpense(true, financials.coinvestAmount, capitalNote, 'Hoàn vốn');
     } else if (request.data.partner_capital_repaid === false && current.partner_capital_repaid === true) {
       await this.expenseRepository.deleteByNameAndCategory(capitalNote, 'Đối tác');
@@ -80,7 +80,7 @@ export class UpdateVehicle {
         amount: financials.partnerProfitShare,
         category: 'Đối tác',
         date: today
-      } as any);
+      });
       await syncStaffExpense(true, financials.partnerProfitShare, profitNote, 'Lợi nhuận góp vốn');
     } else if (request.data.partner_profit_shared === false && current.partner_profit_shared === true) {
       await this.expenseRepository.deleteByNameAndCategory(profitNote, 'Đối tác');

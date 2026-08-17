@@ -1,3 +1,4 @@
+import { ReactElement } from 'react';
 import { toast } from 'sonner';
 import { NotificationService } from '../domain/NotificationService';
 
@@ -7,7 +8,7 @@ export type ToastRenderer = (
   message: string,
   type: NotificationType,
   dismiss: () => void
-) => any;
+) => ReactElement;
 
 export class SonnerNotificationService implements NotificationService {
   private renderer?: ToastRenderer;

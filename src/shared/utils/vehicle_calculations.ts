@@ -49,7 +49,7 @@ export const calculateVehicleFinancials = (vehicle: FinancialInput): VehicleFina
   // Use cost_history if available, otherwise fallback to total_cost field
   const costHistory = vehicle.cost_history || [];
   const totalCost = costHistory.length > 0
-    ? costHistory.reduce((sum: number, item: any) => sum + (item.amount || 0), 0)
+    ? costHistory.reduce((sum: number, item: { amount?: number }) => sum + (item.amount || 0), 0)
     : (vehicle.total_cost || 0);
 
   const totalInvestment = purchasePrice + totalCost;

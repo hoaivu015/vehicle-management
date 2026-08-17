@@ -21,9 +21,9 @@ describe('RecordExpense Use Case', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useCase = new RecordExpense(
-      mockStaffRepo as any,
-      mockVehicleRepo as any,
-      mockExpenseRepo as any
+      mockStaffRepo as unknown as import('../../domain/StaffRepository').StaffRepository,
+      mockVehicleRepo as unknown as import('../../../inventory/domain/VehicleRepository').VehicleRepository,
+      mockExpenseRepo as unknown as import('../../../finance/domain/ExpenseRepository').ExpenseRepository
     );
   });
 

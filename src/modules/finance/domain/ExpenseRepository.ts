@@ -2,13 +2,11 @@ import { Database } from '../../../shared/domain/database.types';
 
 type DBOperatingExpense = Database['public']['Tables']['operating_expenses']['Row'];
 
-export interface Expense extends DBOperatingExpense {
-  // Expense is a direct mapping of operating_expenses
-}
+export type Expense = DBOperatingExpense;
 
 export interface ExpenseRepository {
   getAll(): Promise<Expense[]>;
-  add(expense: Omit<Expense, 'id'>): Promise<void>;
+  add(expense: Omit<Expense, 'id' | 'created_at'> & { created_at?: string | null }): Promise<void>;
   update(id: string | number, expense: Partial<Expense>): Promise<void>;
   delete(id: string | number): Promise<void>;
   deleteByNameAndCategory(name: string, category: string): Promise<void>;

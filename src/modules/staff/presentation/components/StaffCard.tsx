@@ -181,3 +181,5 @@ export const StaffCard = React.memo<StaffCardProps>(({
     </CardShell>
   );
 });
+
+StaffCard.displayName = 'StaffCard';

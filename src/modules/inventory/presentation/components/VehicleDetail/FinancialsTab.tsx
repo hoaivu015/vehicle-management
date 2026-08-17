@@ -52,8 +52,6 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
    staffList,
    actions
 }) => {
-   if (!canSeeFinancials) return <EmptyState icon={AlertCircle} title="Bạn không có quyền xem thông tin tài chính" />;
-
    const {
       financials,
       activeLedger,
@@ -82,6 +80,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
       ...actions
    });
 
+   if (!canSeeFinancials) return <EmptyState icon={AlertCircle} title="Bạn không có quyền xem thông tin tài chính" />;
    if (!financials) return null;
 
    const formatFinance = (val: number) => formatCurrency(val);

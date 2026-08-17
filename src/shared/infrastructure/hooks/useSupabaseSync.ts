@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/src/shared/infrastructure/supabase';
 
 /**
@@ -19,6 +19,10 @@ export function useSupabaseSync<T>(
 ) {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
+  const onErrorRef = useRef(onError);
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   useEffect(() => {
     if (!isEnabled) {
@@ -39,7 +43,7 @@ export function useSupabaseSync<T>(
       
       if (error) {
         console.error(`Error fetching ${tableName}:`, error);
-        if (onError) onError(error);
+        onErrorRef.current?.(error);
       } else {
         // Adapt docId from id to remain compatible with legacy Firestore UI expectation
         const docs = (fetchResult || [])?.map((doc: unknown) => {

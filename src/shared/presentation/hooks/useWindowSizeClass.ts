@@ -67,12 +67,19 @@ export const useWindowSizeClass = (): WindowSizeClassResult => {
         isFoldable = true;
         posture = 'folded'; // Active fold/span state
       }
-    } catch (e) {
+    } catch {
       // Ignore unsupported browser features
     }
 
     // 2. Check navigator.devicePosture API (W3C standard for foldables)
-    const nav = navigator as any;
+    interface NavigatorWithPosture extends Navigator {
+      devicePosture?: {
+        type?: string;
+        addEventListener?: (event: string, listener: () => void) => void;
+        removeEventListener?: (event: string, listener: () => void) => void;
+      };
+    }
+    const nav = navigator as NavigatorWithPosture;
     if (nav.devicePosture) {
       isFoldable = true;
       posture = nav.devicePosture.type === 'folded' ? 'folded' : 'flat';
@@ -114,7 +121,14 @@ export const useWindowSizeClass = (): WindowSizeClassResult => {
     window.addEventListener('resize', handleResize);
 
     // Listen to W3C device posture API changes if available
-    const nav = navigator as any;
+    interface NavigatorWithPosture extends Navigator {
+      devicePosture?: {
+        type?: string;
+        addEventListener?: (event: string, listener: () => void) => void;
+        removeEventListener?: (event: string, listener: () => void) => void;
+      };
+    }
+    const nav = navigator as NavigatorWithPosture;
     let postureListener: (() => void) | null = null;
     if (nav.devicePosture && nav.devicePosture.addEventListener) {
       postureListener = () => {

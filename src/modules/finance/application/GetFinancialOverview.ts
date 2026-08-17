@@ -50,7 +50,7 @@ export class GetFinancialOverview {
 
   async execute(month: string): Promise<FinancialOverviewData> {
     const [settings, vehicles, staff] = await Promise.all([
-      (this.expenseRepo as any).getCompanySettings(),
+      this.expenseRepo.getCompanySettings(),
       this.vehicleRepository.getAll(),
       this.staffRepository.getAll()
     ]);
@@ -106,7 +106,7 @@ export class GetFinancialOverview {
 
     const paymentActivities = vehicles.flatMap(v => [
       ...(v.purchase_payment_history || []).map(p => ({
-        type: 'purchase' as 'purchase',
+        type: 'purchase' as const,
         user: p.receiver || 'Hệ thống',
         action: 'đã thanh toán nhập xe',
         target: v.name,
@@ -114,7 +114,7 @@ export class GetFinancialOverview {
         vCode: v.code
       })),
       ...(v.sale_payment_history || []).map(p => ({
-        type: 'sale' as 'sale',
+        type: 'sale' as const,
         user: p.receiver || 'Hệ thống',
         action: p.amount > 0 ? 'đã thu tiền khách' : 'đã hoàn trả tiền cọc',
         target: v.name,

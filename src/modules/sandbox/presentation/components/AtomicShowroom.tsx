@@ -98,7 +98,7 @@ export const AtomicShowroom = () => {
             <h3 className="text-lg font-black text-kraft-ink uppercase tracking-wider">Ô Nhập Tiền Tệ Thông Minh (Smart Input)</h3>
           </div>
           <p className="text-xs text-kraft-ink/50 mt-2 font-medium">
-            Tự động biên dịch số viết tắt (VD: "5tr" thành 5.000.000, "2.5t" thành 2.500.000.000), hiển thị tooltip xem trước và rung cảnh báo lỗi.
+            Tự động biên dịch số viết tắt (VD: &ldquo;5tr&rdquo; thành 5.000.000, &ldquo;2.5t&rdquo; thành 2.500.000.000), hiển thị tooltip xem trước và rung cảnh báo lỗi.
           </p>
         </div>
 

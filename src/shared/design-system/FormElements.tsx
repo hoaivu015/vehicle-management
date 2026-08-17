@@ -36,7 +36,7 @@ export const BaseInput = React.forwardRef<HTMLInputElement, BaseInputProps>(
             if (props.type === 'date' || props.type === 'month') {
               try {
                 e.currentTarget.showPicker?.();
-              } catch (err) {
+              } catch {
                 // Fallback
               }
             }

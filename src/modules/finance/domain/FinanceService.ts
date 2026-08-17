@@ -64,7 +64,7 @@ export class FinanceService {
     return vehicles
       .filter(v => v.status === VehicleStatus.SOLD && v.sale_date?.startsWith(month))
       .reduce((acc, v) => {
-        const fin = calculateVehicleFinancials(v as any);
+        const fin = calculateVehicleFinancials(v);
         // Doanh thu gộp của Showroom = Lợi nhuận gộp - Phần chia cho đối tác
         return acc + (fin.grossProfit - (fin.partnerProfitShare || 0));
       }, 0);
@@ -101,7 +101,7 @@ export class FinanceService {
      return vehicles
         .filter(v => v.status === VehicleStatus.SOLD && v.is_coinvested)
         .reduce((acc, v) => {
-           const fin = calculateVehicleFinancials(v as any);
+           const fin = calculateVehicleFinancials(v);
            let payout = 0;
            if (v.sale_date?.startsWith(month)) {
               if (v.partner_capital_repaid) payout += fin.coinvestAmount;

@@ -11,7 +11,7 @@ describe('CancelSale Use Case', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    useCase = new CancelSale(mockVehicleRepo as any);
+    useCase = new CancelSale(mockVehicleRepo as unknown as import('../../domain/VehicleRepository').VehicleRepository);
   });
 
   it('should call repository with correct history entry when cancelling sale', async () => {

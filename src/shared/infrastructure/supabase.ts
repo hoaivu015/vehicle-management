@@ -1,13 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 
+interface CustomImportMeta {
+  env?: Record<string, string | undefined>;
+}
+
 const getEnv = (key: string): string => {
   // Try Vite's import.meta.env first
-  if ((import.meta as any).env && (import.meta as any).env[key]) {
-    return (import.meta as any).env[key];
+  const metaEnv = (import.meta as unknown as CustomImportMeta).env;
+  if (metaEnv && metaEnv[key]) {
+    return metaEnv[key] || '';
   }
   // Try process.env (for define or Node environments)
   if (typeof process !== 'undefined' && process.env && process.env[key]) {
-    return process.env[key];
+    return process.env[key] || '';
   }
   return '';
 };

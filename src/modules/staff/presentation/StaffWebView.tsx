@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { AnimatePresence } from 'motion/react';
 
 import { useStaffState, StaffState } from './useStaffState';
@@ -8,19 +8,20 @@ import { PageShell } from '@/src/shared/design-system/PageShell';
 import { cn } from '@/src/shared/utils/cn';
 import { motion } from 'motion/react';
 import { StaffSkeleton } from '@/src/modules/staff/presentation/components/StaffSkeleton';
-import { StaffAddModal } from './components/StaffAddModal';
-import { StaffDetailModal } from './components/StaffDetailModal';
-import { ConfirmModal } from '@/src/shared/design-system/ConfirmModal';
 import { PERMISSIONS } from '@/src/constants';
+
+const StaffAddModal = React.lazy(() => import('./components/StaffAddModal').then(m => ({ default: m.StaffAddModal })));
+const StaffDetailModal = React.lazy(() => import('./components/StaffDetailModal').then(m => ({ default: m.StaffDetailModal })));
+const StaffSalaryPaymentModal = React.lazy(() => import('./components/StaffSalaryPaymentModal').then(m => ({ default: m.StaffSalaryPaymentModal })));
+const ConfirmModal = React.lazy(() => import('@/src/shared/design-system/ConfirmModal').then(m => ({ default: m.ConfirmModal })));
+
+import type { StaffWithSalary } from '../application/GetStaffList';
 
 interface StaffWebViewProps {
   userRole: string;
   hasPermission: (permission: string) => boolean;
   state?: StaffState;
 }
-
-import { StaffWithSalary } from '../application/GetStaffList';
-import { StaffSalaryPaymentModal } from './components/StaffSalaryPaymentModal';
 
 /**
  * Staff WebView - Optimized for Desktop.
@@ -130,58 +131,66 @@ export const StaffWebView: React.FC<StaffWebViewProps> = ({ userRole, hasPermiss
       </div>
 
       <AnimatePresence>
+        {/* Modals */}
         {(isAddOpen || editingStaff) && (
-          <StaffAddModal
-            isOpen={isAddOpen || !!editingStaff}
-            member={editingStaff ?? undefined}
-            onClose={() => {
-              setIsAddOpen(false);
-              setEditingStaff(null);
-            }}
-            onAdd={(data) => editingStaff
-              ? handleUpdateStaff({ ...data, id: editingStaff.id })
-              : handleAddStaff(data)
-            }
-          />
+          <Suspense fallback={null}>
+            <StaffAddModal
+              isOpen={isAddOpen || !!editingStaff}
+              member={editingStaff ?? undefined}
+              onClose={() => {
+                setIsAddOpen(false);
+                setEditingStaff(null);
+              }}
+              onAdd={(data) => editingStaff
+                ? handleUpdateStaff({ ...data, id: editingStaff.id })
+                : handleAddStaff(data)
+              }
+            />
+          </Suspense>
         )}
         {selectedStaff && (
-          <StaffDetailModal
-            member={selectedStaff}
-            isOpen={!!selectedStaff}
-            onClose={() => setSelectedStaff(null)}
-            filterMonth={filterMonth}
-            onAddExpense={handleAddExpense}
-            onToggleReimbursement={handleToggleReimbursement}
-            onDeleteExpense={handleDeleteExpense}
-            onUpdateExpense={handleUpdateExpense}
-            onReimburseMultiple={handleReimburseMultiple}
-            onUpdateVehicle={handleUpdateVehicle}
-            userRole={userRole}
-            vehicles={vehicles}
-          />
+          <Suspense fallback={null}>
+            <StaffDetailModal
+              member={selectedStaff}
+              isOpen={!!selectedStaff}
+              onClose={() => setSelectedStaff(null)}
+              filterMonth={filterMonth}
+              onAddExpense={handleAddExpense}
+              onToggleReimbursement={handleToggleReimbursement}
+              onDeleteExpense={handleDeleteExpense}
+              onUpdateExpense={handleUpdateExpense}
+              onReimburseMultiple={handleReimburseMultiple}
+              onUpdateVehicle={handleUpdateVehicle}
+              userRole={userRole}
+              vehicles={vehicles}
+            />
+          </Suspense>
         )}
         {payingStaff && (
-          <StaffSalaryPaymentModal
-            isOpen={!!payingStaff}
-            onClose={() => setPayingStaff(null)}
-            staff={payingStaff}
-            month={filterMonth}
-            isLoading={isSubmitting}
-            onConfirm={(date) => handleTogglePayment(payingStaff, date)}
-          />
+          <Suspense fallback={null}>
+            <StaffSalaryPaymentModal
+              isOpen={!!payingStaff}
+              onClose={() => setPayingStaff(null)}
+              staff={payingStaff}
+              month={filterMonth}
+              isLoading={isSubmitting}
+              onConfirm={(date) => handleTogglePayment(payingStaff, date)}
+            />
+          </Suspense>
         )}
         {deletingStaff && (
-          <ConfirmModal
-            isOpen={!!deletingStaff}
-            onClose={() => setDeletingStaff(null)}
-            onConfirm={handleDelete}
-            isLoading={isSubmitting}
-            title="Xác nhận xóa?"
-            message={`Bạn có chắc chắn muốn xóa nhân viên ${deletingStaff.name}? Dữ liệu này sẽ không thể khôi phục.`}
-          />
+          <Suspense fallback={null}>
+            <ConfirmModal
+              isOpen={!!deletingStaff}
+              onClose={() => setDeletingStaff(null)}
+              onConfirm={handleDelete}
+              isLoading={isSubmitting}
+              title="Xác nhận xóa?"
+              message={`Bạn có chắc chắn muốn xóa nhân viên ${deletingStaff.name}? Dữ liệu này sẽ không thể khôi phục.`}
+            />
+          </Suspense>
         )}
       </AnimatePresence>
     </PageShell>
   );
 };
-

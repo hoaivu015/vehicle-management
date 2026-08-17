@@ -31,7 +31,10 @@ describe('AddVehicle Use Case', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    useCase = new AddVehicle(mockVehicleRepo as any, mockCodeGenerator as any);
+    useCase = new AddVehicle(
+      mockVehicleRepo as unknown as import('../../domain/VehicleRepository').VehicleRepository,
+      mockCodeGenerator as unknown as import('../../domain/services/VehicleCodeGenerator').VehicleCodeGenerator
+    );
   });
 
   const validRequest = {
@@ -83,7 +86,7 @@ describe('AddVehicle Use Case', () => {
       coinvest_amount: 900000000 // > 800,000,000
     };
 
-    await expect(useCase.execute(invalidRequest as any)).rejects.toThrow('Số tiền góp vốn không được lớn hơn giá mua xe.');
+    await expect(useCase.execute(invalidRequest as unknown as import('../AddVehicle').AddVehicleRequest)).rejects.toThrow('Số tiền góp vốn không được lớn hơn giá mua xe.');
   });
 
   it('nên sử dụng các giá trị mặc định từ schema nếu thiếu', async () => {
@@ -98,7 +101,7 @@ describe('AddVehicle Use Case', () => {
     mockCodeGenerator.generate.mockResolvedValue('VH1405-02');
     mockVehicleRepo.create.mockImplementation((item) => Promise.resolve({ id: 2, ...item }));
 
-    const result = await useCase.execute(minimalRequest as any);
+    const result = await useCase.execute(minimalRequest as unknown as import('../AddVehicle').AddVehicleRequest);
 
     expect(result.year).toBe('2021');
     expect(result.odo).toBe(0);
@@ -113,6 +116,6 @@ describe('AddVehicle Use Case', () => {
       // Thiếu year, purchase_price, etc.
     };
 
-    await expect(useCase.execute(incompleteRequest as any)).rejects.toThrow();
+    await expect(useCase.execute(incompleteRequest as unknown as import('../AddVehicle').AddVehicleRequest)).rejects.toThrow();
   });
 });

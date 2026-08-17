@@ -25,10 +25,10 @@ export class VehicleService {
 
     // Move staff name fetching logic from repository to service
     if (data.buyer && data.buyer !== current.buyer) {
-      (updates as any).buyer_name = await this.staffManager.getStaffName(data.buyer);
+      updates.buyer_name = await this.staffManager.getStaffName(data.buyer);
     }
     if (data.seller && data.seller !== current.seller) {
-      (updates as any).seller_name = await this.staffManager.getStaffName(data.seller);
+      updates.seller_name = await this.staffManager.getStaffName(data.seller);
     }
 
     const updated = await this.vehicleRepo.update(id, updates);

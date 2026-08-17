@@ -107,7 +107,7 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
               whileTap={{ scale: 0.85 }}
               onClick={(e) => {
                 e.stopPropagation();
-                onPin && onPin(car.id, !car.is_pinned);
+                onPin?.(car.id, !car.is_pinned);
               }}
               className={cn(
                 "shrink-0 w-7 h-7 rounded-xl border flex items-center justify-center transition-all",
@@ -193,7 +193,7 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
               whileHover={{ scale: 1.1 }}
               onClick={(e) => {
                 e.stopPropagation();
-                onPin && onPin(car.id, !car.is_pinned);
+                onPin?.(car.id, !car.is_pinned);
               }}
               className={cn(
                 "absolute top-g2 right-g2 md:top-g4 md:right-g4 w-touch h-touch rounded-xl border shadow-kraft flex items-center justify-center transition-all duration-300",

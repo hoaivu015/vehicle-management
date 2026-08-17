@@ -18,6 +18,17 @@ interface PersonalVehiclesSectionProps {
   onSelectVehicle: (vehicle: Vehicle) => void;
 }
 
+interface PersonalTransactionItem extends Vehicle {
+  type: string;
+  label: string;
+  date?: string;
+  amount?: number;
+  commission?: number;
+  color: string;
+  statusLabel?: string;
+  isSoldInSelectedMonth?: boolean;
+}
+
 export const PersonalVehiclesSection: React.FC<PersonalVehiclesSectionProps> = ({
   soldCars,
   boughtCars,
@@ -29,7 +40,7 @@ export const PersonalVehiclesSection: React.FC<PersonalVehiclesSectionProps> = (
   const monthNum = selectedMonth.split('-')[1];
 
   // Merge all transaction types into a single list
-  const unifiedItems = [
+  const unifiedItems: PersonalTransactionItem[] = [
     ...soldCars.map(car => ({
       ...car,
       type: 'sale',
@@ -39,7 +50,7 @@ export const PersonalVehiclesSection: React.FC<PersonalVehiclesSectionProps> = (
       commission: car.commission ?? (user.commission_per_car || 0),
       color: 'emerald'
     })),
-    ...boughtCars.reduce((acc: any[], car) => {
+    ...boughtCars.reduce<PersonalTransactionItem[]>((acc, car) => {
       // 1. Nhập xe (chỉ hiển thị nếu buying_commission > 0 hoặc không phải là xe nợ thưởng từ tháng trước)
       if ((car.buying_commission ?? 0) > 0 || (car.buying_commission === undefined && !car.buying_bonus_paid)) {
         acc.push({
@@ -67,7 +78,7 @@ export const PersonalVehiclesSection: React.FC<PersonalVehiclesSectionProps> = (
       return acc;
     }, []),
     ...coinvestedCars.map(car => {
-      const financials = calculateVehicleFinancials(car as any);
+      const financials = calculateVehicleFinancials(car);
       const isSoldInSelectedMonth = car.status === VehicleStatus.SOLD && car.sale_date?.startsWith(selectedMonth);
       return {
         ...car,
@@ -112,7 +123,7 @@ export const PersonalVehiclesSection: React.FC<PersonalVehiclesSectionProps> = (
               </tr>
             </thead>
             <tbody className="divide-y divide-black/5">
-              {unifiedItems.map((item: any, index: number) => (
+              {unifiedItems.map((item, index: number) => (
                 <motion.tr 
                   key={`${item.type}-${item.id}`} 
                   initial={{ opacity: 0, y: 12, filter: 'blur(2px)' }}
@@ -156,7 +167,7 @@ export const PersonalVehiclesSection: React.FC<PersonalVehiclesSectionProps> = (
                     {formatCurrency(item.amount)}
                   </td>
                   <td className="py-6 px-8 text-right font-black text-base text-income tracking-tighter">
-                    {item.commission > 0 ? `+${formatCurrency(item.commission)}` : '-'}
+                    {(item.commission || 0) > 0 ? `+${formatCurrency(item.commission || 0)}` : '-'}
                   </td>
                 </motion.tr>
               ))}

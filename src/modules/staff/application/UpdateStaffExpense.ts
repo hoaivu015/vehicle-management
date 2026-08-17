@@ -1,4 +1,4 @@
-import { Staff } from '../../../shared/domain/types';
+import { Staff, StaffExpense } from '../../../shared/domain/types';
 import { StaffRepository } from '../domain/StaffRepository';
 import { VehicleRepository } from '../../inventory/domain/VehicleRepository';
 import { UpdateStaffExpenseSchema, UpdateStaffExpenseInput } from '../domain/StaffValidation';
@@ -63,12 +63,16 @@ export class UpdateStaffExpense {
       updateData.vehicle_code = undefined;
     }
 
-    const updatedExpenses = (staff.expenses || []).map(exp => {
+    const updatedExpenses: StaffExpense[] = (staff.expenses || []).map(exp => {
       if (exp.id === expenseId) {
-        return { ...exp, ...updateData };
+        return { 
+          ...exp, 
+          ...updateData,
+          vehicleId: updateData.vehicleId !== undefined ? (updateData.vehicleId ? Number(updateData.vehicleId) : undefined) : exp.vehicleId
+        };
       }
       return exp;
-    }) as any; // Temporary cast for nested mapping, will be fixed with full DTO mapping later
+    });
 
     return await this.repository.update(staffId, {
       expenses: updatedExpenses

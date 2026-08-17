@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, LogOut, Key, UserCircle, DollarSign, Clock, CheckCircle, Car, Settings, Edit2, Trash2 } from 'lucide-react';
-import { calculateStaffSalaryDetails } from '@/src/shared/utils/finance';
+import { StaffSalaryService, SalaryDetails } from '@/src/modules/staff/domain/StaffSalaryService';
 import { UserRole } from '@/src/shared/domain/constants';
 import { BaseModal as Modal, ModalBody, ModalFooter } from '@/src/shared/design-system/BaseModal';
 import { VehicleDetailModal } from '@/src/modules/inventory/presentation/components/VehicleDetailModal';
@@ -9,13 +9,13 @@ import { useDependencies } from '@/src/shared/ioc/DependencyContext';
 import { NativePage, NativeHeader } from '@/src/shared/design-system/native/NativePage';
 import { LargeTitle, SecondaryLabel } from '@/src/shared/design-system/native/NativeTypography';
 import { motion, AnimatePresence } from 'motion/react';
-import { Staff } from '@/src/shared/domain/types';
+import { Staff, Vehicle, StaffExpense } from '@/src/shared/domain/types';
 import { formatCurrency } from '@/src/shared/utils/currency';
 import { cn } from '@/src/shared/utils/cn';
 import { formatDate } from '@/src/shared/utils/date';
 import { ShoppingBag, ArrowUpRight, Award, Share2, ReceiptText } from 'lucide-react';
 import { StaffAddExpenseModal } from '@/src/modules/staff/presentation/components/StaffAddExpenseModal';
-import { StaffSalaryDetails } from '@/src/shared/utils/finance';
+import { UpdateVehicleInput } from '@/src/modules/inventory/domain/VehicleSchema';
 import { calculateVehicleFinancials } from '@/src/shared/utils/vehicle_calculations';
 import { Skeleton } from '@/src/shared/design-system/Skeleton';
 
@@ -172,7 +172,7 @@ export const PersonalMobileView = ({ user, onUpdateUser, onLogout, state: propSt
 
   if (!user) return null;
 
-  const salaryDetails = staffData?.salaryDetails || calculateStaffSalaryDetails(user, allVehicles, selectedMonth);
+  const salaryDetails = staffData?.salaryDetails || StaffSalaryService.calculateMonthlySalary(user, allVehicles, selectedMonth);
 
   return (
     <NativePage className="bg-[#F8F9FA] animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -346,7 +346,7 @@ export const PersonalMobileView = ({ user, onUpdateUser, onLogout, state: propSt
                 <ReceiptText size={18} className="text-kraft-accent" />
                 <SecondaryLabel className="!mb-0 uppercase tracking-widest text-[10px] font-black">Bảng kê chi tiết lương</SecondaryLabel>
               </motion.div>
-              <SalaryStatement salaryDetails={salaryDetails as any} />
+              <SalaryStatement salaryDetails={salaryDetails} />
             </section>
           </div>
         </div>
@@ -385,7 +385,7 @@ export const PersonalMobileView = ({ user, onUpdateUser, onLogout, state: propSt
 
       {/* Modals (Standardized) */}
       <PasswordModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} value={newPassword} onChange={setNewPassword} onSubmit={handleChangePassword} />
-      <ProfileModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} data={editFormData} onChange={(data) => setEditFormData({ ...editFormData, ...data })} onSubmit={handleUpdateProfile} />
+      <ProfileModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} data={editFormData} onChange={(data: { name: string; phone: string; department?: string }) => setEditFormData({ ...editFormData, ...data })} onSubmit={handleUpdateProfile} />
 
       <AnimatePresence>
         {isVehicleDetailOpen && selectedVehicle && (
@@ -395,12 +395,12 @@ export const PersonalMobileView = ({ user, onUpdateUser, onLogout, state: propSt
             onClose={() => setIsVehicleDetailOpen(false)}
             onUpdateStatus={(id, nextStatus, extra) => handleUpdateStatus(id, nextStatus, extra || {})}
             onDeleteVehicle={handleDeleteVehicle}
-            onUpdateVehicle={(id, data) => handleUpdateVehicle(id, data as any)}
+            onUpdateVehicle={(id, data) => handleUpdateVehicle(id, data as unknown as UpdateVehicleInput)}
             onAddCost={handleAddCost}
             onDeleteCost={handleDeleteCost}
             onPin={handlePin}
             onAddPurchasePayment={handleAddPurchasePayment}
-            onAddSalePayment={(...args) => handleAddSalePayment(args[0], args[1], args[2], args[3], args[4] as any, args[5], args[6] || '', args[7] || 0, args[8], args[9])}
+            onAddSalePayment={(...args) => handleAddSalePayment(args[0], args[1], args[2], args[3], args[4], args[5], args[6] || '', args[7] || 0, args[8], args[9])}
             onCancelSale={handleCancelSale}
             staffList={staffList}
             userRole={user.role}
@@ -448,20 +448,22 @@ interface SettingsItemProps {
 
 const SettingsItem = ({ icon: Icon, label, onClick, color }: SettingsItemProps) => (
   <motion.button 
-    whileTap={{ scale: 0.95 }}
+    whileTap={{ scale: 0.96 }}
     onClick={onClick}
-    className="w-full flex items-center justify-between p-5 hover:bg-black/5 transition-colors active:bg-black/10"
+    className="w-full flex items-center justify-between p-4 rounded-2xl bg-black/[0.03] active:bg-black/5 transition-colors text-left"
   >
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-3">
       <div className={cn(
-        "w-10 h-10 rounded-xl flex items-center justify-center",
+        "w-8 h-8 rounded-xl flex items-center justify-center",
         color === 'blue' ? "bg-blue-50 text-blue-600" : "bg-orange-50 text-orange-600"
       )}>
-        <Icon size={20} />
+        <Icon size={16} />
       </div>
-      <span className="font-bold text-sm text-kraft-ink">{label}</span>
+      <span className="text-xs font-black text-kraft-ink uppercase tracking-wider">{label}</span>
     </div>
-    <div className="text-kraft-ink/20 font-black">→</div>
+    <div className="w-6 h-6 rounded-full bg-black/5 flex items-center justify-center text-kraft-ink/40">
+      <Settings size={12} />
+    </div>
   </motion.button>
 );
 
@@ -473,15 +475,21 @@ interface PasswordModalProps {
   onSubmit: () => void;
 }
 
-const PasswordModal = ({ isOpen, onClose, value, onChange, onSubmit }: PasswordModalProps) => (
+const PasswordModal: React.FC<PasswordModalProps> = ({ isOpen, onClose, value, onChange, onSubmit }) => (
   <Modal isOpen={isOpen} onClose={onClose} title="Đổi mật khẩu">
     <ModalBody>
-      <div className="space-y-3">
-        <label className="text-[11px] font-black uppercase opacity-40 px-2">Mật khẩu mới</label>
-        <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className="liquid-input h-14 bg-black/5 border-none rounded-2xl px-5 font-black w-full" placeholder="Mật khẩu mới..." />
+      <div className="space-y-4">
+        <label className="text-[11px] font-black uppercase opacity-40 px-2">Mật khẩu mới (tối thiểu 6 ký tự)</label>
+        <input 
+          type="password" 
+          value={value} 
+          onChange={(e) => onChange(e.target.value)} 
+          className="liquid-input h-14 bg-black/5 border-none rounded-2xl px-5 font-black w-full"
+          placeholder="••••••••" 
+        />
       </div>
     </ModalBody>
-    <ModalFooter onCancel={onClose} onSubmit={onSubmit} submitLabel="Lưu" />
+    <ModalFooter onCancel={onClose} onSubmit={onSubmit} submitLabel="Đổi mật khẩu" />
   </Modal>
 );
 
@@ -493,10 +501,10 @@ interface ProfileModalProps {
   onSubmit: () => void;
 }
 
-const ProfileModal = ({ isOpen, onClose, data, onChange, onSubmit }: ProfileModalProps) => (
-  <Modal isOpen={isOpen} onClose={onClose} title="Chỉnh sửa hồ sơ">
+const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, data, onChange, onSubmit }) => (
+  <Modal isOpen={isOpen} onClose={onClose} title="Chỉnh sửa thông tin">
     <ModalBody>
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div className="space-y-3">
           <label className="text-[11px] font-black uppercase opacity-40 px-2">Họ và tên</label>
           <input type="text" value={data.name} onChange={(e) => onChange({...data, name: e.target.value})} className="liquid-input h-14 bg-black/5 border-none rounded-2xl px-5 font-black w-full" />
@@ -511,12 +519,21 @@ const ProfileModal = ({ isOpen, onClose, data, onChange, onSubmit }: ProfileModa
   </Modal>
 );
 
-const SalaryStatement = ({ salaryDetails }: { salaryDetails: StaffSalaryDetails }) => {
-  const items: any[] = [];
+interface SalaryStatementItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  amount: number;
+  icon: React.ElementType;
+  color: 'blue' | 'amber' | 'orange' | 'indigo';
+}
+
+const SalaryStatement = ({ salaryDetails }: { salaryDetails: SalaryDetails }) => {
+  const items: SalaryStatementItem[] = [];
 
   // 1. Xe bán (Hoa hồng bán xe)
-  salaryDetails.soldCars.forEach((c: any) => {
-    const amount = c.commission * (salaryDetails.kpiBonusMultiplier || 1);
+  salaryDetails.soldCars.forEach((c: Vehicle) => {
+    const amount = (c.commission || 0) * (salaryDetails.kpiBonusMultiplier || 1);
     if (amount > 0) {
       items.push({
         id: `sale-${c.id}`,
@@ -530,24 +547,24 @@ const SalaryStatement = ({ salaryDetails }: { salaryDetails: StaffSalaryDetails 
   });
 
   // 2. Xe mua (Hoa hồng nhập xe & Thưởng thêm nếu có)
-  salaryDetails.boughtCars.forEach((c: any) => {
-    if (c.buying_commission > 0) {
+  salaryDetails.boughtCars.forEach((c: Vehicle) => {
+    if ((c.buying_commission || 0) > 0) {
       items.push({
         id: `buy-${c.id}`,
         title: c.name,
         subtitle: `Mua: ${c.code}`,
-        amount: c.buying_commission,
+        amount: c.buying_commission || 0,
         icon: ShoppingBag,
         color: 'amber'
       });
     }
     
-    if (c.buying_bonus > 0) {
+    if ((c.buying_bonus || 0) > 0) {
       items.push({
         id: `buy-bonus-${c.id}`,
         title: c.name,
         subtitle: `Thưởng mua: ${c.code}`,
-        amount: c.buying_bonus,
+        amount: c.buying_bonus || 0,
         icon: Award,
         color: 'orange'
       });
@@ -555,7 +572,7 @@ const SalaryStatement = ({ salaryDetails }: { salaryDetails: StaffSalaryDetails 
   });
 
   // 3. Góp vốn (Chia sẻ lợi nhuận góp vốn)
-  salaryDetails.coinvestedCars.forEach((c: any) => {
+  salaryDetails.coinvestedCars.forEach((c: Vehicle) => {
     const financials = calculateVehicleFinancials(c);
     const amount = c.partner_profit_shared ? 0 : financials.partnerProfitShare;
     if (amount > 0) {
@@ -617,11 +634,18 @@ const SalaryStatement = ({ salaryDetails }: { salaryDetails: StaffSalaryDetails 
   );
 };
 
-const UnifiedExpenseList = ({ expenses, selectedMonth, onEdit, onDelete }: { 
-  expenses: any[], 
-  selectedMonth: string,
-  onEdit: (exp: any) => void,
-  onDelete: (id: string) => void
+interface UnifiedExpenseListProps {
+  expenses: StaffExpense[];
+  selectedMonth: string;
+  onEdit: (exp: StaffExpense) => void;
+  onDelete: (id: string) => void;
+}
+
+const UnifiedExpenseList: React.FC<UnifiedExpenseListProps> = ({ 
+  expenses, 
+  selectedMonth,
+  onEdit,
+  onDelete
 }) => {
   const pending = expenses.filter(e => !e.is_reimbursed).sort((a, b) => b.date.localeCompare(a.date));
   const reimbursed = expenses.filter(e => e.is_reimbursed && e.date.startsWith(selectedMonth)).sort((a, b) => b.date.localeCompare(a.date));
@@ -634,7 +658,7 @@ const UnifiedExpenseList = ({ expenses, selectedMonth, onEdit, onDelete }: {
     );
   }
 
-  const renderCard = (exp: any, index: number) => (
+  const renderCard = (exp: StaffExpense, index: number) => (
     <motion.div 
       key={exp.id} 
       initial={{ opacity: 0, y: 10 }}

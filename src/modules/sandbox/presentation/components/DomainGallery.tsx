@@ -5,6 +5,8 @@ import { calculateVehicleFinancials } from '../../../../shared/utils/vehicle_cal
 import { Sliders, Eye, EyeOff, LayoutGrid, Sparkles } from 'lucide-react';
 import { haptics } from '../../../../shared/utils/haptics';
 
+import { createMockVehicle } from '../../../../shared/utils/__tests__/mock_data';
+
 export const DomainGallery = () => {
   const [carStatus, setCarStatus] = useState<VehicleStatus>(VehicleStatus.IN_STOCK);
   const [canSeeFullInfo, setCanSeeFullInfo] = useState<boolean>(true);
@@ -13,11 +15,11 @@ export const DomainGallery = () => {
   const [isCompact, setIsCompact] = useState<boolean>(false);
   const [daysInStock, setDaysInStock] = useState<number>(15);
 
-  const mockVehicle = {
+  const mockVehicle = createMockVehicle({
     id: 1,
     name: "Porsche 911 GT3 RS (992)",
     code: "POR-911",
-    year: 2024,
+    year: '2024',
     odo: 2500,
     status: carStatus,
     purchase_price: 15500000000,
@@ -31,7 +33,7 @@ export const DomainGallery = () => {
     is_coinvested: true,
     coinvest_amount: 5000000000, // góp 5 tỷ
     buyer: ""
-  } as any;
+  });
 
   const financials = calculateVehicleFinancials(mockVehicle);
 

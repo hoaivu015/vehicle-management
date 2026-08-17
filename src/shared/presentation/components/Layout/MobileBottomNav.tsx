@@ -42,7 +42,7 @@ export const MobileBottomNav = ({ navItems, activeTab }: { navItems: NavItem[], 
                   whileTap={{ scale: 0.92 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 14 }}
                   onClick={async () => {
-                    try { await haptics.light(); } catch (err) {}
+                    try { await haptics.light(); } catch { /* ignore haptics error */ }
                     item.onClick();
                   }}
                   className="relative -top-5 flex flex-col items-center justify-center h-13 w-13 bg-gradient-to-tr from-kraft-accent to-[#818cf8] text-white rounded-full border-[3px] border-white dark:border-[#161a23]/90 shadow-[0_6px_24px_rgba(99,102,241,0.3),inset_0_1px_2px_rgba(255,255,255,0.45)] z-20 cursor-pointer will-change-transform"
@@ -57,7 +57,7 @@ export const MobileBottomNav = ({ navItems, activeTab }: { navItems: NavItem[], 
             <button 
               key={item.id} 
               onClick={async () => {
-                try { await haptics.light(); } catch (err) {}
+                try { await haptics.light(); } catch { /* ignore haptics error */ }
                 item.onClick();
               }} 
               className={cn(

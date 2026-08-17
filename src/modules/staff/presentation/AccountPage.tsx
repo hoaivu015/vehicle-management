@@ -73,7 +73,7 @@ export const AccountPage: React.FC = () => {
   const notification = useNotification();
   const { staffRepo: repository } = useDependencies();
 
-  const fetchAccounts = async () => {
+  const fetchAccounts = React.useCallback(async () => {
     setLoading(true);
     try {
       const data = await repository.getAccounts();
@@ -84,11 +84,12 @@ export const AccountPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [repository, notification]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchAccounts();
-  }, []);
+  }, [fetchAccounts]);
 
   const togglePassword = (email: string) => {
     setShowPasswordMap(prev => ({
@@ -121,7 +122,7 @@ export const AccountPage: React.FC = () => {
       notification.success(`Đã cập nhật mật khẩu cho tài khoản ${editingAccount.name || editingAccount.email} thành công!`);
       setEditingAccount(null);
       fetchAccounts();
-    } catch (error) {
+    } catch {
       notification.error('Lỗi khi cập nhật mật khẩu. Hãy đảm bảo Edge Function đã được triển khai.');
       haptics.error();
     } finally {

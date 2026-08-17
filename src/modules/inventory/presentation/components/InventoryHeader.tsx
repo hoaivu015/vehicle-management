@@ -1,3 +1,4 @@
+import React from 'react';
 import { Package, Search, Calendar, Plus, Filter, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '@/src/shared/utils/cn';

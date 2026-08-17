@@ -43,7 +43,7 @@ export const useActionResponse = () => {
       }
       
       return result;
-    } catch (error: any) {
+    } catch (error: unknown) {
       haptics.error(); // Phản hồi xúc giác khi lỗi
       const message = error instanceof Error ? error.message : 'Đã xảy ra lỗi';
       notification.error(message);

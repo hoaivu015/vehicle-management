@@ -11,7 +11,7 @@ describe('AddSalePayment Use Case', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    useCase = new AddSalePayment(mockVehicleRepo as any);
+    useCase = new AddSalePayment(mockVehicleRepo as unknown as import('../../domain/VehicleRepository').VehicleRepository);
   });
 
   it('should call repository with correct data when adding a payment', async () => {

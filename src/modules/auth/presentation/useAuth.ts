@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDependencies } from '@/src/shared/ioc/DependencyContext';
-import { PermissionService } from '@/src/modules/auth/domain/PermissionService';
+import { PermissionService, Permission } from '@/src/modules/auth/domain/PermissionService';
 import { useNotification } from '@/src/shared/presentation/useNotification';
 import { Staff, Vehicle } from '@/src/shared/domain/types';
 
@@ -10,6 +10,12 @@ export const useAuth = () => {
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isAuthed, setIsAuthed] = useState(false);
   const notification = useNotification();
+
+  const handleLogout = useCallback(async () => {
+    setCurrentUser(null);
+    setIsAuthed(false);
+    await authRepo.signOut();
+  }, [authRepo]);
 
   const fetchPermissions = useCallback(async () => {
     try {
@@ -24,10 +30,11 @@ export const useAuth = () => {
 
   const fetchProfile = useCallback(async (email: string) => {
     try {
-      // Fetch permissions first or in parallel
-      await fetchPermissions();
-      
-      const data = await staffRepo.getByEmail(email);
+      // Fetch permissions and employee profile in parallel to eliminate waterfall
+      const [, data] = await Promise.all([
+        fetchPermissions(),
+        staffRepo.getByEmail(email)
+      ]);
 
       if (data) {
         setCurrentUser(data);
@@ -42,7 +49,7 @@ export const useAuth = () => {
     } finally {
       setIsAuthLoading(false);
     }
-  }, [fetchPermissions, staffRepo]);
+  }, [fetchPermissions, staffRepo, handleLogout, notification]);
 
   useEffect(() => {
     authRepo.getSessionUserEmail().then((email) => {
@@ -68,14 +75,8 @@ export const useAuth = () => {
     return () => unsubscribe();
   }, [fetchProfile, fetchPermissions, authRepo]);
 
-  const handleLogout = async () => {
-    setCurrentUser(null);
-    setIsAuthed(false);
-    await authRepo.signOut();
-  };
-
-  const hasPermission = useCallback((permission: string) => {
-    return PermissionService.hasPermission(currentUser?.role, permission as any);
+  const hasPermission = useCallback((permission: Permission | string) => {
+    return PermissionService.hasPermission(currentUser?.role, permission as Permission);
   }, [currentUser]);
 
   const can = useCallback((module: string, action: 'access' | 'view' | 'edit' | 'delete') => {
@@ -100,7 +101,7 @@ export const useAuth = () => {
         await authRepo.updatePassword(data.password);
       }
 
-      const { password, ...profileData } = data;
+      const { password: _password, ...profileData } = data;
       if (Object.keys(profileData).length > 0 && currentUser) {
         await staffRepo.update(currentUser.id, profileData);
       }

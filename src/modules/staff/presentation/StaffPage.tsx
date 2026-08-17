@@ -1,9 +1,10 @@
-import React from 'react';
-import { StaffWebView } from './StaffWebView';
-import { StaffMobileView } from './StaffMobileView';
+import React, { Suspense } from 'react';
 import { useIsMobile } from '@/src/shared/presentation/hooks/useIsMobile';
-
 import { useStaffState } from './useStaffState';
+
+// Lazy load views to optimize platform-specific bundle size
+const StaffWebView = React.lazy(() => import('./StaffWebView').then(m => ({ default: m.StaffWebView })));
+const StaffMobileView = React.lazy(() => import('./StaffMobileView').then(m => ({ default: m.StaffMobileView })));
 
 interface StaffPageProps {
   userRole: string;
@@ -18,9 +19,13 @@ export const StaffPage: React.FC<StaffPageProps> = (props) => {
   const currentMonth = React.useMemo(() => new Date().toISOString().slice(0, 7), []);
   const staffState = useStaffState(currentMonth, props.userRole);
 
-  if (isMobile) {
-    return <StaffMobileView {...props} state={staffState} />;
-  }
-
-  return <StaffWebView {...props} state={staffState} />;
+  return (
+    <Suspense fallback={<div className="h-full w-full animate-pulse bg-kraft-accent/5 rounded-[3rem]" />}>
+      {isMobile ? (
+        <StaffMobileView {...props} state={staffState} />
+      ) : (
+        <StaffWebView {...props} state={staffState} />
+      )}
+    </Suspense>
+  );
 };

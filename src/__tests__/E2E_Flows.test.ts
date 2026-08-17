@@ -5,6 +5,7 @@ import { StaffSalaryService } from '../modules/staff/domain/StaffSalaryService';
 import { calculateVehicleFinancials } from '../shared/utils/vehicle_calculations';
 import { VehicleStatus } from '../shared/domain/constants';
 import { Vehicle, StaffExpense } from '../shared/domain/types';
+import { createMockVehicle, createMockStaff } from '../shared/utils/__tests__/mock_data';
 
 describe('E2E Workflow: The Perfect Sale', () => {
   // Mocks
@@ -16,6 +17,7 @@ describe('E2E Workflow: The Perfect Sale', () => {
   };
   const mockExpenseRepo = {
     add: vi.fn(),
+    deleteByNameAndCategory: vi.fn(),
     getByVehicleId: vi.fn(),
   };
   const mockStaffRepo = {
@@ -27,8 +29,14 @@ describe('E2E Workflow: The Perfect Sale', () => {
     update: vi.fn(),
   };
 
-  const updateVehicle = new UpdateVehicle(mockVehicleRepo as any, mockExpenseRepo as any, mockStaffRepo as any);
-  const addSalePayment = new AddSalePayment(mockVehicleRepo as any);
+  const updateVehicle = new UpdateVehicle(
+    mockVehicleRepo as unknown as import('../modules/inventory/domain/VehicleRepository').VehicleRepository,
+    mockExpenseRepo as unknown as import('../modules/finance/domain/ExpenseRepository').ExpenseRepository,
+    mockStaffRepo as unknown as import('../modules/staff/domain/StaffRepository').StaffRepository
+  );
+  const addSalePayment = new AddSalePayment(
+    mockVehicleRepo as unknown as import('../modules/inventory/domain/VehicleRepository').VehicleRepository
+  );
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -36,14 +44,14 @@ describe('E2E Workflow: The Perfect Sale', () => {
 
   it('should flow correctly from import to sale and salary calculation', async () => {
     // 1. Initial Vehicle State (Imported)
-    const baseVehicle: Vehicle = {
+    const baseVehicle: Vehicle = createMockVehicle({
       id: 1,
-      vehicle_code: 'CAR001',
+      code: 'CAR001',
       status: VehicleStatus.IN_STOCK,
       purchase_price: 500000000,
       is_coinvested: false,
-      date_imported: '2026-04-01',
-    } as any;
+      purchase_date: '2026-04-01',
+    });
 
     // 2. Add Costs (e.g., Repair cost of 10M)
     const repairExpense: StaffExpense = {
@@ -65,34 +73,40 @@ describe('E2E Workflow: The Perfect Sale', () => {
       seller: 'NV01',
       salePrice: 600000000,
       commission: 5000000,
-      date: '2026-04-20'
+      date: '2026-04-20',
+      note: 'Sold in full',
+      receiver: 'Auto28'
     };
-    await addSalePayment.execute(saleRequest as any);
+    await addSalePayment.execute(saleRequest);
     
     expect(mockVehicleRepo.addSalePayment).toHaveBeenCalledWith(
       1, expect.any(Object), VehicleStatus.SOLD, 'NV01', undefined, 600000000, 5000000, undefined
     );
 
     // 4. Update the vehicle state in our mock "snapshot"
-    const soldVehicle: Vehicle = {
+    const soldVehicle: Vehicle = createMockVehicle({
       ...baseVehicle,
       status: VehicleStatus.SOLD,
       sale_price: 600000000,
       seller: 'NV01',
       commission: 5000000,
       sale_date: '2026-04-20',
-      cost_history: [repairExpense]
-    } as any;
+      cost_history: [{
+        ...repairExpense,
+        staff_id: 'NV01',
+        staff_expense_id: 'e1'
+      }]
+    });
 
     // 5. Calculate Financials
-    const financials = calculateVehicleFinancials(soldVehicle as any);
+    const financials = calculateVehicleFinancials(soldVehicle);
     expect(financials.grossProfit).toBe(90000000); // 600M - 500M - 10M
     expect(financials.netProfit).toBe(85000000); // 90M - 5M commission
 
     // 6. Check Staff Salary for NV01 in April
     mockStaffRepo.getExpensesByStaffId.mockResolvedValue([]); // No other expenses
     const salaryData = StaffSalaryService.calculateMonthlySalary(
-      { code: 'NV01', base_salary: 10000000, target: 1 } as any,
+      createMockStaff({ code: 'NV01', base_salary: 10000000, target: 1 }),
       [soldVehicle],
       '2026-04'
     );
@@ -103,9 +117,8 @@ describe('E2E Workflow: The Perfect Sale', () => {
 
   it('should flow correctly for a co-investment sale', async () => {
     // 1. Co-invested Vehicle (NV02 is partner)
-    const vehicle: Vehicle = {
+    const vehicle: Vehicle = createMockVehicle({
       id: 2,
-      vehicle_code: 'CAR002',
       name: 'Mercedes S450',
       code: 'CAR002',
       status: VehicleStatus.SOLD,
@@ -117,15 +130,15 @@ describe('E2E Workflow: The Perfect Sale', () => {
       sale_date: '2026-04-25',
       partner_profit_shared: false,
       cost_history: []
-    } as any;
+    });
 
     // 2. Calculate Profit Share
-    const financials = calculateVehicleFinancials(vehicle as any);
+    const financials = calculateVehicleFinancials(vehicle);
     expect(financials.partnerProfitShare).toBe(50000000); // 50% of (500M - 400M)
 
     // 3. Check NV02 Salary (Should include the profit share)
     let salaryData = StaffSalaryService.calculateMonthlySalary(
-      { code: 'NV02', base_salary: 10000000 } as any,
+      createMockStaff({ code: 'NV02', base_salary: 10000000 }),
       [vehicle],
       '2026-04'
     );
@@ -154,7 +167,7 @@ describe('E2E Workflow: The Perfect Sale', () => {
     // 6. Check NV02 Salary again (Should now be 10M since profit is paid)
     const paidVehicle = { ...vehicle, partner_profit_shared: true };
     salaryData = StaffSalaryService.calculateMonthlySalary(
-      { code: 'NV02', base_salary: 10000000 } as any,
+      createMockStaff({ code: 'NV02', base_salary: 10000000 }),
       [paidVehicle],
       '2026-04'
     );

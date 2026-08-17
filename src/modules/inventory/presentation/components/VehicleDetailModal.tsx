@@ -125,7 +125,7 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = (props) => 
                            return (
                               <button
                                  key={tab.id}
-                                 onClick={() => handleTabChange(tab.id as any)}
+                                 onClick={() => handleTabChange(tab.id as 'info' | 'financials' | 'history')}
                                  className="relative flex items-center justify-center h-8 px-5 rounded-full transition-all active:scale-95 cursor-pointer z-10 group"
                               >
                                  {isActive && (

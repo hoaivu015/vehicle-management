@@ -17,7 +17,7 @@ export const createMockVehicle = (overrides: Partial<Vehicle> = {}): Vehicle => 
   seller: '',
   seller_name: '',
   commission: 0,
-  buying_commission: 3000000,
+  buying_commission: 0,
   buying_bonus: 0,
   buying_bonus_paid: false,
   total_cost: 0,

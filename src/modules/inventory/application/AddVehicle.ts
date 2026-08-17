@@ -22,7 +22,7 @@ export class AddVehicle {
 
     let attempts = 0;
     const maxAttempts = 3;
-    let lastError: any;
+    let lastError: unknown;
 
     while (attempts < maxAttempts) {
       try {
@@ -79,10 +79,11 @@ export class AddVehicle {
           ...newVehicle,
           history: [historyEntry]
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
         lastError = error;
+        const err = error as { code?: string; status?: number };
         // Lỗi 23505 (Postgres) hoặc 409 (HTTP Conflict) là trùng mã xe
-        if (error.code === '23505' || error.status === 409 || error.code === '409') {
+        if (err.code === '23505' || err.status === 409 || err.code === '409') {
           attempts++;
           console.log(`[AddVehicle] Phát hiện trùng mã xe, đang thử lại lần ${attempts}...`);
           continue;

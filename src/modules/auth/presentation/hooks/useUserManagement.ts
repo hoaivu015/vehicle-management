@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNotification } from '@/src/shared/presentation/useNotification';
 import { UserRole, ADMIN_EMAILS } from '@/src/shared/domain/constants';
 import { UserProfile } from '@/src/modules/user/domain/UserRepository';
@@ -32,7 +32,7 @@ export const useUserManagement = () => {
   }, [presenter, notification]);
 
   const uniqueUsers = useMemo(() => {
-    const emailMap = new Map<string, any>();
+    const emailMap = new Map<string, UserProfile>();
     users.forEach(user => {
       if (!user.email) return;
       const existing = emailMap.get(user.email);

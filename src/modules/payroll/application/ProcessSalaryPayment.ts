@@ -34,7 +34,7 @@ export class ProcessSalaryPayment {
       amount,
       category,
       date: request.paymentDate || new Date().toISOString().split('T')[0]
-    } as any);
+    });
 
     // 2. Ghi nhận vào bảng Payouts -> TRIGGER tự động cập nhật paid_months và hoàn ứng expenses
     await this.staffRepository.addSalaryPayout({

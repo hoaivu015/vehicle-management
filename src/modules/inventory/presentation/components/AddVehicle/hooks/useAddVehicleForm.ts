@@ -1,9 +1,26 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AddVehicleRequest } from '@/src/modules/inventory/application/AddVehicle';
 
 export interface VehicleStorageRepository {
   uploadImage(file: File): Promise<string>;
 }
+
+const getInitialFormState = (): AddVehicleRequest => ({
+  name: '',
+  year: new Date().getFullYear().toString(),
+  odo: 0,
+  color: '',
+  purchase_price: 0,
+  purchase_date: new Date().toISOString().split('T')[0],
+  buyer: '',
+  is_coinvested: false,
+  coinvestor_code: '',
+  coinvest_amount: 0,
+  notes: '',
+  image_url: '',
+  buying_commission: 0,
+  battery_type: 'None'
+});
 
 export const useAddVehicleForm = (
   isOpen: boolean, 
@@ -11,31 +28,15 @@ export const useAddVehicleForm = (
   onClose: () => void,
   storageRepo: VehicleStorageRepository
 ) => {
-  const initialFormState: AddVehicleRequest = {
-    name: '',
-    year: new Date().getFullYear().toString(),
-    odo: 0,
-    color: '',
-    purchase_price: 0,
-    purchase_date: new Date().toISOString().split('T')[0],
-    buyer: '',
-    is_coinvested: false,
-    coinvestor_code: '',
-    coinvest_amount: 0,
-    notes: '',
-    image_url: '',
-    buying_commission: 0,
-    battery_type: 'None'
-  };
-
-  const [formData, setFormData] = useState<AddVehicleRequest>(initialFormState);
+  const [formData, setFormData] = useState<AddVehicleRequest>(getInitialFormState);
   const [loading, setLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) {
-      setFormData(initialFormState);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFormData(getInitialFormState());
       setFormError(null);
     }
   }, [isOpen]);

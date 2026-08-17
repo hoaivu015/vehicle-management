@@ -4,7 +4,7 @@ import { SmartAmountInput } from '@/src/shared/design-system/SmartAmountInput';
 
 // Mock numberToVietnameseText as it might be complex or non-deterministic in tests
 vi.mock('@/src/shared/utils/currency', async () => {
-  const actual = await vi.importActual('@/src/shared/utils/currency') as any;
+  const actual = await vi.importActual<typeof import('@/src/shared/utils/currency')>('@/src/shared/utils/currency');
   return {
     ...actual,
     numberToVietnameseText: (val: number) => `Text for ${val}`,

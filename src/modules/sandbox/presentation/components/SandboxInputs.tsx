@@ -1,7 +1,13 @@
+import React from 'react';
 import { Search, AlertCircle, Sparkles } from 'lucide-react';
 import { SmartAmountInput } from '@/src/shared/design-system/SmartAmountInput';
 
-export const SandboxInputs = ({ testAmount, setTestAmount }: any) => (
+interface SandboxInputsProps {
+  testAmount: number;
+  setTestAmount: (val: number) => void;
+}
+
+export const SandboxInputs: React.FC<SandboxInputsProps> = ({ testAmount, setTestAmount }) => (
   <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
     <section className="section-card">
       <h2 className="text-xl font-black text-kraft-ink mb-8 flex items-center gap-2"><div className="w-2 h-6 bg-kraft-accent rounded-full" />Smart Inputs</h2>

@@ -7,6 +7,7 @@ import { StaffAddExpenseModal } from '@/src/modules/staff/presentation/component
 import { VehicleDetailModal } from '@/src/modules/inventory/presentation/components/VehicleDetailModal';
 import { PersonalState, usePersonalState } from '@/src/modules/personal/presentation/usePersonalState';
 import { useDependencies } from '@/src/shared/ioc/DependencyContext';
+import { UpdateVehicleInput } from '@/src/modules/inventory/domain/VehicleSchema';
 
 import { PersonalSidebar } from './components/PersonalSidebar';
 import { SalaryBreakdownCard } from './components/SalaryBreakdownCard';
@@ -181,12 +182,12 @@ export const PersonalWebView = ({ user, onUpdateUser, onLogout, state: propState
             onClose={() => setIsVehicleDetailOpen(false)}
             onUpdateStatus={(id, nextStatus, extra) => handleUpdateStatus(id, nextStatus, extra || {})}
             onDeleteVehicle={handleDeleteVehicle}
-            onUpdateVehicle={(id, data) => handleUpdateVehicle(id, data as any)}
+            onUpdateVehicle={(id, data) => handleUpdateVehicle(id, data as unknown as UpdateVehicleInput)}
             onAddCost={handleAddCost}
             onDeleteCost={handleDeleteCost}
             onPin={handlePin}
             onAddPurchasePayment={handleAddPurchasePayment}
-            onAddSalePayment={(...args) => handleAddSalePayment(args[0], args[1], args[2], args[3], args[4] as any, args[5], args[6], args[7], args[8], args[9])}
+            onAddSalePayment={(...args) => handleAddSalePayment(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9])}
             onCancelSale={handleCancelSale}
             staffList={staffList}
             userRole={user.role}

@@ -19,7 +19,7 @@ export class SupabaseVehicleStaffRepository implements VehicleStaffRepository {
       if (!currentTracked.includes(vehicleCode)) {
         await supabase
           .from('employees')
-          .update({ tracked_cars: [...currentTracked, vehicleCode] } as any)
+          .update({ tracked_cars: [...currentTracked, vehicleCode] })
           .eq('code', staffCode);
       }
     } catch (err) {
@@ -42,7 +42,7 @@ export class SupabaseVehicleStaffRepository implements VehicleStaffRepository {
       await Promise.all(staffList.map(staff => 
         supabase
           .from('employees')
-          .update({ tracked_cars: (staff.tracked_cars || []).filter((c: string) => c !== vehicleCode) } as any)
+          .update({ tracked_cars: (staff.tracked_cars || []).filter((c: string) => c !== vehicleCode) })
           .eq('id', staff.id)
       ));
     } catch (err) {
@@ -62,7 +62,7 @@ export class SupabaseVehicleStaffRepository implements VehicleStaffRepository {
         .eq('code', staffCode)
         .maybeSingle();
       return error || !data ? staffCode : data.name;
-    } catch (e) {
+    } catch {
       return staffCode;
     }
   }

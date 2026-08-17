@@ -48,7 +48,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ vehicle }) => {
                            <p className="text-[10px] font-black text-kraft-ink uppercase tracking-widest">{h.user}</p>
                         </div>
                         <p className="text-xs sm:text-sm text-kraft-ink/60 leading-relaxed italic">
-                           "{h.note}"
+                           &ldquo;{h.note}&rdquo;
                         </p>
                      </div>
                   </div>

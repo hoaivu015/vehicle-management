@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { LogIn, AlertCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useDependencies } from '@/src/shared/ioc/DependencyContext';
+import { Staff } from '@/src/shared/domain/types';
 
-interface LoginProps {
-  onLogin: (user: any) => void;
+export interface LoginProps {
+  onLogin?: (user: Staff) => void;
 }
 
-export const Login = ({}: LoginProps) => {
+export const Login: React.FC<LoginProps> = () => {
   const { authRepo, staffRepo } = useDependencies();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

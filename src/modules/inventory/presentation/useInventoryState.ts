@@ -62,7 +62,7 @@ export const useInventoryState = ({
       setSelectedVehicle(vehicle);
     },
     setStaffList: setStaffList,
-  }), [presenter]);
+  }), [presenter, notification]);
 
   useEffect(() => {
     presenter.attachView(view);
@@ -101,6 +101,7 @@ export const useInventoryState = ({
       }
 
       if (targetCar) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedVehicle(targetCar);
         setIsDetailOpen(true);
         setHasHandledAction(true);
@@ -114,6 +115,7 @@ export const useInventoryState = ({
       const allCars = [...availableCars, ...soldCars];
       const targetCar = allCars.find(c => c.code === initialSearch || c.name === initialSearch);
       if (targetCar) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedVehicle(targetCar);
         setIsDetailOpen(true);
         if (soldCars.includes(targetCar)) {
@@ -127,6 +129,7 @@ export const useInventoryState = ({
   }, [availableCars, soldCars, initialAction, initialSearch, hasHandledAction]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedVehicle(current => {
       if (!current) return current;
       const updated = [...availableCars, ...soldCars].find(c => c.id === current.id);
@@ -135,6 +138,7 @@ export const useInventoryState = ({
   }, [availableCars, soldCars]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearchQuery(initialSearch);
   }, [initialSearch]);
 

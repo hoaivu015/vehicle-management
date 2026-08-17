@@ -12,9 +12,7 @@ export interface User {
   updated_at?: string;
 }
 
-export interface Account extends User {
-  // Account is used for authentication and user management
-}
+export type Account = User;
 
 export interface Staff {
   id: number;

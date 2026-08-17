@@ -5,7 +5,7 @@ import { zId, zString, zNumber } from '../../../shared/utils/zod';
  * UnifiedExpenseSchema - Nguồn sự thật duy nhất cho mọi giao dịch chi phí.
  * Áp dụng Luật 6: Zod Boundary.
  */
-export const UnifiedExpenseSchema = z.object({
+const BaseUnifiedExpenseObject = z.object({
   id: zId.optional(),
   name: z.string().min(1, "Nội dung chi không được để trống"),
   amount: zNumber,
@@ -17,11 +17,17 @@ export const UnifiedExpenseSchema = z.object({
   type: z.enum(['vehicle', 'operating']),
   staffId: z.union([z.string(), z.number()]).optional(),
   vehicleId: z.union([z.string(), z.number()]).optional(),
-}).passthrough().transform((data: any) => {
-  // Backward compatibility: Map snake_case from DB to camelCase
-  if (data.vehicle_id && !data.vehicleId) data.vehicleId = data.vehicle_id;
-  if (data.staff_id && !data.staffId) data.staffId = data.staff_id;
-  return data;
+});
+
+export const UnifiedExpenseSchema = BaseUnifiedExpenseObject.passthrough().transform((data) => {
+  const d = data as typeof data & { vehicle_id?: string | number; staff_id?: string | number };
+  const vehicleId = d.vehicleId ?? d.vehicle_id;
+  const staffId = d.staffId ?? d.staff_id;
+  return {
+    ...d,
+    vehicleId: vehicleId as string | number | undefined,
+    staffId: staffId as string | number | undefined,
+  };
 }).refine(data => {
   if (data.type === 'vehicle' && !data.vehicleId) return false;
   return true;

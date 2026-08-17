@@ -117,6 +117,7 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
   }, [presenter, staffPresenter, inventoryPresenter, user, selectedMonth]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedVehicle(current => {
       if (!current) return current;
       const updated = allVehicles.find(c => c.id === current.id);
@@ -152,7 +153,7 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
   };
 
   const handleUpdateStatus = (id: number, status: string, extra: Record<string, unknown>) =>
-    executeAction(() => inventoryPresenter.updateVehicleStatus({ id, nextStatus: status as any, user: user.code, ...extra }, user.role), { 
+    executeAction(() => inventoryPresenter.updateVehicleStatus({ id, nextStatus: status as import('@/src/shared/domain/constants').VehicleStatus, user: user.code, ...extra }, user.role), { 
       successMessage: 'Cập nhật trạng thái thành công!' 
     });
 
@@ -185,7 +186,7 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
     });
 
   const handleAddSalePayment = (id: number, amount: number, note: string, receiver: string, status: string, seller: string, bName?: string, sPrice?: number, comm?: number, bBonus?: number) =>
-    executeAction(() => inventoryPresenter.addSalePayment(id, amount, note, receiver, status as any, seller, bName || '', sPrice || 0, comm || 0, bBonus || 0, user.role), { 
+    executeAction(() => inventoryPresenter.addSalePayment(id, amount, note, receiver, status as import('@/src/shared/domain/constants').VehicleStatus, seller, bName || '', sPrice || 0, comm || 0, bBonus || 0, user.role), { 
       successMessage: 'Ghi nhận giao dịch thành công!' 
     });
 

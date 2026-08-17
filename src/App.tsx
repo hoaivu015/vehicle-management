@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Header } from '@/src/shared/presentation/components/Layout/Header';
 import { Login } from '@/src/modules/auth/presentation/views/Login';
 import { Toaster } from 'sonner';
@@ -12,9 +12,13 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PERMISSIONS } from '@/src/constants';
 import { NotificationInitializer } from '@/src/shared/presentation/components/NotificationInitializer';
-import { StaffAddExpenseModal } from '@/src/modules/staff/presentation/components/StaffAddExpenseModal';
 import { useDependencies } from '@/src/shared/ioc/DependencyContext';
 import { AnimatePresence, MotionConfig } from 'motion/react';
+
+// Lazy-load global modal to avoid bloat on startup
+const StaffAddExpenseModal = React.lazy(() => 
+  import('@/src/modules/staff/presentation/components/StaffAddExpenseModal').then(m => ({ default: m.StaffAddExpenseModal }))
+);
 
 export default function App() {
   const {
@@ -38,7 +42,10 @@ export default function App() {
 
   const staffPresenter = useState(() => createStaffPresenter())[0];
 
+  // Defer vehicle loading until user actually opens global expense modal
   useEffect(() => {
+    if (!isGlobalExpenseOpen) return;
+
     staffPresenter.attachView({
       showStaffList: () => {},
       onStaffAdded: () => {},
@@ -51,15 +58,15 @@ export default function App() {
     });
     staffPresenter.loadVehicles();
     return () => staffPresenter.detachView();
-  }, [staffPresenter]);
+  }, [isGlobalExpenseOpen, staffPresenter]);
 
   // Derive activeTab from URL path
   const activeTab = location.pathname.split('/')[1] || 'dashboard';
 
-  const setActiveTab = (tab: string) => {
+  const setActiveTab = React.useCallback((tab: string) => {
     if (tab === 'dashboard') navigate('/');
     else navigate(`/${tab}`);
-  };
+  }, [navigate]);
 
   const [inventorySearch, setInventorySearch] = useState('');
   const [inventoryFilter, setInventoryFilter] = useState<'ALL' | 'AGING_25'>('ALL');
@@ -100,7 +107,7 @@ export default function App() {
         setActiveTab(firstAllowedTab);
       }
     }
-  }, [activeTab, currentUser, isAuthLoading, isAuthed, hasPermission]);
+  }, [activeTab, currentUser, isAuthLoading, isAuthed, hasPermission, isAdmin, setActiveTab]);
 
   // Reset scroll to top on tab change
   useEffect(() => {
@@ -201,16 +208,18 @@ export default function App() {
 
       <AnimatePresence>
         {isGlobalExpenseOpen && currentUser && (
-          <StaffAddExpenseModal 
-            isOpen={isGlobalExpenseOpen}
-            onClose={() => setIsGlobalExpenseOpen(false)}
-            staffName={currentUser.name}
-            onAdd={async (data) => {
-              await staffPresenter.addStaffExpense(currentUser.id, data);
-              setIsGlobalExpenseOpen(false);
-            }}
-            vehicles={vehicles}
-          />
+          <Suspense fallback={null}>
+            <StaffAddExpenseModal 
+              isOpen={isGlobalExpenseOpen}
+              onClose={() => setIsGlobalExpenseOpen(false)}
+              staffName={currentUser.name}
+              onAdd={async (data) => {
+                await staffPresenter.addStaffExpense(currentUser.id, data);
+                setIsGlobalExpenseOpen(false);
+              }}
+              vehicles={vehicles}
+            />
+          </Suspense>
         )}
       </AnimatePresence>
       <SpeedInsights />

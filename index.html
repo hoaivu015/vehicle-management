@@ -13,12 +13,23 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" type="image/jpeg" href="/logo.jpg" />
-    <!-- Tối ưu kết nối và nạp Font chữ tiếng Việt chuẩn Neural Expressive -->
+    <!-- Tối ưu kết nối sớm và nạp Font chữ tiếng Việt chuẩn Neural Expressive -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Non-blocking Google Fonts Loading -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap">
+    </noscript>
+
+    <!-- Preload Logo & Preconnect Data APIs -->
+    <link rel="preload" as="image" href="/logo_auto28.jpg">
+    <link rel="dns-prefetch" href="https://res.cloudinary.com">
+    <link rel="dns-prefetch" href="https://api.cloudinary.com">
     <title>Quản lí kho Auto28 | Showroom Manager</title>
   </head>
   <body>

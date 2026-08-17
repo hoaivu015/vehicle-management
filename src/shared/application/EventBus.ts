@@ -2,19 +2,19 @@
  * Simple Event Bus for inter-module communication.
  * Helps decouple modules by avoiding direct use case dependencies.
  */
-type EventHandler<T = any> = (data: T) => void | Promise<void>;
+type EventHandler<T = unknown> = (data: T) => void | Promise<void>;
 
 class EventBus {
-  private handlers: Map<string, Set<EventHandler>> = new Map();
+  private handlers: Map<string, Set<EventHandler<unknown>>> = new Map();
 
   subscribe<T>(event: string, handler: EventHandler<T>): () => void {
     if (!this.handlers.has(event)) {
       this.handlers.set(event, new Set());
     }
-    this.handlers.get(event)!.add(handler);
+    this.handlers.get(event)!.add(handler as EventHandler<unknown>);
     
     return () => {
-      this.handlers.get(event)?.delete(handler);
+      this.handlers.get(event)?.delete(handler as EventHandler<unknown>);
     };
   }
 
@@ -24,7 +24,7 @@ class EventBus {
 
     const promises: Promise<void>[] = [];
     eventHandlers.forEach(handler => {
-      const result = handler(data);
+      const result = (handler as EventHandler<T>)(data);
       if (result instanceof Promise) {
         promises.push(result);
       }

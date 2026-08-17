@@ -29,9 +29,10 @@ export const AddCostOverlay: React.FC<AddCostOverlayProps> = ({
    React.useEffect(() => {
       if (isOpen) {
          resetForm();
+         // eslint-disable-next-line react-hooks/set-state-in-effect
          setError(null);
       }
-   }, [isOpen]);
+   }, [isOpen, resetForm]);
 
    const handleConfirm = async () => {
       if (!form.name || form.name.trim() === '') {

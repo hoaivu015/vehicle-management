@@ -23,6 +23,10 @@ export default defineConfig(({mode}) => {
       hmr: process.env.DISABLE_HMR !== 'true',
     },
     build: {
+      target: 'es2022',
+      cssCodeSplit: true,
+      minify: 'esbuild',
+      chunkSizeWarningLimit: 600,
       rollupOptions: {
         input: {
           main: path.resolve(__dirname, 'index.html'),
@@ -30,11 +34,14 @@ export default defineConfig(({mode}) => {
         output: {
           manualChunks: {
             'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+            'vendor-motion': ['motion'],
+            'vendor-icons': ['lucide-react', '@tabler/icons-react'],
             'vendor-mantine': ['@mantine/core', '@mantine/hooks'],
-            'vendor-ui': ['lucide-react', 'motion'],
-            'vendor-charts': ['recharts'],
+            'vendor-charts': ['recharts', '@mantine/charts'],
             'vendor-infra': ['@supabase/supabase-js'],
+            'vendor-sentry': ['@sentry/react'],
             'vendor-zod': ['zod'],
+            'vendor-utils': ['clsx', 'tailwind-merge', 'sonner', 'date-fns', 'dayjs'],
           },
         },
       },

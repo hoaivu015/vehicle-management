@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { FinanceView, FinancePresenter } from './FinancePresenter';
 import { MonthlyFinanceData } from '@/src/modules/finance/application/GetMonthlyFinance';
 import { FinancialOverviewData } from '@/src/modules/finance/application/GetFinancialOverview';

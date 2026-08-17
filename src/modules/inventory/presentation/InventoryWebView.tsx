@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { AnimatePresence } from 'motion/react';
 
 import { InventoryHeader } from './components/InventoryHeader';
 import { InventoryGrid } from './components/InventoryGrid';
-import { VehicleDetailModal } from './components/VehicleDetailModal';
-import { AddVehicleModal } from './components/AddVehicleModal';
 import { useInventoryState, InventoryState } from './useInventoryState';
 import { PageShell } from '@/src/shared/design-system/PageShell';
 import { cn } from '@/src/shared/utils/cn';
 import { motion } from 'motion/react';
 import { InventorySkeleton } from './components/InventorySkeleton';
+
+const VehicleDetailModal = React.lazy(() => import('./components/VehicleDetailModal').then(m => ({ default: m.VehicleDetailModal })));
+const AddVehicleModal = React.lazy(() => import('./components/AddVehicleModal').then(m => ({ default: m.AddVehicleModal })));
 
 interface InventoryWebViewProps {
   userRole: string;
@@ -163,34 +164,38 @@ export const InventoryWebView: React.FC<InventoryWebViewProps> = ({
       {/* Modals */}
       <AnimatePresence>
         {isDetailOpen && (
-          <VehicleDetailModal
-            isOpen={isDetailOpen}
-            vehicle={selectedVehicle}
-            onClose={() => setIsDetailOpen(false)}
-            onUpdateStatus={handleUpdateStatus}
-            onDeleteVehicle={handleDeleteVehicle}
-            onUpdateVehicle={handleUpdateVehicle}
-            onAddCost={handleAddCost}
-            onDeleteCost={handleDeleteCost}
-            onPin={handlePin}
-            onAddPurchasePayment={handleAddPurchasePayment}
-            onAddSalePayment={handleAddSalePayment}
-            onCancelSale={handleCancelSale}
-            staffList={staffList}
-            userRole={userRole}
-            userCode={currentUser?.code || 'SYSTEM'}
-          />
+          <Suspense fallback={null}>
+            <VehicleDetailModal
+              isOpen={isDetailOpen}
+              vehicle={selectedVehicle}
+              onClose={() => setIsDetailOpen(false)}
+              onUpdateStatus={handleUpdateStatus}
+              onDeleteVehicle={handleDeleteVehicle}
+              onUpdateVehicle={handleUpdateVehicle}
+              onAddCost={handleAddCost}
+              onDeleteCost={handleDeleteCost}
+              onPin={handlePin}
+              onAddPurchasePayment={handleAddPurchasePayment}
+              onAddSalePayment={handleAddSalePayment}
+              onCancelSale={handleCancelSale}
+              staffList={staffList}
+              userRole={userRole}
+              userCode={currentUser?.code || 'SYSTEM'}
+            />
+          </Suspense>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {isAddOpen && (
-          <AddVehicleModal
-            isOpen={isAddOpen}
-            onClose={() => setIsAddOpen(false)}
-            onSubmit={handleAddVehicle}
-            staffList={staffList}
-          />
+          <Suspense fallback={null}>
+            <AddVehicleModal
+              isOpen={isAddOpen}
+              onClose={() => setIsAddOpen(false)}
+              onSubmit={handleAddVehicle}
+              staffList={staffList}
+            />
+          </Suspense>
         )}
       </AnimatePresence>
     </PageShell>

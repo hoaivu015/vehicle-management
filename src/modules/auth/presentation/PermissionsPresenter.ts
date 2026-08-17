@@ -37,8 +37,8 @@ export class PermissionsPresenter extends BasePresenter<PermissionsView> {
       // Filter out permissions for the target role to update
       const rolePerms = perms.filter(p => p.role === role);
       
-      const cleanPerms = rolePerms.map(({ ...rest }: any) => {
-        const { id, updated_at, ...cleanRest } = rest;
+      const cleanPerms = rolePerms.map((perm) => {
+        const { id: _id, updated_at: _updated_at, ...cleanRest } = perm as RolePermission & { id?: string; updated_at?: string };
         return cleanRest;
       });
 

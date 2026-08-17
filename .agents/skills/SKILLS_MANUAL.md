@@ -4,10 +4,11 @@ Chào mừng bạn đến với **Cẩm nang Vận hành Kỹ thuật & Chuẩn 
 
 ---
 
-## 🤖 HỆ THỐNG 3 SUBAGENTS CHUYÊN TRÁCH (.agents/agents/)
+## 🤖 HỆ THỐNG SUBAGENTS CHUYÊN TRÁCH (.agents/agents/)
 
 | Agent Identifier | Tên Chuyên Môn & Trách Nhiệm | Link Định Nghĩa |
 | :--- | :--- | :--- |
+| **`app_industrial_lead`** | **Kỹ Sư Trưởng Chuẩn Hóa Toàn Diện Web & Mobile App:** Chỉ huy tổng thể 6 trụ cột công nghiệp: Clean Arch, Core Web Vitals, UX 3 tầng, OWASP ASVS/RBAC, CI/CD Gate và Mobile Native. | [app_industrial_lead.md](file:///.agents/agents/app_industrial_lead.md) |
 | **`industrial_standardizer`** | **Kỹ Sư Trưởng Chuẩn Hóa Doanh Nghiệp:** Phân tầng Clean Architecture, dọn dẹp mã nguồn, giải quyết triệt để Zod Schemas & Zero Any, tối ưu hóa vòng đời State React 19. | [industrial_standardizer.md](file:///.agents/agents/industrial_standardizer.md) |
 | **`standards_inspector`** | **Thanh Tra Trưởng Độc Lập:** Kiểm tra nhị phân (PASS/FAIL) 6 tiêu chuẩn vàng Auto 28 (Type Safety, Clean Arch, Mã Xe SSoT, RBAC Kế toán/Admin, SSoT Finance, iPhone Native UI). | [standards_inspector.md](file:///.agents/agents/standards_inspector.md) |
 | **`ux_standardizer`** | **Kỹ Sư Trưởng Trải Nghiệm Người Dùng:** Thẩm định & thực thi UX/UI 3 tầng (Standard $\rightarrow$ Advanced $\rightarrow$ Enterprise), kiểm soát độ trễ 0ms, Spring Physics, Haptic Matrix và Liquid Glass 2.0. | [ux_standardizer.md](file:///.agents/agents/ux_standardizer.md) |

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Sparkles, User } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '@/src/shared/utils/cn';
@@ -5,11 +6,26 @@ import { CarCard } from '@/src/modules/inventory/presentation/components/CarCard
 import { calculateVehicleFinancials } from '@/src/shared/utils/vehicle_calculations';
 import { StaffCard } from '@/src/modules/staff/presentation/components/StaffCard';
 import { toast } from 'sonner';
+import { Vehicle } from '@/src/shared/domain/types';
+import { StaffWithSalary } from '@/src/modules/staff/application/GetStaffList';
 
-export const SandboxResizers = ({ 
+interface SandboxResizersProps {
+  cardWidth: number;
+  setCardWidth: (val: number) => void;
+  cardHeight: number;
+  setCardHeight: (val: number) => void;
+  cardVariant: 'standard' | 'large';
+  setCardVariant: (val: 'standard' | 'large') => void;
+  staffCardWidth: number;
+  setStaffCardWidth: (val: number) => void;
+  mockVehicle: Vehicle;
+  mockStaff: StaffWithSalary;
+}
+
+export const SandboxResizers: React.FC<SandboxResizersProps> = ({ 
   cardWidth, setCardWidth, cardHeight, setCardHeight, cardVariant, setCardVariant, 
   staffCardWidth, setStaffCardWidth, mockVehicle, mockStaff 
-}: any) => (
+}) => (
   <div className="space-y-12">
     <section className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-300">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-black/5 pb-4">
@@ -59,7 +75,16 @@ export const SandboxResizers = ({
   </div>
 );
 
-const ResizerInput = ({ label, value, min, max, onChange, onReset }: any) => (
+interface ResizerInputProps {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  onChange: (val: number) => void;
+  onReset: () => void;
+}
+
+const ResizerInput: React.FC<ResizerInputProps> = ({ label, value, min, max, onChange, onReset }) => (
   <div className="space-y-4">
     <div className="flex justify-between items-center px-2">
       <label className="text-[10px] font-black uppercase tracking-widest text-kraft-ink/40">{label}</label>

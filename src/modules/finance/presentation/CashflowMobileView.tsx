@@ -1,3 +1,4 @@
+import React from 'react';
 import { Plus, TrendingUp, TrendingDown, Calendar, Wallet } from 'lucide-react';
 import { formatCurrency } from '@/src/shared/utils/currency';
 import { formatDate } from '@/src/shared/utils/date';
