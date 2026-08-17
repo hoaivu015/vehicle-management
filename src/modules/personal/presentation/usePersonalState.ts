@@ -236,3 +236,5 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
     isSubmitting
   };
 };
+
+export type PersonalState = ReturnType<typeof usePersonalState>;

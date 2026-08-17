@@ -5,7 +5,7 @@ import { cn } from '@/src/shared/utils/cn';
 import { FinancePresenter } from './FinancePresenter';
 
 import { PERMISSIONS } from '@/src/constants';
-import { useCashflowState } from './useCashflowState';
+import { useCashflowState, CashflowState } from './useCashflowState';
 import { NativePage, NativeHeader } from '@/src/shared/design-system/native/NativePage';
 import { LargeTitle, SecondaryLabel } from '@/src/shared/design-system/native/NativeTypography';
 import { motion } from 'motion/react';
@@ -62,18 +62,21 @@ interface CashflowMobileViewProps {
   userRole: string;
   hasPermission: (permission: string) => boolean;
   onNavigate: (tab: string, search?: string, filter?: string, action?: string) => void;
+  state?: CashflowState;
 }
 
 /**
  * 🍎 iPhone Native Cashflow View.
  */
-export const CashflowMobileView: React.FC<CashflowMobileViewProps> = ({ presenter, hasPermission, onNavigate }) => {
+export const CashflowMobileView: React.FC<CashflowMobileViewProps> = ({ presenter, hasPermission, onNavigate, state: propState }) => {
+  const internalState = useCashflowState(presenter);
+  const state = propState || internalState;
   const {
     loading, data, filterMonth, showExpenseModal, setShowExpenseModal, showCapitalModal, setShowCapitalModal,
     expenseForm, setExpenseForm, editingExpenseId, setEditingExpenseId, tempCapital, setTempCapital,
     setIsEditingCapital, handleMonthChange, handleSubmitExpense, startEditExpense, errors,
     receivableDebts, totalReceivables, payableDebts, totalPayables, vehicles
-  } = useCashflowState(presenter);
+  } = state;
 
   const isInitialLoading = loading && !data;
   const isSubsequentLoading = loading && !!data;

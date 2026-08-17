@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Calendar, Award, TrendingUp, MapPin, Clock, User, Trash2, AlertCircle } from 'lucide-react';
+import { Calendar, Award, TrendingUp, MapPin, Clock, User, Trash2, AlertCircle, Layers } from 'lucide-react';
 import { cn } from '@/src/shared/utils/cn';
 import { DESIGN_TOKENS } from '@/src/shared/design-system/tokens';
 import { SmartAmountInput } from '@/src/shared/design-system/SmartAmountInput';

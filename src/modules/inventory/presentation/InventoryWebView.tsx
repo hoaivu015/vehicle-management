@@ -5,7 +5,7 @@ import { InventoryHeader } from './components/InventoryHeader';
 import { InventoryGrid } from './components/InventoryGrid';
 import { VehicleDetailModal } from './components/VehicleDetailModal';
 import { AddVehicleModal } from './components/AddVehicleModal';
-import { useInventoryState } from './useInventoryState';
+import { useInventoryState, InventoryState } from './useInventoryState';
 import { PageShell } from '@/src/shared/design-system/PageShell';
 import { cn } from '@/src/shared/utils/cn';
 import { motion } from 'motion/react';
@@ -18,6 +18,7 @@ interface InventoryWebViewProps {
   initialFilter?: string;
   initialAction?: string;
   hasPermission: (p: string) => boolean;
+  state?: InventoryState;
 }
 
 /**
@@ -30,8 +31,17 @@ export const InventoryWebView: React.FC<InventoryWebViewProps> = ({
   initialSearch = '',
   initialFilter = 'ALL',
   initialAction = '',
-  hasPermission
+  hasPermission,
+  state: propState
 }) => {
+  const internalState = useInventoryState({
+    userRole,
+    currentUser,
+    initialSearch,
+    initialFilter,
+    initialAction
+  });
+  const state = propState || internalState;
   const {
     availableCars,
     soldCars,
@@ -62,13 +72,7 @@ export const InventoryWebView: React.FC<InventoryWebViewProps> = ({
     handleAddPurchasePayment,
     handleAddSalePayment,
     handleCancelSale
-  } = useInventoryState({
-    userRole,
-    currentUser,
-    initialSearch,
-    initialFilter,
-    initialAction
-  });
+  } = state;
 
   const [isCompact, setIsCompact] = React.useState(false);
 

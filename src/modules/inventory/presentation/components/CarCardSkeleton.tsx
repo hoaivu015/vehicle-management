@@ -7,7 +7,7 @@ interface CarCardSkeletonProps {
   isCompact?: boolean;
 }
 
-export const CarCardSkeleton: React.FC<CarCardSkeletonProps> = ({ isCompact = false }) => {
+export const CarCardSkeleton: React.FC<CarCardSkeletonProps> = React.memo(({ isCompact = false }) => {
   return (
     <CardShell isCompact={isCompact} minHeight="md:min-h-[350px] min-h-0">
       <CardImageSection className="relative bg-kraft-accent/5">
@@ -57,4 +57,6 @@ export const CarCardSkeleton: React.FC<CarCardSkeletonProps> = ({ isCompact = fa
       </CardContentSection>
     </CardShell>
   );
-};
+});
+
+CarCardSkeleton.displayName = 'CarCardSkeleton';

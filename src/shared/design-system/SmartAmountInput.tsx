@@ -55,8 +55,10 @@ export const SmartAmountInput: React.FC<SmartAmountInputProps> = ({
     }
   }, [autoFocus]);
 
-  // Sync with external value changes
-  useEffect(() => {
+  // Sync with external value changes during render without cascading renders
+  const [prevPropValue, setPrevPropValue] = useState(value);
+  if (prevPropValue !== value) {
+    setPrevPropValue(value);
     if (value === 0 && inputValue !== '') {
       setInputValue('');
       setPreviewValue(0);
@@ -67,7 +69,7 @@ export const SmartAmountInput: React.FC<SmartAmountInputProps> = ({
         setPreviewValue(value);
       }
     }
-  }, [value]);
+  }
 
   // Trigger error haptics when an error occurs
   useEffect(() => {

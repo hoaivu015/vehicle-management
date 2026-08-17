@@ -14,7 +14,6 @@ export const PERMISSIONS = {
   VIEW_PERSONAL: 'VIEW_PERSONAL',
   VIEW_TEAM_DATA: 'VIEW_TEAM_DATA',
   VIEW_OWN_DATA_ONLY: 'VIEW_OWN_DATA_ONLY',
-  MANAGE_LANDINGPAGE: 'MANAGE_LANDINGPAGE',
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;
@@ -45,7 +44,6 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.VIEW_INVENTORY,
     PERMISSIONS.VIEW_STAFF,
     PERMISSIONS.VIEW_CASHFLOW,
-    PERMISSIONS.MANAGE_LANDINGPAGE,
   ],
   [UserRole.STAFF]: [
     PERMISSIONS.VIEW_PERSONAL,
@@ -75,8 +73,7 @@ export class PermissionService {
                           permission.toLowerCase().includes('cashflow') ? 'cashflow' :
                           permission.toLowerCase().includes('users') ? 'users' :
                           permission.toLowerCase().includes('personal') ? 'personal' :
-                          permission.toLowerCase().includes('permissions') ? 'permissions' :
-                          permission.toLowerCase().includes('landingpage') ? 'landingpage' : null;
+                          permission.toLowerCase().includes('permissions') ? 'permissions' : null;
 
       if (moduleMatch) {
         const p = this.dynamicPermissions.find(dp => dp.role === role && dp.module === moduleMatch);
@@ -84,7 +81,7 @@ export class PermissionService {
           if (permission.startsWith('VIEW_') || permission === 'VIEW_PERSONAL') return p.can_access || p.can_view;
           if (permission.startsWith('EDIT_')) return p.can_edit;
           if (permission.startsWith('DELETE_')) return p.can_delete;
-          if (permission === 'MANAGE_USERS' || permission === 'MANAGE_PERMISSIONS' || permission === 'MANAGE_LANDINGPAGE') return p.can_edit || p.can_access;
+          if (permission === 'MANAGE_USERS' || permission === 'MANAGE_PERMISSIONS') return p.can_edit || p.can_access;
         }
       }
     }

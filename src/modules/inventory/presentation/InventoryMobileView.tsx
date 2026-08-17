@@ -7,7 +7,7 @@ import { cn } from '@/src/shared/utils/cn';
 import { InventoryGrid } from './components/InventoryGrid';
 import { VehicleDetailModal } from './components/VehicleDetailModal';
 import { AddVehicleModal } from './components/AddVehicleModal';
-import { useInventoryState } from './useInventoryState';
+import { useInventoryState, InventoryState } from './useInventoryState';
 import { NativePage, NativeHeader } from '@/src/shared/design-system/native/NativePage';
 import { LargeTitle, SecondaryLabel } from '@/src/shared/design-system/native/NativeTypography';
 
@@ -49,6 +49,7 @@ interface InventoryMobileViewProps {
   initialFilter?: string;
   initialAction?: string;
   hasPermission: (p: string) => boolean;
+  state?: InventoryState;
 }
 
 /**
@@ -61,8 +62,17 @@ export const InventoryMobileView: React.FC<InventoryMobileViewProps> = ({
   initialSearch = '',
   initialFilter = 'ALL',
   initialAction = '',
-  hasPermission
+  hasPermission,
+  state: propState
 }) => {
+  const internalState = useInventoryState({
+    userRole,
+    currentUser,
+    initialSearch,
+    initialFilter,
+    initialAction
+  });
+  const state = propState || internalState;
   const {
     availableCars,
     soldCars,
@@ -87,13 +97,7 @@ export const InventoryMobileView: React.FC<InventoryMobileViewProps> = ({
     handleAddPurchasePayment,
     handleAddSalePayment,
     handleCancelSale
-  } = useInventoryState({
-    userRole,
-    currentUser,
-    initialSearch,
-    initialFilter,
-    initialAction
-  });
+  } = state;
 
   const isInitialLoading = loading && !availableCars.length && !soldCars.length;
 

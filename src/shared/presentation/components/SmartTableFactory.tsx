@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { Search, Inbox } from 'lucide-react';
 import { cn } from '@/src/shared/utils/cn';
 

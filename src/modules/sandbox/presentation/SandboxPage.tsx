@@ -50,6 +50,14 @@ export const SandboxPage = () => {
         </div>
       </div>
 
+      {/* ⚠️ Sandbox Environment Notice Banner */}
+      <div className="bg-amber-500/10 border border-amber-500/20 px-5 py-3.5 rounded-2xl flex items-center gap-3 text-amber-900 shadow-sm">
+        <Sparkles size={18} className="text-amber-600 shrink-0" />
+        <p className="text-xs font-bold leading-relaxed">
+          <strong className="font-black uppercase tracking-wide">Môi trường Thử nghiệm UI (Sandbox Showroom):</strong> Dữ liệu và tương tác tại đây dùng cho mục đích kiểm thử R&D giao diện, không ảnh hưởng đến số liệu kinh doanh thật của Showroom.
+        </p>
+      </div>
+
       {/* 📑 Tab Navigation: Liquid Glassmorphism */}
       <div className="bg-white/40 backdrop-blur-xl border border-white/60 p-2 rounded-[2rem] shadow-lg flex flex-wrap gap-1.5">
         {tabsConfig.map((tab) => {

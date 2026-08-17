@@ -41,10 +41,12 @@ Hệ thống tài chính là trái tim của Auto 28. Sai sót về con số là
 
 ---
 
-## 👤 3. Quản Lý Danh Tính (Identity)
+## 👤 3. Quản Lý Danh Tính & Phân Quyền (Identity & Permissions)
 
+- **Mã Xe (Vehicle Code):** Luôn dùng `code` (ví dụ: `VH1405-01`) làm định danh duy nhất cho xe. **Tuyệt đối không dùng số khung (VIN)** để lưu trữ hoặc quản lý thông tin xe.
 - **Mã Nhân Viên (Staff Code):** Luôn dùng `code` (ví dụ: `NV01`) làm định danh duy nhất trong logic (thưởng, doanh số).
 - **Cấm Email Fallback:** Không sử dụng email để so sánh danh tính nhân viên trong code.
+- **Quyền Chuyển Trạng Thái Xe:** Chỉ có vai trò **Kế toán (`ACCOUNTANT`)** và **Ban Giám Đốc (`ADMIN`)** mới có quyền chuyển trạng thái xe (`EDIT_INVENTORY`). **Sale (`STAFF`) tuyệt đối không có quyền chuyển trạng thái hay chỉnh sửa xe**.
 
 ---
 

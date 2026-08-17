@@ -56,12 +56,10 @@ describe('ExpenseTable Component', () => {
     expect(defaultProps.onReimburseMultiple).toHaveBeenCalledWith('m1', ['1', '2']);
   });
 
-  it('disables pay button for non-admin users', () => {
+  it('hides reimbursement toggle buttons for non-admin users', () => {
     render(<ExpenseTable {...defaultProps} userRole={UserRole.STAFF} />);
     
-    const toggleButtons = screen.getAllByRole('button', { name: /Chờ hoàn tiền|Đã chi lại/ });
-    toggleButtons.forEach(button => {
-      expect(button).toBeDisabled();
-    });
+    const toggleButton = screen.queryByTitle(/Đổi thành Chờ hoàn tiền|Đổi thành Đã chi lại/);
+    expect(toggleButton).toBeNull();
   });
 });

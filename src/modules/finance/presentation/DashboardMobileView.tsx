@@ -76,9 +76,12 @@ const DashboardMobileSkeleton = () => (
   </NativePage>
 );
 
+import { DashboardState } from './useDashboardState';
+
 interface DashboardMobileViewProps {
   presenter: FinancePresenter;
   onNavigate: (tab: string, search?: string, filter?: string, action?: string) => void;
+  state?: DashboardState;
 }
 
 /**
@@ -87,8 +90,11 @@ interface DashboardMobileViewProps {
  */
 export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
   presenter,
-  onNavigate
+  onNavigate,
+  state: propState
 }) => {
+  const internalState = useDashboardState(presenter);
+  const state = propState || internalState;
   const {
     loading,
     overview,
@@ -99,7 +105,7 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
     payableDebts,
     totalPayables,
     vehicles
-  } = useDashboardState(presenter);
+  } = state;
 
   const isInitialLoading = loading && !overview;
   const isSubsequentLoading = loading && !!overview;

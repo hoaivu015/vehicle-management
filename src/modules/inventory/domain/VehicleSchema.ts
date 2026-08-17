@@ -27,10 +27,12 @@ export const VehicleSchema = z.object({
   code: zString,
   created_at: z.string().optional(),
   name: zString,
+  license_plate: zString.optional(),
   year: z.union([z.string(), z.number(), z.null()]).transform(v => v?.toString() || '').default(''),
   status: z.nativeEnum(VehicleStatus),
   purchase_price: zNumber,
   purchase_date: zString,
+  expected_profit: zNumber.optional(),
   buyer: zString, 
   buyer_name: zString,
   customer_name: zString,
@@ -55,7 +57,7 @@ export const VehicleSchema = z.object({
   images: zArray(z.string()),
   notes: zString,
   battery_type: zString.default('None'),
-  show_on_landing: zBoolean.default(true),
+  show_on_landing: zBoolean.optional().default(true),
   
   purchase_paid_amount: zNumber,
   purchase_payment_history: zArray(PaymentItemSchema),
@@ -99,7 +101,6 @@ export const CreateVehicleSchema = z.object({
   notes: zString.default(''),
   buying_commission: zNumber.default(3000000),
   battery_type: zString.default('None'),
-  show_on_landing: zBoolean.default(true),
 });
 
 export type CreateVehicleInput = z.infer<typeof CreateVehicleSchema>;

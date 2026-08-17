@@ -12,7 +12,7 @@ import { Expense } from '../domain/ExpenseRepository';
 import { MonthlyFinanceData } from '../application/GetMonthlyFinance';
 import { ExpenseDTO } from '@/src/shared/domain/schemas';
 import { PERMISSIONS } from '@/src/constants';
-import { useCashflowState } from './useCashflowState';
+import { useCashflowState, CashflowState } from './useCashflowState';
 import { BaseCard as CardShell, CardContentSection } from '@/src/shared/design-system/BaseCard';
 import { PageShell, PageHeaderShell } from '@/src/shared/design-system/PageShell';
 import { CashflowSkeleton } from '@/src/modules/finance/presentation/components/CashflowSkeleton';
@@ -25,15 +25,18 @@ interface CashflowWebViewProps {
   presenter: FinancePresenter;
   hasPermission: (permission: string) => boolean;
   onNavigate: (tab: string, search?: string, filter?: string, action?: string) => void;
+  state?: CashflowState;
 }
 
-export const CashflowWebView: React.FC<CashflowWebViewProps> = ({ presenter, hasPermission, onNavigate }) => {
+export const CashflowWebView: React.FC<CashflowWebViewProps> = ({ presenter, hasPermission, onNavigate, state: propState }) => {
+  const internalState = useCashflowState(presenter);
+  const state = propState || internalState;
   const {
     loading, data, filterMonth, showExpenseModal, setShowExpenseModal, showCapitalModal, setShowCapitalModal,
     expenseForm, setExpenseForm, editingExpenseId, setEditingExpenseId, tempCapital, setTempCapital,
     setIsEditingCapital, allCarCosts, handleMonthChange, handleSubmitExpense, startEditExpense,
     receivableDebts, totalReceivables, payableDebts, totalPayables, vehicles
-  } = useCashflowState(presenter);
+  } = state;
 
   const [isCompact, setIsCompact] = React.useState(false);
 

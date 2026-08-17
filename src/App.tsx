@@ -74,7 +74,6 @@ export default function App() {
       inventory: PERMISSIONS.VIEW_INVENTORY,
       staff: PERMISSIONS.VIEW_STAFF,
       cashflow: PERMISSIONS.VIEW_CASHFLOW,
-      landingpage: PERMISSIONS.MANAGE_LANDINGPAGE,
       users: PERMISSIONS.MANAGE_USERS,
       permissions: PERMISSIONS.MANAGE_PERMISSIONS,
       personal: PERMISSIONS.VIEW_PERSONAL,
@@ -128,40 +127,11 @@ export default function App() {
     setActiveTab('inventory');
   };
 
-  const isPublicHost = window.location.hostname === 'auto28.com.vn' || window.location.hostname === 'www.auto28.com.vn';
-  const publicRoutes = ['/dinh-gia', '/huong-dan', '/showroom'];
-  const isPublicRoute = publicRoutes.includes(location.pathname) || (location.pathname === '/' && isPublicHost);
-
   const userRole = currentUser?.role || UserRole.STAFF;
   const isLoading = isAuthLoading || (isAuthed && !currentUser);
 
-  if (!currentUser && !isAuthLoading && !isAuthed && !isPublicRoute) {
+  if (!currentUser && !isAuthLoading && !isAuthed) {
     return <Login onLogin={setCurrentUser} />;
-  }
-
-  // Scoped rendering for public Landing Page / Showroom
-  if (isPublicRoute || (isPublicHost && !isAuthed)) {
-    return (
-      <MotionConfig reducedMotion="user">
-        <div className="min-h-screen overflow-x-hidden bg-transparent p-0 flex flex-col">
-          <MainContent
-            activeTab={activeTab}
-            userRole={userRole}
-            currentUser={currentUser}
-            inventorySearch={inventorySearch}
-            inventoryFilter={inventoryFilter}
-            inventoryAction={inventoryAction}
-            handleLogout={handleLogout}
-            hasPermission={hasPermission}
-            onUpdateUser={handleUpdateUser}
-            financePresenter={financePresenter}
-            handleDashboardAction={handleDashboardAction}
-            loading={isLoading}
-          />
-          <SpeedInsights />
-        </div>
-      </MotionConfig>
-    );
   }
 
   return (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { AnimatePresence } from 'motion/react';
 
-import { useStaffState } from './useStaffState';
+import { useStaffState, StaffState } from './useStaffState';
 import { StaffHeader } from './components/StaffHeader';
 import { StaffList } from './components/StaffList';
 import { PageShell } from '@/src/shared/design-system/PageShell';
@@ -16,6 +16,7 @@ import { PERMISSIONS } from '@/src/constants';
 interface StaffWebViewProps {
   userRole: string;
   hasPermission: (permission: string) => boolean;
+  state?: StaffState;
 }
 
 import { StaffWithSalary } from '../application/GetStaffList';
@@ -24,7 +25,9 @@ import { StaffSalaryPaymentModal } from './components/StaffSalaryPaymentModal';
 /**
  * Staff WebView - Optimized for Desktop.
  */
-export const StaffWebView: React.FC<StaffWebViewProps> = ({ userRole, hasPermission }) => {
+export const StaffWebView: React.FC<StaffWebViewProps> = ({ userRole, hasPermission, state: propState }) => {
+  const internalState = useStaffState(new Date().toISOString().slice(0, 7), userRole);
+  const state = propState || internalState;
   const {
     filterMonth, setFilterMonth,
     staffList,
@@ -47,7 +50,7 @@ export const StaffWebView: React.FC<StaffWebViewProps> = ({ userRole, hasPermiss
     handleDeleteExpense,
     handleUpdateExpense,
     vehicles
-  } = useStaffState(new Date().toISOString().slice(0, 7), userRole);
+  } = state;
 
   const [payingStaff, setPayingStaff] = React.useState<StaffWithSalary | null>(null);
 

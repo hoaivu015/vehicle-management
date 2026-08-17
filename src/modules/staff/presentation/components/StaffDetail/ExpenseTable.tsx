@@ -30,10 +30,12 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
 }) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [filterMonth, setFilterMonth] = useState(initialFilterMonth);
+  const [prevInitialMonth, setPrevInitialMonth] = useState(initialFilterMonth);
   
-  React.useEffect(() => {
+  if (prevInitialMonth !== initialFilterMonth) {
+    setPrevInitialMonth(initialFilterMonth);
     setFilterMonth(initialFilterMonth);
-  }, [initialFilterMonth]);
+  }
   
   const unreimbursed = expenses.filter(e => !e.is_reimbursed).sort((a, b) => b.date.localeCompare(a.date));
   

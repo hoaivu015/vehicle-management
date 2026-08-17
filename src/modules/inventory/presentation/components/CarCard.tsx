@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, TrendingUp, Award, Clock, ArrowRight, Pin } from 'lucide-react';
+import { Calendar, TrendingUp, Award, Clock, ArrowRight, Pin, Layers } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Vehicle } from '../../../../shared/domain/types';
 import { VehicleStatus, VEHICLE_STATUS_CONFIG, INVENTORY_CONSTANTS } from '../../../../shared/domain/constants';
@@ -23,7 +23,7 @@ interface CarCardProps {
   canSeeFullInfo: boolean;
 }
 
-export const CarCard: React.FC<CarCardProps> = ({ 
+export const CarCard: React.FC<CarCardProps> = React.memo(({ 
   car, 
   onClick, 
   onPin, 
@@ -54,6 +54,7 @@ export const CarCard: React.FC<CarCardProps> = ({
             alt={car.name}
             className="w-full h-full object-cover"
             loading="lazy"
+            decoding="async"
           />
           {/* Status badge */}
           <div className="absolute top-2 left-2">
@@ -164,6 +165,7 @@ export const CarCard: React.FC<CarCardProps> = ({
               alt={car.name}
               className="w-full h-full object-cover transition-transform duration-[3000ms] group-hover:scale-110 rounded-[16px]"
               loading="lazy"
+              decoding="async"
             />
 
             <div className="absolute top-2 left-2 md:top-4 md:left-4 flex flex-col gap-1 md:gap-2">
@@ -228,7 +230,7 @@ export const CarCard: React.FC<CarCardProps> = ({
                   <InfoTag icon={Calendar} label={car.year} />
                   <InfoTag icon={TrendingUp} label={`${((car.odo || 0) / 1000).toFixed(0)}K`} />
                   {car.battery_type && car.battery_type !== 'None' && (
-                    <InfoTag label={car.battery_type} />
+                    <InfoTag icon={Layers} label={car.battery_type} />
                   )}
                 </div>
               )}
@@ -260,5 +262,7 @@ export const CarCard: React.FC<CarCardProps> = ({
       </BaseCard>
     </>
   );
-};
+});
+
+CarCard.displayName = 'CarCard';
 

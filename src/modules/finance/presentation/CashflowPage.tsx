@@ -4,6 +4,8 @@ import { CashflowWebView } from './CashflowWebView';
 import { CashflowMobileView } from './CashflowMobileView';
 import { useIsMobile } from '@/src/shared/presentation/hooks/useIsMobile';
 
+import { useCashflowState } from './useCashflowState';
+
 interface CashflowPageProps {
   presenter: FinancePresenter;
   userRole: string;
@@ -16,10 +18,11 @@ interface CashflowPageProps {
  */
 export const CashflowPage: React.FC<CashflowPageProps> = (props) => {
   const isMobile = useIsMobile();
+  const cashflowState = useCashflowState(props.presenter);
 
   if (isMobile) {
-    return <CashflowMobileView {...props} />;
+    return <CashflowMobileView {...props} state={cashflowState} />;
   }
 
-  return <CashflowWebView {...props} />;
+  return <CashflowWebView {...props} state={cashflowState} />;
 };

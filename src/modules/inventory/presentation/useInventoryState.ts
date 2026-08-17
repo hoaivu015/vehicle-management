@@ -86,7 +86,7 @@ export const useInventoryState = ({
       presenter.detachView();
       setHasHandledAction(false);
     };
-  }, [presenter, view, activeTab, soldMonth, initialFilter, userRole, currentUser, initialSearch]);
+  }, [presenter, view, soldMonth, initialFilter, userRole, currentUser?.code, initialSearch]);
 
   // Separate effect for post-load actions to ensure data is ready in state
   useEffect(() => {
@@ -214,3 +214,5 @@ export const useInventoryState = ({
     handleCancelSale
   };
 };
+
+export type InventoryState = ReturnType<typeof useInventoryState>;

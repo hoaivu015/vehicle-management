@@ -16,7 +16,6 @@ export const useStaffState = (initialMonth: string, userRole?: string) => {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<StaffWithSalary | null>(null);
   const [deletingStaff, setDeletingStaff] = useState<StaffWithSalary | null>(null);
-  const [selectedStaff, setSelectedStaff] = useState<StaffWithSalary | null>(null);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const notification = useNotification();
   const { isSubmitting, executeAction } = useActionResponse();
@@ -51,20 +50,21 @@ export const useStaffState = (initialMonth: string, userRole?: string) => {
   }), [presenter, filterMonth, notification]);
 
   useEffect(() => {
+    presenter.loadVehicles();
+  }, [presenter]);
+
+  useEffect(() => {
     presenter.attachView(view);
     presenter.loadStaff(filterMonth);
-    presenter.loadVehicles(); // Load vehicles once or when needed
     presenter.subscribeToChanges(filterMonth);
     return () => presenter.detachView();
   }, [presenter, view, filterMonth]);
 
-  useEffect(() => {
-    setSelectedStaff(current => {
-      if (!current) return current;
-      const updated = staffList.find(s => s.id === current.id);
-      return updated || current;
-    });
-  }, [staffList]);
+  const [selectedStaffRaw, setSelectedStaff] = useState<StaffWithSalary | null>(null);
+  const selectedStaff = useMemo(() => {
+    if (!selectedStaffRaw) return null;
+    return staffList.find(s => s.id === selectedStaffRaw.id) || selectedStaffRaw;
+  }, [selectedStaffRaw, staffList]);
 
   const handleAddStaff = (data: AddStaffInput) => 
     executeAction(() => presenter.addStaff(data), { successMessage: 'Thêm nhân viên thành công!' });
@@ -145,3 +145,5 @@ export const useStaffState = (initialMonth: string, userRole?: string) => {
     handleUpdateVehicle
   };
 };
+
+export type StaffState = ReturnType<typeof useStaffState>;

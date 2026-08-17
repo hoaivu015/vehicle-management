@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { LucideIcon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { formatVND } from '@/src/shared/utils/currency';
 import { cn } from '@/src/shared/utils/cn';

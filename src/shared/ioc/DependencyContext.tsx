@@ -60,20 +60,30 @@ import { UserManagementPresenter } from '../../modules/user/presentation/UserMan
 import { PersonalPresenter } from '../../modules/user/presentation/PersonalPresenter';
 import { PermissionsPresenter } from '../../modules/auth/presentation/PermissionsPresenter';
 
+// Domain Ports (Interfaces)
+import { VehicleRepository } from '../../modules/inventory/domain/VehicleRepository';
+import { StaffRepository } from '../../modules/staff/domain/StaffRepository';
+import { ExpenseRepository } from '../../modules/finance/domain/ExpenseRepository';
+import { VehicleStorageRepository } from '../../modules/inventory/domain/VehicleStorageRepository';
+import { VehicleStaffRepository } from '../../modules/inventory/domain/VehicleStaffRepository';
+import { UserRepository } from '../../modules/user/domain/UserRepository';
+import { PermissionRepository } from '../../modules/auth/domain/PermissionRepository';
+import { AuthRepository } from '../../modules/auth/domain/AuthRepository';
+
 /**
  * Interface định nghĩa tất cả các dependencies của hệ thống.
- * Đây là "Single Source of Truth" cho việc khởi tạo.
+ * Đây là "Single Source of Truth" cho việc khởi tạo theo Domain Ports.
  */
 export interface Dependencies {
-  // Repositories
-  vehicleRepo: SupabaseVehicleRepository;
-  staffRepo: SupabaseStaffRepository;
-  expenseRepo: SupabaseExpenseRepository;
-  storageRepo: CloudinaryVehicleStorageRepository;
-  vehicleStaffRepo: SupabaseVehicleStaffRepository;
-  userRepo: SupabaseUserRepository;
-  permissionRepo: SupabasePermissionRepository;
-  authRepo: SupabaseAuthRepository;
+  // Repositories (Domain Ports)
+  vehicleRepo: VehicleRepository;
+  staffRepo: StaffRepository;
+  expenseRepo: ExpenseRepository;
+  storageRepo: VehicleStorageRepository;
+  vehicleStaffRepo: VehicleStaffRepository;
+  userRepo: UserRepository;
+  permissionRepo: PermissionRepository;
+  authRepo: AuthRepository;
 
   // Inventory Use Cases
   inventory: {

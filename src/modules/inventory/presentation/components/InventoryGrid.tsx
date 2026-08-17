@@ -36,6 +36,11 @@ export const InventoryGrid: React.FC<InventoryGridProps> = ({
 }) => {
   const currentCars = activeTab === 'AVAILABLE' ? availableCars : soldCars;
 
+  const handleCardClick = React.useCallback((c: Vehicle) => {
+    onSelectVehicle(c);
+    setIsDetailOpen(true);
+  }, [onSelectVehicle, setIsDetailOpen]);
+
   if (!loading && currentCars.length === 0) {
     return (
       <EmptyState
@@ -61,7 +66,7 @@ export const InventoryGrid: React.FC<InventoryGridProps> = ({
               key={`skeleton-${i}`} 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
+              transition={{ delay: i * 0.04 }}
               className="w-full h-full"
             >
               <CarCardSkeleton isCompact={isCompact} />
@@ -73,24 +78,23 @@ export const InventoryGrid: React.FC<InventoryGridProps> = ({
             const financials = calculateVehicleFinancials(car);
             const canSeeFullInfo = PermissionService.canSeeFinancials(userRole, userCode, car);
             
-            // Define custom high-end animations depending on the active tab
             const animProps = activeTab === 'AVAILABLE' ? {
-              initial: { opacity: 0, x: -30, rotate: -0.5, filter: 'blur(4px)' },
-              animate: { opacity: 1, x: 0, rotate: 0, filter: 'blur(0px)' },
+              initial: { opacity: 0, y: 12 },
+              animate: { opacity: 1, y: 0 },
               transition: {
                 type: 'spring' as const,
-                stiffness: 140,
-                damping: 18,
-                delay: index * 0.045
+                stiffness: 260,
+                damping: 24,
+                delay: Math.min(index * 0.03, 0.25)
               }
             } : {
-              initial: { opacity: 0, scale: 0.96, x: 25, filter: 'blur(4px)' },
-              animate: { opacity: 1, scale: 1, x: 0, filter: 'blur(0px)' },
+              initial: { opacity: 0, scale: 0.97 },
+              animate: { opacity: 1, scale: 1 },
               transition: {
                 type: 'spring' as const,
-                stiffness: 120,
-                damping: 16,
-                delay: index * 0.04
+                stiffness: 240,
+                damping: 22,
+                delay: Math.min(index * 0.03, 0.25)
               }
             };
 
@@ -99,7 +103,6 @@ export const InventoryGrid: React.FC<InventoryGridProps> = ({
                 key={car.id} 
                 {...animProps}
                 className="w-full h-full"
-                style={{ willChange: 'transform, opacity' }}
               >
                 <CarCard
                   car={car}
@@ -107,10 +110,7 @@ export const InventoryGrid: React.FC<InventoryGridProps> = ({
                   isCompact={isCompact}
                   financials={financials}
                   canSeeFullInfo={canSeeFullInfo}
-                  onClick={(c) => {
-                    onSelectVehicle(c);
-                    setIsDetailOpen(true);
-                  }}
+                  onClick={handleCardClick}
                 />
               </motion.div>
             );

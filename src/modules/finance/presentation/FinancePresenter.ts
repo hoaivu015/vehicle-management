@@ -10,6 +10,7 @@ import { PermissionService } from '@/src/modules/auth/domain/PermissionService';
 import { RecordExpense } from '@/src/modules/finance/application/RecordExpense';
 import { UnifiedExpenseCommand } from '@/src/shared/domain/schemas';
 import { IUnifiedExpensePresenter } from '@/src/shared/presentation/interfaces/IUnifiedExpensePresenter';
+import { supabase } from '@/src/shared/infrastructure/supabase';
 
 export interface FinanceView extends BaseView {
   setMonthlyFinance(data: MonthlyFinanceData): void;
@@ -45,7 +46,6 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
 
   async subscribeToChanges(): Promise<void> {
     if (this.subscription) return;
-    const { supabase } = await import('../../../shared/infrastructure/supabase');
 
     this.subscription = supabase.channel('finance_realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'operating_expenses' }, () => this.loadFinanceData())

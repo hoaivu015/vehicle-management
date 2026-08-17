@@ -109,16 +109,21 @@ const PersonalMobileSkeleton = () => {
   );
 };
 
+import { PersonalState } from '@/src/modules/personal/presentation/usePersonalState';
+
 interface PersonalMobileViewProps {
   user: Staff | null;
   onUpdateUser?: (docId: string, data: Partial<Staff>) => void;
   onLogout?: () => void;
+  state?: PersonalState;
 }
 
 /**
  * 🍎 iPhone Native Personal View.
  */
-export const PersonalMobileView = ({ user, onUpdateUser, onLogout }: PersonalMobileViewProps) => {
+export const PersonalMobileView = ({ user, onUpdateUser, onLogout, state: propState }: PersonalMobileViewProps) => {
+  const internalState = usePersonalState(user as Staff, onUpdateUser);
+  const state = propState || internalState;
   const {
     selectedMonth, setSelectedMonth,
     selectedVehicle,
@@ -145,7 +150,7 @@ export const PersonalMobileView = ({ user, onUpdateUser, onLogout }: PersonalMob
     allVehicles,
     staffData,
     loading
-  } = usePersonalState(user as Staff, onUpdateUser);
+  } = state;
 
   const isInitialLoading = loading && !staffData;
   const isSubsequentLoading = loading && !!staffData;

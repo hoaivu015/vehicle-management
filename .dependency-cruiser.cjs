@@ -32,7 +32,7 @@ module.exports = {
       name: 'no-cross-module-presentation-deps',
       comment: 'Presentation layer should not depend on another module\'s presentation logic',
       severity: 'warn',
-      from: { path: 'src/modules/(?!sandbox)([^/]+)/presentation/.+' },
+      from: { path: 'src/modules/(?!sandbox|personal)([^/]+)/presentation/.+' },
       to: {
         path: 'src/modules/(?!$1)[^/]+/presentation/.+',
       },

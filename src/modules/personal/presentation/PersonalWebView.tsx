@@ -5,7 +5,7 @@ import { UserRole } from '@/src/shared/domain/constants';
 import { BaseModal as Modal, ModalBody, ModalFooter } from '@/src/shared/design-system/BaseModal';
 import { StaffAddExpenseModal } from '@/src/modules/staff/presentation/components/StaffAddExpenseModal';
 import { VehicleDetailModal } from '@/src/modules/inventory/presentation/components/VehicleDetailModal';
-import { usePersonalState } from '@/src/modules/personal/presentation/usePersonalState';
+import { PersonalState, usePersonalState } from '@/src/modules/personal/presentation/usePersonalState';
 import { useDependencies } from '@/src/shared/ioc/DependencyContext';
 
 import { PersonalSidebar } from './components/PersonalSidebar';
@@ -21,9 +21,12 @@ interface PersonalWebViewProps {
   user: Staff | null;
   onUpdateUser?: (docId: string, data: Partial<Staff>) => void;
   onLogout?: () => void;
+  state?: PersonalState;
 }
 
-export const PersonalWebView = ({ user, onUpdateUser, onLogout }: PersonalWebViewProps) => {
+export const PersonalWebView = ({ user, onUpdateUser, onLogout, state: propState }: PersonalWebViewProps) => {
+  const internalState = usePersonalState(user as Staff, onUpdateUser);
+  const state = propState || internalState;
   const {
     allVehicles, selectedMonth, setSelectedMonth, staffData, 
     isExpenseModalOpen, setIsExpenseModalOpen,
@@ -48,7 +51,7 @@ export const PersonalWebView = ({ user, onUpdateUser, onLogout }: PersonalWebVie
     handleUpdateExpense,
     handleDeleteExpense,
     loading
-  } = usePersonalState(user as Staff, onUpdateUser);
+  } = state;
 
   const { staffRepo } = useDependencies();
   const [staffList, setStaffList] = useState<Staff[]>([]);

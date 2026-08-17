@@ -4,7 +4,7 @@ import { Plus, Users, Calendar } from 'lucide-react';
 import { Skeleton } from '@/src/shared/design-system/Skeleton';
 import { cn } from '@/src/shared/utils/cn';
 
-import { useStaffState } from './useStaffState';
+import { useStaffState, StaffState } from './useStaffState';
 import { StaffList } from './components/StaffList';
 import { StaffAddModal } from './components/StaffAddModal';
 import { StaffDetailModal } from './components/StaffDetailModal';
@@ -52,12 +52,15 @@ const StaffMobileSkeleton = () => (
 interface StaffMobileViewProps {
   userRole: string;
   hasPermission: (permission: string) => boolean;
+  state?: StaffState;
 }
 
 /**
  * 🍎 iPhone Native Staff View.
  */
-export const StaffMobileView: React.FC<StaffMobileViewProps> = ({ userRole, hasPermission }) => {
+export const StaffMobileView: React.FC<StaffMobileViewProps> = ({ userRole, hasPermission, state: propState }) => {
+  const internalState = useStaffState(new Date().toISOString().slice(0, 7), userRole);
+  const state = propState || internalState;
   const {
     filterMonth, setFilterMonth,
     staffList,
@@ -80,7 +83,7 @@ export const StaffMobileView: React.FC<StaffMobileViewProps> = ({ userRole, hasP
     handleDeleteExpense,
     handleUpdateExpense,
     vehicles
-  } = useStaffState(new Date().toISOString().slice(0, 7), userRole);
+  } = state;
 
   const [payingStaff, setPayingStaff] = React.useState<import('@/src/modules/staff/application/GetStaffList').StaffWithSalary | null>(null);
 

@@ -20,12 +20,8 @@ const AccountPage = React.lazy(() => import('@/src/modules/staff/presentation/Ac
 const PersonalView = React.lazy(() => import('@/src/modules/personal/presentation/PersonalView').then(m => ({ default: m.PersonalView })));
 const SandboxPage = React.lazy(() => import('@/src/modules/sandbox/presentation/SandboxPage').then(m => ({ default: m.SandboxPage })));
 const PermissionsPage = React.lazy(() => import('@/src/modules/auth/presentation/PermissionsPage').then(m => ({ default: m.PermissionsPage })));
-const LandingPageManager = React.lazy(() => import('@/src/modules/landingpage/presentation/LandingPageManager').then(m => ({ default: m.LandingPageManager })));
 
-// Showroom public pages (lazy loaded)
-const ShowroomPage = React.lazy(() => import('@/src/modules/showroom/presentation/ShowroomPage').then(m => ({ default: m.ShowroomPage })));
-const SellCarPage = React.lazy(() => import('@/src/modules/showroom/presentation/SellCarPage').then(m => ({ default: m.SellCarPage })));
-const LegalGuidePage = React.lazy(() => import('@/src/modules/showroom/presentation/LegalGuidePage').then(m => ({ default: m.LegalGuidePage })));
+
 
 
 const TabLoading = () => (
@@ -167,20 +163,12 @@ export const MainContent: React.FC<MainContentProps> = ({
           <Suspense fallback={<TabLoading />}>
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={
-                (window.location.hostname === 'auto28.com.vn' || window.location.hostname === 'www.auto28.com.vn') ? 
-                <ShowroomPage /> : (
-                  hasPermission(PERMISSIONS.VIEW_DASHBOARD) ? 
-                  <DashboardPage presenter={financePresenter} onNavigate={handleDashboardAction} /> : 
-                  <Navigate to="/inventory" replace />
-                )
+                hasPermission(PERMISSIONS.VIEW_DASHBOARD) ? 
+                <DashboardPage presenter={financePresenter} onNavigate={handleDashboardAction} /> : 
+                <Navigate to="/inventory" replace />
               } />
               
               <Route path="/dashboard" element={<Navigate to="/" replace />} />
-
-              {/* Public Showroom Routing */}
-              <Route path="/showroom" element={<ShowroomPage />} />
-              <Route path="/dinh-gia" element={<SellCarPage />} />
-              <Route path="/huong-dan" element={<LegalGuidePage />} />
 
               <Route path="/inventory" element={
                 hasPermission(PERMISSIONS.VIEW_INVENTORY) ?
@@ -212,11 +200,6 @@ export const MainContent: React.FC<MainContentProps> = ({
                 <Navigate to="/" replace />
               } />
 
-              <Route path="/landingpage" element={
-                hasPermission(PERMISSIONS.MANAGE_LANDINGPAGE) ?
-                <LandingPageManager /> :
-                <Navigate to="/" replace />
-              } />
 
               <Route path="/permissions" element={
                 hasPermission(PERMISSIONS.MANAGE_PERMISSIONS) ?

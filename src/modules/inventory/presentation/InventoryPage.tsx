@@ -3,6 +3,8 @@ import { InventoryWebView } from './InventoryWebView';
 import { InventoryMobileView } from './InventoryMobileView';
 import { useIsMobile } from '@/src/shared/presentation/hooks/useIsMobile';
 
+import { useInventoryState } from './useInventoryState';
+
 interface InventoryPageProps {
   userRole: string;
   currentUser: import('../../../shared/domain/types').Staff | null;
@@ -18,10 +20,11 @@ interface InventoryPageProps {
  */
 export const InventoryPage: React.FC<InventoryPageProps> = (props) => {
   const isMobile = useIsMobile();
+  const inventoryState = useInventoryState(props);
 
   if (isMobile) {
-    return <InventoryMobileView {...props} />;
+    return <InventoryMobileView {...props} state={inventoryState} />;
   }
 
-  return <InventoryWebView {...props} />;
+  return <InventoryWebView {...props} state={inventoryState} />;
 };

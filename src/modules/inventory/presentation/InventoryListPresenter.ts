@@ -5,6 +5,7 @@ import { isVehicleAging } from '../../../shared/utils/vehicle_calculations';
 import { VehicleStatus, INVENTORY_CONSTANTS } from '../../../shared/domain/constants';
 import { fuzzyMatch } from '@/src/shared/utils/string';
 import { StaffRepository } from '../../staff/domain/StaffRepository';
+import { PermissionService } from '../../auth/domain/PermissionService';
 
 export interface InventoryListView extends BaseView {
   showAvailableCars(cars: Vehicle[]): void;
@@ -37,7 +38,6 @@ export class InventoryListPresenter extends BasePresenter<InventoryListView> {
       ]);
       
       this.availableCars = cars;
-      const { PermissionService } = await import('@/src/modules/auth/domain/PermissionService');
       this.staff = allStaff.filter(s => !PermissionService.isAdmin(s.role));
       
       if (this.view) {
@@ -64,8 +64,6 @@ export class InventoryListPresenter extends BasePresenter<InventoryListView> {
       
       this.availableCars = available;
       this.soldCars = personal.filter(c => c.status === VehicleStatus.SOLD && c.sale_date?.startsWith(monthStr));
-      
-      const { PermissionService } = await import('@/src/modules/auth/domain/PermissionService');
       this.staff = allStaff.filter(s => !PermissionService.isAdmin(s.role));
       
       if (this.view) {
@@ -85,8 +83,6 @@ export class InventoryListPresenter extends BasePresenter<InventoryListView> {
       
       this.availableCars = available;
       this.soldCars = deptCars.filter(c => c.status === VehicleStatus.SOLD && c.sale_date?.startsWith(monthStr));
-      
-      const { PermissionService } = await import('@/src/modules/auth/domain/PermissionService');
       this.staff = allStaff.filter(s => !PermissionService.isAdmin(s.role));
 
       if (this.view) {

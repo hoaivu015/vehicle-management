@@ -87,3 +87,5 @@ export const useDashboardState = (presenter: FinancePresenter) => {
     totalPayables
   };
 };
+
+export type DashboardState = ReturnType<typeof useDashboardState>;

@@ -1,6 +1,6 @@
 import { BasePresenter, BaseView } from '../../../shared/presentation/BasePresenter';
 import { PermissionRepository } from '../domain/PermissionRepository';
-import { RolePermission } from '../domain/PermissionService';
+import { PermissionService, RolePermission } from '../domain/PermissionService';
 import { NotificationService } from '../../../shared/domain/NotificationService';
 
 export interface PermissionsView extends BaseView {
@@ -24,9 +24,7 @@ export class PermissionsPresenter extends BasePresenter<PermissionsView> {
           this.view.setPermissions(data);
         }
         // Update PermissionService cache
-        import('../domain/PermissionService').then(({ PermissionService }) => {
-          PermissionService.setDynamicPermissions(data);
-        });
+        PermissionService.setDynamicPermissions(data);
       },
       'Không thể tải dữ liệu phân quyền'
     );

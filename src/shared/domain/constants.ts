@@ -71,5 +71,4 @@ export const USER_TAB_LABELS: Record<string, string> = {
   personal: 'Trang cá nhân',
   users: 'Quản lý tài khoản',
   sandbox: 'Thử nghiệm',
-  landingpage: 'Quản lý Landing Page',
 };

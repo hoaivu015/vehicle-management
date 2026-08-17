@@ -136,3 +136,5 @@ export const useCashflowState = (presenter: FinancePresenter) => {
   };
 };
 
+export type CashflowState = ReturnType<typeof useCashflowState>;
+

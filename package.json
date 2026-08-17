@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch server.ts",
-    "build": "vite build && cp -r lading-page dist/",
+    "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit && eslint src",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint:arch": "depcruise src --config .dependency-cruiser.cjs",
+    "audit:standards": "node scripts/audit_standards.js",
     "health-check": "./scripts/check-complexity.sh",
     "prepare": "husky"
   },
@@ -42,7 +43,6 @@
     "express": "^4.21.2",
     "express-rate-limit": "^8.4.1",
     "file-saver": "^2.0.5",
-    "framer-motion": "^12.38.0",
     "google-auth-library": "^10.6.2",
     "googleapis": "^171.4.0",
     "helmet": "^8.1.0",

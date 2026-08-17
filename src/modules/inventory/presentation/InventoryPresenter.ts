@@ -8,6 +8,8 @@ import { UpdateStatusRequest } from '../application/UpdateVehicleStatus';
 import { VehicleStatus } from '../../../shared/domain/constants';
 import { IUnifiedExpensePresenter } from '@/src/shared/presentation/interfaces/IUnifiedExpensePresenter';
 import { UnifiedExpenseCommand } from '@/src/shared/domain/schemas';
+import { supabase } from '../../../shared/infrastructure/supabase';
+import { PermissionService } from '../../auth/domain/PermissionService';
 
 export interface InventoryView extends BaseView {
   showAvailableCars(cars: Vehicle[]): void;
@@ -46,14 +48,12 @@ export class InventoryPresenter extends BasePresenter<InventoryView> implements 
     this.actionPresenter.detachView();
     this.transactionPresenter.detachView();
     if (this.subscription) {
-      import('../../../shared/infrastructure/supabase').then(({ supabase }) => {
-        if (this.subscription) supabase.removeChannel(this.subscription);
-      });
+      supabase.removeChannel(this.subscription);
+      this.subscription = null;
     }
   }
 
   async subscribeToChanges(): Promise<void> {
-    const { supabase } = await import('../../../shared/infrastructure/supabase');
     if (this.subscription) return;
     this.subscription = supabase.channel('inventory_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => this.refreshCurrentView())
@@ -78,7 +78,6 @@ export class InventoryPresenter extends BasePresenter<InventoryView> implements 
     await this.listPresenter.loadDepartment(codes, month);
   }
   async loadInventory(role: string, code: string | null, month: string): Promise<void> {
-    const { PermissionService } = await import('@/src/modules/auth/domain/PermissionService');
     this.currentMonth = month;
     if (PermissionService.canSeeAllData(role)) {
       await Promise.all([this.loadAvailable(), this.loadSold(month)]);

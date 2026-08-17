@@ -8,6 +8,8 @@ import { motion } from 'motion/react';
 import { useDependencies } from '@/src/shared/ioc/DependencyContext';
 import { PermissionsView } from './PermissionsPresenter';
 import { Skeleton } from '@/src/shared/design-system/Skeleton';
+import { ConfirmModal } from '@/src/shared/design-system/ConfirmModal';
+import { haptics } from '@/src/shared/utils/haptics';
 
 const PermissionsPageSkeleton = () => (
   <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-10">
@@ -91,6 +93,7 @@ export const PermissionsPage: React.FC = () => {
   const [permissions, setPermissions] = useState<RolePermission[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const notification = useNotification();
 
   const { createPermissionsPresenter } = useDependencies();
@@ -121,6 +124,7 @@ export const PermissionsPage: React.FC = () => {
   };
 
   const togglePermission = (role: string, module: string, action: keyof Omit<RolePermission, 'id' | 'role' | 'module' | 'updated_at'>) => {
+    haptics.light();
     setPermissions(prev => {
       const existing = prev.find(p => p.role === role && p.module === module);
       if (existing) {
@@ -143,8 +147,15 @@ export const PermissionsPage: React.FC = () => {
     });
   };
 
-  const handleSave = async () => {
+  const handleSaveClick = () => {
+    haptics.medium();
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmSave = async () => {
+    setIsConfirmOpen(false);
     await presenter.savePermissions(selectedRole, permissions);
+    haptics.medium();
   };
 
   if (loading) return <PermissionsPageSkeleton />;
@@ -165,7 +176,7 @@ export const PermissionsPage: React.FC = () => {
         </div>
 
         <button
-          onClick={handleSave}
+          onClick={handleSaveClick}
           disabled={saving}
           className="glass-purity-button bg-kraft-accent text-white px-8 py-3.5 rounded-2xl flex items-center justify-center gap-2.5 font-black text-xs uppercase tracking-widest shadow-xl shadow-kraft-accent/20 active:scale-95 transition-all disabled:opacity-50"
         >
@@ -287,6 +298,17 @@ export const PermissionsPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal Xác Nhận Lưu Phân Quyền */}
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleConfirmSave}
+        title="Xác Nhận Lưu Phân Quyền"
+        message={`Bạn có chắc chắn muốn lưu ma trận phân quyền mới cho vai trò "${USER_ROLE_LABELS[selectedRole]}"? Thay đổi sẽ có hiệu lực tức thời đối với toàn bộ người dùng.`}
+        confirmText="Xác nhận lưu"
+        cancelText="Xem lại"
+      />
     </div>
   );
 };

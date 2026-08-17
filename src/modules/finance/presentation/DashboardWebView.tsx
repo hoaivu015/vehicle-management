@@ -20,16 +20,17 @@ import { DashboardHeader, DashboardStat } from './components/DashboardHeader';
 import { DashboardCharts } from './components/DashboardCharts';
 import { DashboardActivityLogs } from './components/DashboardActivityLogs';
 import { DashboardStatGrid } from '@/src/shared/design-system/components/dashboard/DashboardStatGrid';
-import { useDashboardState } from './useDashboardState';
+import { useDashboardState, DashboardState } from './useDashboardState';
 import { motion } from 'motion/react';
 import { cn } from '@/src/shared/utils/cn';
-import { DashboardSkeleton } from '@/src/modules/dashboard/presentation/DashboardSkeleton';
+import { DashboardSkeleton } from '@/src/shared/design-system/components/dashboard/DashboardSkeleton';
 
 const MONTHLY_SALES_TARGET = 25;
 
 interface DashboardWebViewProps {
   presenter: FinancePresenter;
   onNavigate: (tab: string, search?: string, filter?: string, action?: string) => void;
+  state?: DashboardState;
 }
 
 /**
@@ -38,8 +39,11 @@ interface DashboardWebViewProps {
  */
 export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
   presenter,
-  onNavigate
+  onNavigate,
+  state: propState
 }) => {
+  const internalState = useDashboardState(presenter);
+  const state = propState || internalState;
   const {
     loading,
     overview,
@@ -50,7 +54,7 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
     totalReceivables,
     payableDebts,
     totalPayables
-  } = useDashboardState(presenter);
+  } = state;
 
   const stats: DashboardStat[] = useMemo(() => [
     {
