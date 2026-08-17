@@ -23,6 +23,7 @@ export class InventoryPresenter extends BasePresenter<InventoryView> implements 
   private subscription: RealtimeChannel | null = null;
   private currentStaffCode: string | null = null;
   private currentMonth: string = new Date().toISOString().slice(0, 7);
+  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly listPresenter: InventoryListPresenter,
@@ -42,11 +43,24 @@ export class InventoryPresenter extends BasePresenter<InventoryView> implements 
     this.transactionPresenter.attachView(view);
   }
 
+  private debouncedRefreshCurrentView(): void {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+    this.debounceTimer = setTimeout(() => {
+      this.refreshCurrentView();
+    }, 300);
+  }
+
   detachView(): void {
     super.detachView();
     this.listPresenter.detachView();
     this.actionPresenter.detachView();
     this.transactionPresenter.detachView();
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
     if (this.subscription) {
       supabase.removeChannel(this.subscription);
       this.subscription = null;
@@ -56,7 +70,7 @@ export class InventoryPresenter extends BasePresenter<InventoryView> implements 
   async subscribeToChanges(): Promise<void> {
     if (this.subscription) return;
     this.subscription = supabase.channel('inventory_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => this.refreshCurrentView())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => this.debouncedRefreshCurrentView())
       .subscribe();
   }
 

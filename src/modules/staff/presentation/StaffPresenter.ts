@@ -23,6 +23,7 @@ export interface StaffView extends BaseView, StaffListView {
 export class StaffPresenter extends BasePresenter<StaffView> implements IUnifiedExpensePresenter {
   private subscription: RealtimeChannel | null = null;
   private currentMonth: string = new Date().toISOString().slice(0, 7);
+  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly listPresenter: StaffListPresenter,
@@ -42,12 +43,25 @@ export class StaffPresenter extends BasePresenter<StaffView> implements IUnified
     this.payrollPresenter.attachView(view);
   }
 
+  private debouncedLoadStaff(monthStr: string): void {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+    this.debounceTimer = setTimeout(() => {
+      this.loadStaff(monthStr);
+    }, 300);
+  }
+
   detachView(): void {
     super.detachView();
     this.listPresenter.detachView();
     this.actionPresenter.detachView();
     this.expensePresenter.detachView();
     this.payrollPresenter.detachView();
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
     if (this.subscription) {
       supabase.removeChannel(this.subscription);
       this.subscription = null;
@@ -59,7 +73,7 @@ export class StaffPresenter extends BasePresenter<StaffView> implements IUnified
     this.currentMonth = monthStr;
     this.subscription = supabase.channel('staff_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'employees' }, () => {
-        this.loadStaff(this.currentMonth);
+        this.debouncedLoadStaff(this.currentMonth);
       })
       .subscribe();
   }

@@ -64,7 +64,6 @@ export const useAuth = () => {
     const unsubscribe = authRepo.onAuthStateChange(async (email) => {
       setIsAuthed(!!email);
       if (email) {
-        fetchPermissions(); // Refresh permissions on auth change
         fetchProfile(email);
       } else {
         setCurrentUser(null);
@@ -73,7 +72,7 @@ export const useAuth = () => {
     });
 
     return () => unsubscribe();
-  }, [fetchProfile, fetchPermissions, authRepo]);
+  }, [fetchProfile, authRepo]);
 
   const hasPermission = useCallback((permission: Permission | string) => {
     return PermissionService.hasPermission(currentUser?.role, permission as Permission);

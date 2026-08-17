@@ -1,11 +1,9 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { FinancePresenter } from './FinancePresenter';
 import { useIsMobile } from '@/src/shared/presentation/hooks/useIsMobile';
 import { useCashflowState } from './useCashflowState';
-
-// Lazy load views to optimize platform-specific bundle size
-const CashflowWebView = React.lazy(() => import('./CashflowWebView').then(m => ({ default: m.CashflowWebView })));
-const CashflowMobileView = React.lazy(() => import('./CashflowMobileView').then(m => ({ default: m.CashflowMobileView })));
+import { CashflowWebView } from './CashflowWebView';
+import { CashflowMobileView } from './CashflowMobileView';
 
 interface CashflowPageProps {
   presenter: FinancePresenter;
@@ -16,18 +14,15 @@ interface CashflowPageProps {
 
 /**
  * CashflowPage - The Dispatcher.
+ * Direct imports prevent Double Suspense Waterfall and eliminate UI flickering.
  */
 export const CashflowPage: React.FC<CashflowPageProps> = (props) => {
   const isMobile = useIsMobile();
   const cashflowState = useCashflowState(props.presenter);
 
-  return (
-    <Suspense fallback={<div className="h-full w-full animate-pulse bg-kraft-accent/5 rounded-[3rem]" />}>
-      {isMobile ? (
-        <CashflowMobileView {...props} state={cashflowState} />
-      ) : (
-        <CashflowWebView {...props} state={cashflowState} />
-      )}
-    </Suspense>
+  return isMobile ? (
+    <CashflowMobileView {...props} state={cashflowState} />
+  ) : (
+    <CashflowWebView {...props} state={cashflowState} />
   );
 };

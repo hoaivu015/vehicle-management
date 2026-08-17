@@ -23,6 +23,7 @@ export interface FinanceView extends BaseView {
 export class FinancePresenter extends BasePresenter<FinanceView> implements IUnifiedExpensePresenter {
   private currentMonth: string = new Date().toISOString().slice(0, 7);
   private subscription: { unsubscribe: () => void } | null = null;
+  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly getMonthlyFinance: GetMonthlyFinance,
@@ -36,8 +37,21 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
     super();
   }
 
+  private debouncedLoadFinanceData(): void {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+    this.debounceTimer = setTimeout(() => {
+      this.loadFinanceData();
+    }, 300);
+  }
+
   detachView(): void {
     super.detachView();
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
     if (this.subscription) {
       this.subscription.unsubscribe();
       this.subscription = null;
@@ -48,19 +62,26 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
     if (this.subscription) return;
 
     this.subscription = supabase.channel('finance_realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'operating_expenses' }, () => this.loadFinanceData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'company_settings' }, () => this.loadFinanceData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => this.loadFinanceData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'operating_expenses' }, () => this.debouncedLoadFinanceData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'company_settings' }, () => this.debouncedLoadFinanceData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => this.debouncedLoadFinanceData())
       .subscribe() as unknown as { unsubscribe: () => void };
   }
 
   async loadFinanceData(): Promise<void> {
     await this.perform(async () => {
-      const [monthlyData, overviewData, vehicles, staff] = await Promise.all([
-        this.getMonthlyFinance.execute(this.currentMonth),
-        this.getFinancialOverview.execute(this.currentMonth),
+      // 1 single parallel batch for all required raw datasets
+      const [settings, vehicles, staff, allOpExpenses] = await Promise.all([
+        this.expenseRepo.getCompanySettings(),
         this.vehicleRepository.getAll(),
-        this.staffRepository.getAll()
+        this.staffRepository.getAll(),
+        this.expenseRepo.getAll()
+      ]);
+      
+      // Calculate monthly finance and overview in memory with 0 duplicate DB requests
+      const [monthlyData, overviewData] = await Promise.all([
+        this.getMonthlyFinance.execute(this.currentMonth, { allOpExpenses, vehicles, staff }),
+        this.getFinancialOverview.execute(this.currentMonth, { settings, vehicles, staff, allOpExpenses })
       ]);
       
       if (this.view) {

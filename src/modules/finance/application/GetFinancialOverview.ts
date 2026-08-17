@@ -1,6 +1,6 @@
-import { Vehicle } from '@/src/shared/domain/types';
+import { Vehicle, Staff } from '@/src/shared/domain/types';
 import { FinanceService } from '@/src/modules/finance/domain/FinanceService';
-import { ExpenseRepository } from '@/src/modules/finance/domain/ExpenseRepository';
+import { ExpenseRepository, Expense } from '@/src/modules/finance/domain/ExpenseRepository';
 import { VehicleStatus, INVENTORY_CONSTANTS } from '@/src/shared/domain/constants';
 import { isVehicleAging } from '@/src/shared/utils/vehicle_calculations';
 import { VehicleRepository } from '@/src/modules/inventory/domain/VehicleRepository';
@@ -48,11 +48,20 @@ export class GetFinancialOverview {
     private readonly staffRepository: StaffRepository
   ) {}
 
-  async execute(month: string): Promise<FinancialOverviewData> {
-    const [settings, vehicles, staff] = await Promise.all([
-      this.expenseRepo.getCompanySettings(),
-      this.vehicleRepository.getAll(),
-      this.staffRepository.getAll()
+  async execute(
+    month: string,
+    preloadedData?: {
+      settings?: { total_capital: number };
+      vehicles?: Vehicle[];
+      staff?: Staff[];
+      allOpExpenses?: Expense[];
+    }
+  ): Promise<FinancialOverviewData> {
+    const [settings, vehicles, staff, allOpExpenses] = await Promise.all([
+      preloadedData?.settings ?? this.expenseRepo.getCompanySettings(),
+      preloadedData?.vehicles ?? this.vehicleRepository.getAll(),
+      preloadedData?.staff ?? this.staffRepository.getAll(),
+      preloadedData?.allOpExpenses ?? this.expenseRepo.getAll()
     ]);
     const totalCapital = settings.total_capital || 0;
 
@@ -60,7 +69,6 @@ export class GetFinancialOverview {
     const inventoryValue = inventoryVehicles.reduce((acc, v) => acc + ((v.purchase_price || 0) - (v.coinvest_amount || 0)) + (v.total_cost || 0), 0);
     
     // Correct Cash Balance Calculation
-    const allOpExpenses = await this.expenseRepo.getAll();
     const availableCash = FinanceService.calculateTotalCashBalance(
       totalCapital,
       vehicles,

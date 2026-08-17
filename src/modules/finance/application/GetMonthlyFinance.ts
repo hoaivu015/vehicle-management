@@ -2,6 +2,7 @@ import { FinanceService, Expense, SalaryCalculation } from '@/src/modules/financ
 import { ExpenseRepository } from '@/src/modules/finance/domain/ExpenseRepository';
 import { VehicleRepository } from '@/src/modules/inventory/domain/VehicleRepository';
 import { StaffRepository } from '@/src/modules/staff/domain/StaffRepository';
+import { Vehicle, Staff } from '@/src/shared/domain/types';
 
 export interface MonthlyFinanceData {
   revenue: number;
@@ -26,11 +27,18 @@ export class GetMonthlyFinance {
     private readonly staffRepository: StaffRepository
   ) {}
 
-  async execute(month: string): Promise<MonthlyFinanceData> {
+  async execute(
+    month: string,
+    preloadedData?: {
+      allOpExpenses?: Expense[];
+      vehicles?: Vehicle[];
+      staff?: Staff[];
+    }
+  ): Promise<MonthlyFinanceData> {
     const [allOpExpenses, vehicles, staff] = await Promise.all([
-      this.expenseRepo.getAll(),
-      this.vehicleRepository.getAll(),
-      this.staffRepository.getAll()
+      preloadedData?.allOpExpenses ?? this.expenseRepo.getAll(),
+      preloadedData?.vehicles ?? this.vehicleRepository.getAll(),
+      preloadedData?.staff ?? this.staffRepository.getAll()
     ]);
     const monthlyOpExpenses = allOpExpenses.filter(e => e.date?.startsWith(month));
     

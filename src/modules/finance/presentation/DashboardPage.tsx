@@ -1,12 +1,9 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { FinancePresenter } from './FinancePresenter';
 import { useIsMobile } from '@/src/shared/presentation/hooks/useIsMobile';
-
 import { useDashboardState } from './useDashboardState';
-
-// Lazy load views to optimize bundle size
-const DashboardWebView = React.lazy(() => import('./DashboardWebView').then(m => ({ default: m.DashboardWebView })));
-const DashboardMobileView = React.lazy(() => import('./DashboardMobileView').then(m => ({ default: m.DashboardMobileView })));
+import { DashboardWebView } from './DashboardWebView';
+import { DashboardMobileView } from './DashboardMobileView';
 
 interface DashboardPageProps {
   presenter: FinancePresenter;
@@ -16,7 +13,7 @@ interface DashboardPageProps {
 /**
  * DashboardPage - The Dispatcher.
  * Automatically renders the optimized view based on the platform/screen size.
- * This maintains a single route while delivering two distinct experiences.
+ * Direct imports prevent Double Suspense Waterfall and eliminate UI flickering.
  */
 export const DashboardPage: React.FC<DashboardPageProps> = ({
   presenter,
@@ -25,13 +22,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const isMobile = useIsMobile();
   const dashboardState = useDashboardState(presenter);
   
-  return (
-    <Suspense fallback={<div className="h-full w-full animate-pulse bg-kraft-accent/5 rounded-[3rem]" />}>
-      {isMobile ? (
-        <DashboardMobileView presenter={presenter} onNavigate={onNavigate} state={dashboardState} />
-      ) : (
-        <DashboardWebView presenter={presenter} onNavigate={onNavigate} state={dashboardState} />
-      )}
-    </Suspense>
+  return isMobile ? (
+    <DashboardMobileView presenter={presenter} onNavigate={onNavigate} state={dashboardState} />
+  ) : (
+    <DashboardWebView presenter={presenter} onNavigate={onNavigate} state={dashboardState} />
   );
 };
