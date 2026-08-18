@@ -1,10 +1,13 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/src/shared/utils/cn';
+import { AnimatedNumber } from '@/src/shared/design-system/AnimatedNumber';
 
 interface Stat {
   label: string;
   value: string | number;
+  numericValue?: number;
+  isCurrency?: boolean;
   icon: React.ElementType;
   subValue?: string;
   isNegative?: boolean;
@@ -52,9 +55,9 @@ export const DashboardStatGrid: React.FC<DashboardStatGridProps> = ({ stats }) =
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: _i * 0.05 }}
-              whileHover={{ y: -5, scale: 1.01 }}
-              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25, delay: _i * 0.05 }}
+              whileHover={{ y: -4, scale: 1.01 }}
+              whileTap={{ scale: 0.96 }}
               onMouseEnter={() => setHoveredLabel(stat.label)}
               onMouseLeave={() => setHoveredLabel(null)}
               onClick={(_e) => {
@@ -65,11 +68,11 @@ export const DashboardStatGrid: React.FC<DashboardStatGridProps> = ({ stats }) =
                 }
               }}
               className={cn(
-                "relative h-full p-g3 md:p-g4 rounded-t2 border transition-all duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-kraft-deep active:scale-[0.98] active:brightness-95 native-interactive",
+                "relative h-full p-g3 md:p-g4 rounded-t2 border transition-all duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-kraft-deep active:scale-[0.98] active:brightness-95 native-interactive backdrop-blur-md",
                 stat.isWarning
                   ? "bg-expense-light/40 border-expense/20 hover:bg-expense-light/60"
-                  : "bg-white border-black/5 hover:bg-white/80",
-                isActive && "border-kraft-accent/40 bg-white/90 shadow-kraft-accent/10"
+                  : "bg-white/80 border-white/80 hover:bg-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)]",
+                isActive && "border-kraft-accent/40 bg-white shadow-kraft-accent/10"
               )}
             >
               <div className="flex justify-between items-start mb-6">
@@ -105,10 +108,14 @@ export const DashboardStatGrid: React.FC<DashboardStatGridProps> = ({ stats }) =
                   {stat.label}
                 </p>
                 <h4 className={cn(
-                  "text-xl sm:text-2xl md:text-[28px] font-black tracking-tighter leading-tight break-all",
+                  "text-xl sm:text-2xl md:text-[28px] font-black tracking-tighter leading-tight whitespace-nowrap truncate",
                   stat.isNegative ? "text-expense" : "text-kraft-ink"
                 )}>
-                  {stat.value}
+                  {stat.numericValue !== undefined ? (
+                    <AnimatedNumber value={stat.numericValue} isCurrency={stat.isCurrency ?? true} />
+                  ) : (
+                    stat.value
+                  )}
                 </h4>
                 {stat.subValue && (
                   <div className="flex items-center gap-2 pt-2">

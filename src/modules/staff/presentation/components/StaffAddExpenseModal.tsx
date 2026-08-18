@@ -184,7 +184,7 @@ const StaffAddExpenseForm: React.FC<StaffAddExpenseFormProps> = ({
         onSubmit={handleSubmit}
         onDelete={isEdit ? handleDelete : undefined}
         isSubmitting={isSubmitting}
-        submitLabel={isEdit ? 'Lưu' : 'Ghi nhận chi'}
+        submitLabel={isEdit ? 'Lưu khoản chi' : 'Ghi nhận chi'}
       />
     </form>
   );

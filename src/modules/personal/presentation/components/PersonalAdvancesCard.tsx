@@ -56,14 +56,14 @@ export const PersonalAdvancesCard: React.FC<PersonalAdvancesCardProps> = ({
             </p>
           </div>
         </div>
-        <p className="font-black text-sm text-kraft-ink tracking-tighter shrink-0">
+        <p className="font-black text-sm text-kraft-ink tracking-tighter shrink-0 whitespace-nowrap">
           {formatCurrency(expense.amount)}
         </p>
       </div>
 
       <div className="flex items-center justify-between mt-2">
         <div className={cn(
-          "inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border font-black text-[10px] uppercase tracking-widest",
+          "inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border font-black text-[10px] uppercase tracking-widest whitespace-nowrap",
           expense.is_reimbursed 
             ? "bg-income/10 border-income/20 text-income" 
             : "bg-expense-light/40 border-expense/20 text-expense"
@@ -104,61 +104,61 @@ export const PersonalAdvancesCard: React.FC<PersonalAdvancesCardProps> = ({
       style={{ willChange: 'transform, opacity' }}
       className="liquid-card border-white/60 !p-0 shadow-[var(--shadow-kraft-deep)] overflow-hidden rounded-t1 flex flex-col h-full"
     >
-      <div className="p-8 border-b border-hairline-soft bg-kraft-accent/5 flex items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <h3 className="text-xl font-black uppercase flex items-center gap-4 text-kraft-accent font-heading tracking-tighter">
-            <div className="w-11 h-11 rounded-xl bg-kraft-accent/10 flex items-center justify-center">
-              <DollarSign size={20} strokeWidth={2.5} />
+      <div className="p-4 md:p-8 border-b border-hairline-soft bg-kraft-accent/5 flex items-center justify-between">
+        <div className="flex flex-col gap-1 min-w-0">
+          <h3 className="text-lg md:text-xl font-black uppercase flex items-center gap-3 md:gap-4 text-kraft-accent font-heading tracking-tighter">
+            <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl bg-kraft-accent/10 flex items-center justify-center shrink-0">
+              <DollarSign size={18} className="md:w-5 md:h-5" strokeWidth={2.5} />
             </div>
             Chi phí & Hoàn ứng
           </h3>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 ml-16">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-sub-label">Chờ hoàn:</span>
-              <span className="text-xs font-black text-kraft-accent tracking-tighter">{formatCurrency(totalUnreimbursedAmount)}</span>
+          <div className="flex flex-wrap items-center gap-x-4 md:gap-x-6 gap-y-1 ml-12 md:ml-16">
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <span className="text-[10px] font-black uppercase tracking-widest text-sub-label whitespace-nowrap">Chờ hoàn:</span>
+              <span className="text-xs font-black text-kraft-accent tracking-tighter whitespace-nowrap">{formatCurrency(totalUnreimbursedAmount)}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-sub-label">Đã chi ({selectedMonth}):</span>
-              <span className="text-xs font-black text-income tracking-tighter">{formatCurrency(totalReimbursedInMonth)}</span>
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <span className="text-[10px] font-black uppercase tracking-widest text-sub-label whitespace-nowrap">Đã chi ({selectedMonth}):</span>
+              <span className="text-xs font-black text-income tracking-tighter whitespace-nowrap">{formatCurrency(totalReimbursedInMonth)}</span>
             </div>
           </div>
         </div>
         <motion.button 
           whileTap={{ scale: 0.95 }}
           onClick={onAddClick}
-          className="w-11 h-11 bg-kraft-accent text-white rounded-xl hover:opacity-80 transition-all shadow-kraft-deep flex items-center justify-center"
+          className="w-10 h-10 md:w-11 md:h-11 bg-kraft-accent text-white rounded-xl hover:opacity-80 transition-all shadow-kraft-deep flex items-center justify-center shrink-0"
           title="Thêm khoản chi"
         >
-          <Plus size={20} strokeWidth={3} />
+          <Plus size={18} className="md:w-5 md:h-5" strokeWidth={3} />
         </motion.button>
       </div>
       
-      <div className="p-8 space-y-8 flex-1 overflow-y-auto custom-scrollbar max-h-[600px]">
+      <div className="p-4 md:p-8 space-y-6 md:space-y-8 flex-1 overflow-y-auto custom-scrollbar max-h-[600px]">
         {unreimbursed.length > 0 && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 px-2">
-              <Clock size={14} className="text-expense" />
-              <h4 className="text-[10px] font-black uppercase tracking-widest text-expense">Chờ hoàn tiền</h4>
+          <div className="space-y-3 md:space-y-4">
+            <div className="flex items-center gap-2 px-1 md:px-2">
+              <Clock size={14} className="text-expense shrink-0" />
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-expense whitespace-nowrap">Chờ hoàn tiền</h4>
               <div className="h-px flex-1 bg-expense/10 ml-2" />
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {unreimbursed.map(renderExpenseCard)}
             </div>
           </div>
         )}
 
         {reimbursedInSelectedMonth.length > 0 && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between px-2">
+          <div className="space-y-3 md:space-y-4">
+            <div className="flex items-center justify-between px-1 md:px-2 flex-wrap gap-2">
               <div className="flex items-center gap-2">
-                <CheckCircle size={14} className="text-income" />
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-income">Đã chi tháng {selectedMonth.split('-')[1]}/{selectedMonth.split('-')[0]}</h4>
+                <CheckCircle size={14} className="text-income shrink-0" />
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-income whitespace-nowrap">Đã chi tháng {selectedMonth.split('-')[1]}/{selectedMonth.split('-')[0]}</h4>
               </div>
-              <span className="text-[10px] font-black text-kraft-ink/40 uppercase tracking-widest">
-                Tổng tháng: <span className="text-emerald-600">{formatCurrency(totalReimbursedInMonth)}</span>
+              <span className="text-[10px] font-black text-kraft-ink/40 uppercase tracking-widest whitespace-nowrap">
+                Tổng tháng: <span className="text-emerald-600 whitespace-nowrap">{formatCurrency(totalReimbursedInMonth)}</span>
               </span>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {reimbursedInSelectedMonth.map(renderExpenseCard)}
             </div>
           </div>

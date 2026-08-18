@@ -47,8 +47,8 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
           onClick(car);
         }}
       >
-        {/* Thumbnail square */}
-        <div className="relative shrink-0 w-[120px] h-[120px]">
+        {/* Thumbnail square - Clean 1 Hero Badge */}
+        <div className="relative shrink-0 w-[110px] h-[110px] rounded-l-[20px] overflow-hidden bg-slate-100 dark:bg-slate-800">
           <img
             src={optimizeCloudinaryUrl(car.image_url, { width: 400 })}
             alt={car.name}
@@ -56,89 +56,101 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
             loading="lazy"
             decoding="async"
           />
-          {/* Status badge */}
+          {/* Status badge - Single hero badge on image */}
           <div className="absolute top-2 left-2">
             <StatusBadge 
               label={statusConfig?.label || car.status} 
               badgeClass={statusConfig?.badgeClass ?? "glass-badge-dark"} 
             />
           </div>
-          {/* Aging indicator */}
-          {isAging && car.status !== VehicleStatus.SOLD && (
-            <div className="absolute bottom-2 left-2 w-6 h-6 rounded-lg bg-red-500 text-white flex items-center justify-center">
-              <Clock size={12} strokeWidth={3} />
-            </div>
-          )}
-          {/* Coinvested */}
-          {car.is_coinvested && (
-            <div className="absolute bottom-2 right-2 w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center">
-              <Award size={12} />
-            </div>
-          )}
         </div>
 
-        {/* Info section */}
-        <div className="flex-1 min-w-0 p-3 flex flex-col justify-between">
-          {/* Top: name + pin */}
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <h3 className="text-sm font-black text-kraft-ink leading-tight line-clamp-2 tracking-tight">
+        {/* Info section - 100% Cố định đúng 4 hàng đồng bộ tuyệt đối */}
+        <div className="flex-1 min-w-0 p-2.5 flex flex-col justify-between">
+          <div>
+            {/* Hàng 1: Code & Pin Button */}
+            <div className="flex items-center justify-between gap-1.5 mb-0.5">
+              {car.code ? (
+                <span className="px-1.5 py-0.5 bg-black/5 dark:bg-white/10 rounded text-[9px] font-black uppercase tracking-wider text-kraft-ink/60 whitespace-nowrap">
+                  #{car.code}
+                </span>
+              ) : <div />}
+
+              {/* Pin action button */}
+              <motion.button
+                whileTap={{ scale: 0.85 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPin?.(car.id, !car.is_pinned);
+                }}
+                className={cn(
+                  "shrink-0 w-6 h-6 rounded-md border flex items-center justify-center transition-all native-interactive",
+                  car.is_pinned
+                    ? "bg-kraft-accent text-white border-transparent shadow-sm"
+                    : "bg-kraft-ink/5 hover:bg-kraft-ink/10 text-kraft-ink/40 border-transparent"
+                )}
+                title={car.is_pinned ? "Bỏ ghim" : "Ghim xe"}
+              >
+                <Pin size={11} fill={car.is_pinned ? "currentColor" : "none"} />
+              </motion.button>
+            </div>
+
+            {/* Hàng 2: Tên xe & Tag Góp Vốn Inline */}
+            <div className="flex items-center gap-1.5 min-w-0">
+              <h3 className="text-sm font-black text-kraft-ink leading-tight truncate tracking-tight">
                 {car.name}
               </h3>
-              <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                <div className="flex items-center gap-0.5 text-[10px] text-kraft-ink/50 font-bold">
-                  <Calendar size={9} />
-                  <span>{car.year}</span>
-                </div>
-                <span className="text-[10px] text-kraft-ink/20">•</span>
-                <div className="flex items-center gap-0.5 text-[10px] text-kraft-ink/50 font-bold">
-                  <TrendingUp size={9} />
-                  <span>{((car.odo || 0) / 1000).toFixed(0)}K km</span>
-                </div>
-                {car.battery_type && car.battery_type !== 'None' && (
-                  <>
-                    <span className="text-[10px] text-kraft-ink/20">•</span>
-                    <span className="text-[10px] text-kraft-accent font-black uppercase tracking-wider">{car.battery_type}</span>
-                  </>
-                )}
-              </div>
-            </div>
-            <motion.button
-              whileTap={{ scale: 0.85 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onPin?.(car.id, !car.is_pinned);
-              }}
-              className={cn(
-                "shrink-0 w-7 h-7 rounded-xl border flex items-center justify-center transition-all",
-                car.is_pinned
-                  ? "bg-kraft-accent text-white border-transparent"
-                  : "bg-kraft-ink/5 text-kraft-ink/30 border-transparent"
+              {car.is_coinvested && (
+                <span className="shrink-0 px-1.5 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded text-[8.5px] font-black uppercase tracking-wider whitespace-nowrap flex items-center gap-0.5 border border-purple-500/20">
+                  <Award size={8.5} strokeWidth={2.5} />
+                  Góp vốn
+                </span>
               )}
-            >
-              <Pin size={12} fill={car.is_pinned ? "currentColor" : "none"} />
-            </motion.button>
+            </div>
+
+            {/* Hàng 3: Thông số & Ngày lưu kho */}
+            <div className="flex items-center gap-1 mt-1 text-kraft-ink/50 flex-nowrap overflow-hidden">
+              <div className="flex items-center gap-0.5 text-[10px] font-bold whitespace-nowrap">
+                <Calendar size={9} />
+                <span>{car.year}</span>
+              </div>
+              <span className="text-[10px] text-kraft-ink/20">•</span>
+              <div className="flex items-center gap-0.5 text-[10px] font-bold whitespace-nowrap">
+                <TrendingUp size={9} />
+                <span>{((car.odo || 0) / 1000).toFixed(0)}K km</span>
+              </div>
+              <span className="text-[10px] text-kraft-ink/20">•</span>
+              <span className={cn(
+                "text-[9.5px] font-bold uppercase tracking-wider flex items-center gap-0.5 whitespace-nowrap",
+                isAging ? "text-coral font-black" : "text-kraft-ink/50"
+              )}>
+                <Clock size={9} className="shrink-0" />
+                {car.days || 0}d
+              </span>
+            </div>
           </div>
 
-          {/* Bottom: days + price + profit */}
-          <div className="flex items-end justify-between mt-2">
-            <div className="flex flex-col gap-0.5">
-              <span className={cn(
-                "text-[11px] font-black uppercase tracking-wider",
-                isAging ? "text-coral/80 font-bold" : "text-kraft-ink/40"
-              )}>
-                {car.days || 0} ngày lưu kho
+          {/* Bottom: price (left) + profit (right) - Zero Collision Matrix */}
+          <div className="flex items-end justify-between mt-2 pt-1.5 border-t border-black/[0.04] dark:border-white/[0.04]">
+            <div className="flex flex-col min-w-0">
+              <span className="text-[9px] font-bold text-kraft-ink/40 uppercase tracking-tight whitespace-nowrap">
+                {car.status === VehicleStatus.SOLD ? "Giá chốt" : "Giá chào"}
               </span>
-              <span className="text-xs font-black text-kraft-ink">
+              <span className="text-xs sm:text-sm font-black text-kraft-ink whitespace-nowrap">
                 {formatCurrency(car.sale_price || 0)}
               </span>
             </div>
             {canSeeFullInfo ? (
-              <span className="text-xs font-black text-emerald-600">
-                +{formatCurrency(financials.showroomProfitShare).replace('₫', '')}
-              </span>
+              <div className="flex flex-col items-end shrink-0 pl-2">
+                <span className="text-[9px] font-bold text-kraft-ink/40 uppercase tracking-tight whitespace-nowrap">
+                  Lãi dự kiến
+                </span>
+                <span className="text-xs sm:text-sm font-black text-emerald-600 whitespace-nowrap">
+                  +{formatCurrency(financials.showroomProfitShare).replace('₫', '')}
+                </span>
+              </div>
             ) : (
-              <ArrowRight size={14} className="text-kraft-accent" strokeWidth={3} />
+              <ArrowRight size={14} className="text-kraft-accent shrink-0" strokeWidth={3} />
             )}
           </div>
         </div>
@@ -218,6 +230,13 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
             className="flex-1 flex flex-col"
           >
             <div className={isCompact ? "mb-1 md:mb-2" : "mb-2 md:mb-3"}>
+              <div className="flex items-center gap-1.5 mb-1">
+                {car.code && (
+                  <span className="px-1.5 py-0.5 bg-black/5 dark:bg-white/10 rounded text-[10px] font-black uppercase tracking-wider text-kraft-ink/50 whitespace-nowrap">
+                    #{car.code}
+                  </span>
+                )}
+              </div>
               <h3 className={cn(
                 "font-black text-kraft-ink tracking-tighter uppercase leading-tight line-clamp-2 transition-colors group-hover:text-kraft-accent",
                 isCompact ? "text-sm md:text-lg min-h-[1.25rem] md:min-h-[2.5rem]" : "text-sm md:text-xl min-h-[1.25rem] md:min-h-[3rem]",
@@ -239,7 +258,7 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
             <CardFooter className={isCompact ? "pt-2 md:pt-3" : "pt-3 md:pt-4"}>
               <div className="flex items-center gap-g1">
                 <span className={cn(
-                  "text-body font-black tracking-tighter leading-none uppercase",
+                  "text-body font-black tracking-tighter leading-none uppercase whitespace-nowrap",
                   isAging ? "text-coral/80 font-bold" : "text-kraft-ink/40",
                   isCompact && "text-sm"
                 )}>
@@ -249,7 +268,7 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
 
               <div className="text-right">
                 {canSeeFullInfo ? (
-                  <p className="text-body font-black text-income tracking-tighter leading-none">
+                  <p className="text-body font-black text-income tracking-tighter leading-none whitespace-nowrap">
                     +{formatCurrency(financials.showroomProfitShare).replace('₫', '')}
                   </p>
                 ) : (

@@ -14,6 +14,7 @@ import { NativePage, NativeHeader } from '@/src/shared/design-system/native/Nati
 import { LargeTitle, SecondaryLabel } from '@/src/shared/design-system/native/NativeTypography';
 import { cn } from '@/src/shared/utils/cn';
 import { Skeleton } from '@/src/shared/design-system/Skeleton';
+import { AnimatedNumber } from '@/src/shared/design-system/AnimatedNumber';
 
 const ReceivableDebtsList = React.lazy(() =>
   import('./components/ReceivableDebtsList').then(module => ({
@@ -142,15 +143,16 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
         <div className={cn("transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]", isSubsequentLoading && "opacity-50 blur-[2px] pointer-events-none")}>
           <div className="space-y-4">
             {/* Primary Profit Card - The "Wow" Component */}
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-kraft-accent to-indigo-700 p-8 text-white shadow-2xl shadow-kraft-accent/30 expressive-reveal-card">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl" />
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-kraft-accent via-indigo-600 to-indigo-800 p-8 text-white shadow-2xl shadow-kraft-accent/30 expressive-reveal-card border border-white/20">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-white/15 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-cyan-400/20 rounded-full -ml-12 -mb-12 blur-2xl pointer-events-none" />
               <SecondaryLabel className="text-white/70">Lợi nhuận ròng</SecondaryLabel>
               <div className="text-4xl font-black mt-2 tracking-tighter">
-                {formatCurrency(overview?.netProfit || 0)}
+                <AnimatedNumber value={overview?.netProfit || 0} isCurrency={true} />
               </div>
-              <div className="flex items-center gap-2 mt-4 text-xs font-bold bg-white/10 w-fit px-3 py-1 rounded-full backdrop-blur-md">
-                <TrendingUp size={14} />
-                <span>+12% so với tháng trước</span>
+              <div className="flex items-center gap-2 mt-4 text-xs font-bold bg-white/10 w-fit px-3.5 py-1.5 rounded-full backdrop-blur-md border border-white/10">
+                <TrendingUp size={14} className="text-emerald-300" />
+                <span>Hiệu suất kinh doanh tháng</span>
               </div>
             </div>
 
@@ -159,6 +161,7 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
               <StatCard 
                 label="Tiền mặt"
                 value={formatCurrency(overview?.availableCash || 0)}
+                numericValue={overview?.availableCash || 0}
                 icon={Wallet}
                 color="emerald"
               />
@@ -236,7 +239,7 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
         {/* LỚP PHỦ KÍNH THỞ (Liquid Flow Glass Overlay) - Chạy 100% bằng GPU CSS animations */}
         {isSubsequentLoading && (
           <div
-            className="absolute inset-0 bg-white/5 backdrop-blur-[6px] border border-white/10 rounded-[2.5rem] flex items-center justify-center z-50 pointer-events-none animate-in fade-in duration-300"
+            className="absolute inset-0 bg-white/5 backdrop-blur-[6px] border border-white/10 rounded-[2.5rem] flex items-center justify-center z-50 pointer-events-none"
             style={{ animation: 'breathe-glow 3s ease-in-out infinite' }}
           >
             <div className="absolute inset-0 -z-10 opacity-30 mix-blend-color-dodge pointer-events-none overflow-hidden rounded-[2.5rem]">
@@ -255,23 +258,25 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
 interface StatCardProps {
   label: string;
   value: string | number;
+  numericValue?: number;
+  isCurrency?: boolean;
   icon: React.ElementType;
   color?: string;
   isWarning?: boolean;
   onClick?: () => void;
 }
 
-const StatCard = ({ label, value, icon: Icon, color = 'blue', isWarning, onClick }: StatCardProps) => (
+const StatCard = ({ label, value, numericValue, isCurrency = true, icon: Icon, color = 'blue', isWarning, onClick }: StatCardProps) => (
   <button 
     onClick={onClick}
     className={cn(
-      "flex flex-col gap-3 p-5 rounded-[2rem] border transition-all active:scale-95 text-left",
-      "bg-white border-black/5 shadow-sm",
-      isWarning && "bg-red-50/50 border-red-100"
+      "flex flex-col gap-3 p-5 rounded-[2rem] border transition-all active:scale-95 text-left backdrop-blur-md",
+      "bg-white/80 border-white/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] hover:bg-white",
+      isWarning && "bg-red-50/60 border-red-100/80"
     )}
   >
     <div className={cn(
-      "w-10 h-10 rounded-xl flex items-center justify-center",
+      "w-10 h-10 rounded-xl flex items-center justify-center shadow-inner",
       color === 'emerald' && "bg-emerald-100 text-emerald-600",
       color === 'blue' && "bg-blue-100 text-blue-600",
       color === 'orange' && "bg-orange-100 text-orange-600",
@@ -287,7 +292,11 @@ const StatCard = ({ label, value, icon: Icon, color = 'blue', isWarning, onClick
         "text-lg font-black tracking-tight text-kraft-ink",
         isWarning && "text-red-600"
       )}>
-        {value}
+        {numericValue !== undefined ? (
+          <AnimatedNumber value={numericValue} isCurrency={isCurrency} />
+        ) : (
+          value
+        )}
       </div>
     </div>
   </button>

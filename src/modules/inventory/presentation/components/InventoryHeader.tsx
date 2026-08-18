@@ -6,6 +6,7 @@ import { PERMISSIONS } from '@/src/constants';
 import { INVENTORY_CONSTANTS } from '@/src/shared/domain/constants';
 import { BaseInput } from '@/src/shared/design-system/FormElements';
 import { SlidingPillSwitcher } from '@/src/shared/design-system/Buttons';
+import { haptics } from '@/src/shared/utils/haptics';
 
 interface InventoryHeaderProps {
   searchQuery: string;
@@ -94,7 +95,10 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
         <div className="flex glass-surface p-1 !rounded-full shadow-kraft-deep relative">
           <motion.button
             whileTap={{ scale: 0.95 }}
-            onClick={() => setActiveTab('AVAILABLE')}
+            onClick={() => {
+              haptics.light();
+              setActiveTab('AVAILABLE');
+            }}
             className={cn(
               "relative px-4 md:px-6 py-2 rounded-full text-sub-label transition-all duration-500 cursor-pointer",
               activeTab === 'AVAILABLE' ? "text-white font-black scale-105" : "text-kraft-ink/60 hover:text-kraft-ink"
@@ -111,7 +115,10 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.95 }}
-            onClick={() => setActiveTab('SOLD')}
+            onClick={() => {
+              haptics.light();
+              setActiveTab('SOLD');
+            }}
             className={cn(
               "relative px-4 md:px-6 py-2 rounded-full text-sub-label transition-all duration-500 cursor-pointer",
               activeTab === 'SOLD' ? "text-white font-black scale-105" : "text-kraft-ink/60 hover:text-kraft-ink"

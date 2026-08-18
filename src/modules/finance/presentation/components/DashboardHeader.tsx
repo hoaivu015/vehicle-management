@@ -7,6 +7,8 @@ import { PillButton } from '@/src/shared/design-system/Buttons';
 export interface DashboardStat {
   label: string;
   value: string;
+  numericValue?: number;
+  isCurrency?: boolean;
   icon: React.ElementType;
   subValue: string;
   tooltip?: string;
@@ -14,6 +16,7 @@ export interface DashboardStat {
   isWarning?: boolean;
   actionIcon?: React.ElementType;
   onActionClick?: (e: React.MouseEvent) => void;
+  onClick?: () => void;
 }
 
 interface DashboardHeaderProps {

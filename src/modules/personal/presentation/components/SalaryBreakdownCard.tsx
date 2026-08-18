@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { cn } from '@/src/shared/utils/cn';
 import { SalaryItem } from './PersonalShared';
 import { formatCurrency } from '@/src/shared/utils/currency';
+import { AnimatedNumber } from '@/src/shared/design-system/AnimatedNumber';
 
 interface SalaryDetails {
   base: number;
@@ -35,18 +36,18 @@ export const SalaryBreakdownCard: React.FC<SalaryBreakdownCardProps> = ({
       style={{ willChange: 'transform, opacity' }}
       className="liquid-card border-hairline-soft !p-0 shadow-kraft-deep overflow-hidden rounded-t2 h-full"
     >
-      <div className="p-8 border-b border-hairline-soft bg-income/5 flex items-center justify-between">
-        <h3 className="text-xl font-black uppercase flex items-center gap-4 text-income font-heading tracking-tighter">
-          <div className="w-11 h-11 rounded-xl bg-income/10 flex items-center justify-center">
-            <PieChart size={20} strokeWidth={2.5} />
+      <div className="p-4 md:p-8 border-b border-hairline-soft bg-income/5 flex items-center justify-between">
+        <h3 className="text-lg md:text-xl font-black uppercase flex items-center gap-3 md:gap-4 text-income font-heading tracking-tighter">
+          <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl bg-income/10 flex items-center justify-center shrink-0">
+            <PieChart size={18} className="md:w-5 md:h-5" strokeWidth={2.5} />
           </div>
           Bảng kê lương chi tiết
         </h3>
-        <span className="text-sub-label font-black text-[10px] uppercase tracking-widest opacity-40">Tháng {monthNum}</span>
+        <span className="text-sub-label font-black text-[10px] uppercase tracking-widest opacity-40 whitespace-nowrap">Tháng {monthNum}</span>
       </div>
       
-      <div className="p-10 space-y-8">
-        <div className="space-y-6">
+      <div className="p-4 md:p-8 lg:p-10 space-y-6 md:space-y-8">
+        <div className="space-y-4 md:space-y-6">
           <SalaryItem 
             label="Lương cơ bản" 
             value={formatCurrency(salaryDetails.base)} 
@@ -71,23 +72,23 @@ export const SalaryBreakdownCard: React.FC<SalaryBreakdownCardProps> = ({
         </div>
 
         {salaryDetails.totalReimbursements > 0 && (
-          <div className="pt-6 border-t border-hairline-soft">
+          <div className="pt-4 md:pt-6 border-t border-hairline-soft">
             <div className="flex justify-between items-center text-kraft-accent">
               <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Chi hộ & Hoàn phí:</span>
-              <span className="text-sm font-black tracking-tighter">+{formatCurrency(salaryDetails.totalReimbursements)}</span>
+              <span className="text-sm font-black tracking-tighter whitespace-nowrap">+{formatCurrency(salaryDetails.totalReimbursements)}</span>
             </div>
           </div>
         )}
         
-        <div className="pt-8 border-t-2 border-dashed border-hairline-soft mt-4">
+        <div className="pt-6 md:pt-8 border-t-2 border-dashed border-hairline-soft mt-4">
           <div className="flex justify-between items-center">
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-sub-label mb-1">Tổng thu nhập thực nhận</p>
               <p className={cn(
-                "text-4xl font-black tracking-tighter transition-colors",
+                "text-2xl md:text-4xl font-black tracking-tighter transition-colors whitespace-nowrap",
                 salaryDetails.isPaid ? "text-income" : "text-kraft-ink"
               )}>
-                {formatCurrency(salaryDetails.netSalary)}
+                <AnimatedNumber value={salaryDetails.netSalary} isCurrency={true} />
               </p>
               {salaryDetails.isPaid && (
                 <p className="text-[10px] font-black text-income uppercase tracking-widest mt-2 flex items-center gap-2">
@@ -96,10 +97,10 @@ export const SalaryBreakdownCard: React.FC<SalaryBreakdownCardProps> = ({
               )}
             </div>
             <div className={cn(
-              "w-16 h-16 rounded-t2 shadow-kraft-deep flex items-center justify-center text-white transition-colors",
+              "w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-t2 shadow-kraft-deep flex items-center justify-center text-white transition-colors shrink-0",
               salaryDetails.isPaid ? "bg-income" : "bg-kraft-ink"
             )}>
-              <ShieldCheck size={32} strokeWidth={2.5} />
+              <ShieldCheck size={24} className="md:w-8 md:h-8" strokeWidth={2.5} />
             </div>
           </div>
         </div>

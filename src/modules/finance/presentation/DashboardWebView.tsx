@@ -60,6 +60,7 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
     {
       label: 'Lợi nhuận gộp (Showroom)',
       value: formatCurrency(overview?.grossProfit || 0),
+      numericValue: overview?.grossProfit || 0,
       icon: CircleDollarSign,
       subValue: 'Phần thực hưởng của Showroom',
       tooltip: formatCurrency(overview?.grossProfit || 0, { showFull: true })
@@ -67,6 +68,7 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
     {
       label: 'Lợi nhuận ròng',
       value: formatCurrency(overview?.netProfit || 0),
+      numericValue: overview?.netProfit || 0,
       icon: TrendingUp,
       subValue: 'Sau khi chia sẻ góp vốn & trừ CP',
       isNegative: (overview?.netProfit || 0) < 0,
@@ -75,6 +77,7 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
     {
       label: 'Lợi ròng cuối',
       value: formatCurrency(overview?.finalNetProfit || 0),
+      numericValue: overview?.finalNetProfit || 0,
       icon: Coins,
       subValue: 'Sau khi quyết toán lương & thưởng',
       isNegative: (overview?.finalNetProfit || 0) < 0,
@@ -83,12 +86,23 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
     {
       label: 'Tiền mặt khả dụng',
       value: formatCurrency(overview?.availableCash || 0),
+      numericValue: overview?.availableCash || 0,
       icon: Wallet,
       subValue: 'Số dư thực tế tại quỹ',
       tooltip: formatCurrency(overview?.availableCash || 0, { showFull: true })
     },
-    { label: 'Xe đã bán', value: `${overview?.soldCount || 0} xe`, icon: CheckCircle2, subValue: `Kế hoạch tháng: ${MONTHLY_SALES_TARGET} xe` },
-    { label: 'Xe nhập mới', value: `${overview?.boughtCount || 0} xe`, icon: ShoppingBag, subValue: 'Tốc độ nhập hàng' },
+    { 
+      label: 'Xe đã bán', 
+      value: `${overview?.soldCount || 0} xe`, 
+      icon: CheckCircle2, 
+      subValue: `Kế hoạch tháng: ${MONTHLY_SALES_TARGET} xe` 
+    },
+    { 
+      label: 'Xe nhập mới', 
+      value: `${overview?.boughtCount || 0} xe`, 
+      icon: ShoppingBag, 
+      subValue: 'Tốc độ nhập hàng' 
+    },
     {
       label: 'Tồn kho hiện tại',
       value: `${overview?.inventoryCount || 0} xe`,

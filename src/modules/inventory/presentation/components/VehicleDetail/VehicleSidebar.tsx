@@ -96,19 +96,19 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
                   </div>
                ) : (
                   <div className="flex items-center gap-2 text-[10px] font-bold text-kraft-ink/80 leading-none mt-1 pt-1.5 border-t border-hairline-soft">
-                     <div className="flex items-center gap-0.5">
+                     <div className="flex items-center gap-0.5 whitespace-nowrap">
                         <span className="text-[10px] font-black uppercase tracking-[0.15em] text-sub-label leading-none">Năm:</span>
                         <span className="font-bold">{vehicle.year || 'N/A'}</span>
                      </div>
                      <div className="w-[1px] h-2.5 bg-black/10 shrink-0" />
-                     <div className="flex items-center gap-0.5">
+                     <div className="flex items-center gap-0.5 whitespace-nowrap">
                         <span className="text-[10px] font-black uppercase tracking-[0.15em] text-sub-label leading-none">ODO:</span>
-                        <span className="font-bold truncate max-w-[50px]">{vehicle.odo ? `${(vehicle.odo / 1000).toFixed(0)}k km` : 'N/A'}</span>
+                        <span className="font-bold">{vehicle.odo ? `${(vehicle.odo / 1000).toFixed(0)}k km` : 'N/A'}</span>
                      </div>
                      <div className="w-[1px] h-2.5 bg-black/10 shrink-0" />
-                     <div className="flex items-center gap-0.5">
+                     <div className="flex items-center gap-0.5 whitespace-nowrap">
                         <span className="text-[10px] font-black uppercase tracking-[0.15em] text-sub-label leading-none">Màu:</span>
-                        <span className="font-bold truncate max-w-[40px]">{vehicle.color || 'N/A'}</span>
+                        <span className="font-bold">{vehicle.color || 'N/A'}</span>
                      </div>
                   </div>
                )}
@@ -186,7 +186,7 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
                            className="flex-1 bg-income shadow-income/20"
                            icon={isSubmitting ? RefreshCw : Save}
                         >
-                           Lưu
+                           Lưu thay đổi
                         </PillButton>
                      ) : (
                         <PillButton
@@ -195,7 +195,7 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
                            className="flex-1"
                            icon={TrendingUp}
                         >
-                           Trạng thái
+                           Đổi trạng thái
                         </PillButton>
                      )}
 

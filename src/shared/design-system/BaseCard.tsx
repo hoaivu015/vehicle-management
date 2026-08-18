@@ -129,7 +129,7 @@ export const PriceBadge: React.FC<{ label: string; value: string; className?: st
     <span className="text-[10px] font-bold uppercase tracking-widest text-kraft-ink/40 mb-0">
       {label}
     </span>
-    <span className="text-sm md:text-xl font-black tracking-tight">
+    <span className="text-sm md:text-xl font-black tracking-tight whitespace-nowrap">
       {value}
     </span>
   </div>

@@ -18,6 +18,8 @@ import { StaffAddExpenseModal } from '@/src/modules/staff/presentation/component
 import { UpdateVehicleInput } from '@/src/modules/inventory/domain/VehicleSchema';
 import { calculateVehicleFinancials } from '@/src/shared/utils/vehicle_calculations';
 import { Skeleton } from '@/src/shared/design-system/Skeleton';
+import { AnimatedNumber } from '@/src/shared/design-system/AnimatedNumber';
+import { haptics } from '@/src/shared/utils/haptics';
 
 
 
@@ -205,7 +207,10 @@ export const PersonalMobileView = ({ user, onUpdateUser, onLogout, state: propSt
           <input 
             type="month" 
             value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
+            onChange={(e) => {
+              haptics.light();
+              setSelectedMonth(e.target.value);
+            }}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
           />
         </div>
@@ -219,11 +224,13 @@ export const PersonalMobileView = ({ user, onUpdateUser, onLogout, state: propSt
               initial={{ opacity: 0, scale: 0.95, y: 30, filter: 'blur(4px)' }}
               animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
               transition={{ type: 'spring', stiffness: 120, damping: 15, delay: 0.1 }}
-              className="bg-kraft-ink text-white p-6 rounded-[2.5rem] shadow-xl relative overflow-hidden"
+              className="bg-kraft-ink text-white p-6 rounded-[2.5rem] shadow-xl relative overflow-hidden border border-white/10"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl" />
               <SecondaryLabel className="text-white/50">Tổng thu nhập tháng</SecondaryLabel>
-              <div className="text-3xl font-black mt-1">{formatCurrency(salaryDetails.totalSalary)}</div>
+              <div className="text-3xl font-black mt-1">
+                <AnimatedNumber value={salaryDetails.totalSalary} isCurrency={true} />
+              </div>
               
               <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/10">
                 <div>
@@ -232,7 +239,9 @@ export const PersonalMobileView = ({ user, onUpdateUser, onLogout, state: propSt
                 </div>
                 <div>
                   <div className="text-[10px] uppercase font-black opacity-40">Hoa hồng</div>
-                  <div className="font-bold text-emerald-400">+{formatCurrency(salaryDetails.totalCommission)}</div>
+                  <div className="font-bold text-emerald-400">
+                    +<AnimatedNumber value={salaryDetails.totalCommission} isCurrency={true} />
+                  </div>
                 </div>
               </div>
             </motion.div>

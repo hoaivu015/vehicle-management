@@ -13,3 +13,4 @@ export * from './Skeleton';
 export * from './HeaderSkeleton';
 export * from './AccountSkeleton';
 export * from './ErrorBoundary';
+export * from './AnimatedNumber';

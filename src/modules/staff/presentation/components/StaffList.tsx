@@ -55,7 +55,7 @@ export const StaffList: React.FC<StaffListProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-g2 md:gap-g4 justify-items-center overflow-y-auto h-full custom-scrollbar pb-g6 pt-g2 render-boundary-isolated">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-g4 justify-items-stretch overflow-y-auto h-full custom-scrollbar pb-g6 pt-g2 render-boundary-isolated">
       {staffList.map((member, index) => (
         <motion.div 
           key={member.id} 

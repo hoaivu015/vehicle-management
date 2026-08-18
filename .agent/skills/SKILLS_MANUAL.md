@@ -12,6 +12,8 @@ Chào mừng bạn đến với **Cẩm nang Vận hành Kỹ thuật & Chuẩn 
 | **`industrial_standardizer`** | **Kỹ Sư Trưởng Chuẩn Hóa Doanh Nghiệp:** Phân tầng Clean Architecture, dọn dẹp mã nguồn, giải quyết triệt để Zod Schemas & Zero Any, tối ưu hóa vòng đời State React 19. | [industrial_standardizer.md](file:///.agents/agents/industrial_standardizer.md) |
 | **`standards_inspector`** | **Thanh Tra Trưởng Độc Lập:** Kiểm tra nhị phân (PASS/FAIL) 6 tiêu chuẩn vàng Auto 28 (Type Safety, Clean Arch, Mã Xe SSoT, RBAC Kế toán/Admin, SSoT Finance, iPhone Native UI). | [standards_inspector.md](file:///.agents/agents/standards_inspector.md) |
 | **`ux_standardizer`** | **Kỹ Sư Trưởng Trải Nghiệm Người Dùng:** Thẩm định & thực thi UX/UI 3 tầng (Standard $\rightarrow$ Advanced $\rightarrow$ Enterprise), kiểm soát độ trễ 0ms, Spring Physics, Haptic Matrix và Liquid Glass 2.0. | [ux_standardizer.md](file:///.agents/agents/ux_standardizer.md) |
+| **`card_modal_sentinel`** | **Kỹ Sư Trưởng Card & Modal UI/UX:** Chuyên trách chống gãy dòng (Anti-Truncation), bảo vệ điểm chạm Fitts's Law, chống che khuất nội dung dưới Bottom Bar cho toàn bộ Card & Popup. | [card_modal_sentinel.md](file:///.agents/agents/card_modal_sentinel.md) |
+| **`navigation_ui_sentinel`** | **Kỹ Sư Trưởng Thanh Điều Hướng & Tab Bar:** Chuyên trách chuẩn 3-5 tabs, Safe Area ≥ 34px, nút trung tâm (+) Hero FAB nhô cao, viên thuốc Active Pill nảy lò xo, chống che khuất nội dung. | [navigation_ui_sentinel.md](file:///.agents/agents/navigation_ui_sentinel.md) |
 
 ---
 
@@ -43,6 +45,7 @@ graph TD
         UX["UX Standards Enforcer (3-Tier UX)"]
         DS["Design System Guide (Neural Expressive)"]
         IP["iPhone Native UI Enforcer"]
+        NV["Navigation & Surface UI Sentinel"]
     end
 
     %% Luồng phối hợp
@@ -54,6 +57,7 @@ graph TD
     SO --> UX
     UX --> DS
     DS --> IP
+    IP --> NV
 ```
 
 ---
@@ -88,25 +92,33 @@ graph TD
 * **Mục tiêu:** Đảm bảo Safe Area `env(safe-area-inset-top/bottom)`, Touch target $\ge 44\text{px}$, co giãn `active:scale-95`, chống khuyết chữ.
 * **Kích hoạt:** *"Tối ưu giao diện iPhone Native UI"*.
 
-### 8. 🚀 Andrej Karpathy (Karpathy Precision)
+### 8. 🧭 Navigation & Surface UI Sentinel (Thanh Điều Hướng & Tab Bar)
+* **Mục tiêu:** Kiểm soát thanh `MobileBottomNav`, Safe Area $\ge 34\text{px}$, Hero FAB (+), Active Pill trượt nảy lò xo, Haptic feedback, Header đỉnh và Segmented Tabs.
+* **Kích hoạt:** *"Audit thanh điều hướng"*, *"Tối ưu thanh Bottom Nav và Tab Bar"*.
+
+### 9. 🚀 Andrej Karpathy (Karpathy Precision)
 * **Mục tiêu:** Giữ code tối giản, phẫu thuật chính xác đúng dòng cần sửa, chống over-engineering.
 * **Kích hoạt:** *"Viết code Karpathy Mode, phẫu thuật chính xác"*.
 
-### 9. 🏭 Industrial Standardization (Chuẩn Hóa Doanh Nghiệp)
+### 10. 🏭 Industrial Standardization (Chuẩn Hóa Doanh Nghiệp)
 * **Mục tiêu:** 5 giai đoạn chuẩn hóa: Dọn dẹp dependencies rác, Zero Any Zod schemas, phân tầng IoC, tối ưu State, tự động hóa kiểm thử.
 * **Kích hoạt:** *"Chuẩn hóa dự án đạt chuẩn công nghiệp"*.
 
-### 10. 🛡️ Zod Schema Sentinel (Bảo Vệ Toàn Vẹn Dữ Liệu)
+### 11. 🛡️ Zod Schema Sentinel (Bảo Vệ Toàn Vẹn Dữ Liệu)
 * **Mục tiêu:** Chống Zod strip dữ liệu (`license_plate`, `phone`, `auth_id`), loại bỏ `as any`, đồng bộ DB $\leftrightarrow$ Domain Type $\leftrightarrow$ Zod.
 * **Kích hoạt:** *"Đồng bộ Zod Schema và loại bỏ as any"*.
 
-### 11. ⚡ State Lifecycle Optimizer (Tối Ưu Vòng Đời & Hiệu Năng)
+### 12. ⚡ State Lifecycle Optimizer (Tối Ưu Vòng Đời & Hiệu Năng)
 * **Mục tiêu:** Nâng state lên Dispatcher Page, loại bỏ cascading renders trong `useEffect`, debounce real-time sync.
 * **Kích hoạt:** *"Tối ưu hóa state lifecycle và chống giật lag"*.
 
-### 12. 🛡️ Standards Auditor (Thanh Tra Tiêu Chuẩn)
+### 13. 🛡️ Standards Auditor (Thanh Tra Tiêu Chuẩn)
 * **Mục tiêu:** Chạy lệnh `npm run audit:standards` kiểm tra 6 tiêu chuẩn vàng Auto 28 đạt 100/100 điểm.
 * **Kích hoạt:** *"Kiểm tra tiêu chuẩn dự án"*, *"Chạy audit standards"*.
+
+### 14. 🎴 Card & Modal UI/UX Sentinel (Bảo Vệ Card & Popup)
+* **Mục tiêu:** Chống gãy dòng chữ/tiền tệ (`whitespace-nowrap`), đảm bảo vùng chạm Fitts $\ge 44\text{px}$, chống che nội dung đáy Bottom Sheet, Liquid Glass Action Bar.
+* **Kích hoạt:** *"Audit Card và Popup"*, *"Fix giao diện Card và Modal"*.
 
 ---
 

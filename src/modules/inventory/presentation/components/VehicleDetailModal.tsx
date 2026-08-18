@@ -199,7 +199,7 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = (props) => 
                                  className="h-12 flex-1 bg-kraft-ink text-white rounded-full font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-1.5 shadow-lg shadow-kraft-ink/20 active:scale-[0.98] transition-all"
                               >
                                  <TrendingUp size={14} />
-                                 <span>Trạng Thái</span>
+                                 <span>Đổi trạng thái</span>
                               </motion.button>
                            )}
 
