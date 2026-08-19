@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import { PERMISSIONS } from '@/src/constants';
 import { PermissionService } from '@/src/modules/auth/domain/PermissionService';
 import { DashboardSkeleton } from '@/src/modules/dashboard/presentation/DashboardSkeleton';
@@ -7,9 +7,8 @@ import { StaffSkeleton } from '@/src/modules/staff/presentation/components/Staff
 import { CashflowSkeleton } from '@/src/modules/finance/presentation/components/CashflowSkeleton';
 import { PersonalSkeleton } from '@/src/modules/personal/presentation/components/PersonalSkeleton';
 import { AccountSkeleton } from '@/src/shared/design-system/AccountSkeleton';
-import { AnimatePresence } from 'motion/react';
 import { PageTransition } from '@/src/shared/design-system/PageTransition';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { cn } from '@/src/shared/utils/cn';
 
 // Lazy load tab components
 const DashboardPage = React.lazy(() => import('@/src/modules/finance/presentation/DashboardPage').then(m => ({ default: m.DashboardPage })));
@@ -20,29 +19,6 @@ const AccountPage = React.lazy(() => import('@/src/modules/staff/presentation/Ac
 const PersonalView = React.lazy(() => import('@/src/modules/personal/presentation/PersonalView').then(m => ({ default: m.PersonalView })));
 const SandboxPage = React.lazy(() => import('@/src/modules/sandbox/presentation/SandboxPage').then(m => ({ default: m.SandboxPage })));
 const PermissionsPage = React.lazy(() => import('@/src/modules/auth/presentation/PermissionsPage').then(m => ({ default: m.PermissionsPage })));
-
-
-
-
-const TabLoading = () => (
-  <div className="w-full h-full min-h-[70vh] p-4 md:p-12 space-y-6 animate-in fade-in duration-300">
-    <div className="space-y-3">
-      <div className="h-8 w-48 rounded-2xl bg-black/5 animate-pulse" />
-      <div className="h-4 w-72 rounded-xl bg-black/5 animate-pulse" />
-    </div>
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {[...Array(4)].map((_, i) => (
-        <div key={i} className="h-32 rounded-[2.5rem] bg-black/5 animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
-      ))}
-    </div>
-    <div className="h-64 rounded-[3rem] bg-black/5 animate-pulse" />
-    <div className="space-y-3">
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="h-16 rounded-2xl bg-black/5 animate-pulse" style={{ animationDelay: `${i * 60}ms` }} />
-      ))}
-    </div>
-  </div>
-);
 
 // Skeleton cho trang Phân quyền (admin-only)
 const PermissionsSkeleton = () => (
@@ -141,10 +117,15 @@ export const MainContent: React.FC<MainContentProps> = ({
   handleDashboardAction,
   loading
 }) => {
-  const location = useLocation();
+  const currentTab = activeTab === '' ? 'dashboard' : activeTab;
+  const [visitedTabs, setVisitedTabs] = useState<Set<string>>(() => new Set([currentTab]));
+
+  if (!visitedTabs.has(currentTab)) {
+    setVisitedTabs(prev => new Set(prev).add(currentTab));
+  }
 
   if (loading) {
-    switch (activeTab) {
+    switch (currentTab) {
       case 'dashboard': return <DashboardSkeleton />;
       case 'inventory': return <InventorySkeleton />;
       case 'staff': return <StaffSkeleton />;
@@ -157,67 +138,142 @@ export const MainContent: React.FC<MainContentProps> = ({
   }
 
   return (
-    <div className="w-full h-full min-h-screen">
-      <AnimatePresence mode="wait">
-        <PageTransition transitionKey={location.pathname}>
-          <Suspense fallback={<TabLoading />}>
-            <Routes location={location} key={location.pathname}>
-              <Route path="/" element={
-                hasPermission(PERMISSIONS.VIEW_DASHBOARD) ? 
-                <DashboardPage presenter={financePresenter} onNavigate={handleDashboardAction} /> : 
-                <Navigate to="/inventory" replace />
-              } />
-              
-              <Route path="/dashboard" element={<Navigate to="/" replace />} />
+    <div className="w-full h-full min-h-screen relative">
+      {/* 1. Dashboard Tab */}
+      {visitedTabs.has('dashboard') && hasPermission(PERMISSIONS.VIEW_DASHBOARD) && (
+        <div 
+          className={cn("w-full h-full", currentTab === 'dashboard' ? "block" : "hidden")}
+          style={{ display: currentTab === 'dashboard' ? 'block' : 'none' }}
+          aria-hidden={currentTab !== 'dashboard'}
+        >
+          <PageTransition transitionKey="dashboard">
+            <Suspense fallback={<DashboardSkeleton />}>
+              <DashboardPage presenter={financePresenter} onNavigate={handleDashboardAction} />
+            </Suspense>
+          </PageTransition>
+        </div>
+      )}
 
-              <Route path="/inventory" element={
-                hasPermission(PERMISSIONS.VIEW_INVENTORY) ?
-                <InventoryPage userRole={userRole} currentUser={currentUser} hasPermission={hasPermission} initialSearch={inventorySearch} initialFilter={inventoryFilter} initialAction={inventoryAction} /> :
-                <Navigate to="/personal" replace />
-              } />
+      {/* 2. Inventory Tab */}
+      {visitedTabs.has('inventory') && hasPermission(PERMISSIONS.VIEW_INVENTORY) && (
+        <div 
+          className={cn("w-full h-full", currentTab === 'inventory' ? "block" : "hidden")}
+          style={{ display: currentTab === 'inventory' ? 'block' : 'none' }}
+          aria-hidden={currentTab !== 'inventory'}
+        >
+          <PageTransition transitionKey="inventory">
+            <Suspense fallback={<InventorySkeleton />}>
+              <InventoryPage 
+                userRole={userRole} 
+                currentUser={currentUser} 
+                hasPermission={hasPermission} 
+                initialSearch={inventorySearch} 
+                initialFilter={inventoryFilter} 
+                initialAction={inventoryAction} 
+              />
+            </Suspense>
+          </PageTransition>
+        </div>
+      )}
 
-              <Route path="/staff" element={
-                hasPermission(PERMISSIONS.VIEW_STAFF) ?
-                <StaffPage userRole={userRole} hasPermission={hasPermission} /> :
-                <Navigate to="/inventory" replace />
-              } />
+      {/* 3. Staff Tab */}
+      {visitedTabs.has('staff') && hasPermission(PERMISSIONS.VIEW_STAFF) && (
+        <div 
+          className={cn("w-full h-full", currentTab === 'staff' ? "block" : "hidden")}
+          style={{ display: currentTab === 'staff' ? 'block' : 'none' }}
+          aria-hidden={currentTab !== 'staff'}
+        >
+          <PageTransition transitionKey="staff">
+            <Suspense fallback={<StaffSkeleton />}>
+              <StaffPage userRole={userRole} hasPermission={hasPermission} />
+            </Suspense>
+          </PageTransition>
+        </div>
+      )}
 
-              <Route path="/cashflow" element={
-                hasPermission(PERMISSIONS.VIEW_CASHFLOW) ?
-                <CashflowPage presenter={financePresenter} userRole={userRole} hasPermission={hasPermission} onNavigate={handleDashboardAction} /> :
-                <Navigate to="/inventory" replace />
-              } />
+      {/* 4. Cashflow Tab */}
+      {visitedTabs.has('cashflow') && hasPermission(PERMISSIONS.VIEW_CASHFLOW) && (
+        <div 
+          className={cn("w-full h-full", currentTab === 'cashflow' ? "block" : "hidden")}
+          style={{ display: currentTab === 'cashflow' ? 'block' : 'none' }}
+          aria-hidden={currentTab !== 'cashflow'}
+        >
+          <PageTransition transitionKey="cashflow">
+            <Suspense fallback={<CashflowSkeleton />}>
+              <CashflowPage 
+                presenter={financePresenter} 
+                userRole={userRole} 
+                hasPermission={hasPermission} 
+                onNavigate={handleDashboardAction} 
+              />
+            </Suspense>
+          </PageTransition>
+        </div>
+      )}
 
-              <Route path="/users" element={
-                hasPermission(PERMISSIONS.MANAGE_USERS) ?
-                <AccountPage /> :
-                <Navigate to="/inventory" replace />
-              } />
+      {/* 5. Personal Tab */}
+      {visitedTabs.has('personal') && hasPermission(PERMISSIONS.VIEW_PERSONAL) && (
+        <div 
+          className={cn("w-full h-full", currentTab === 'personal' ? "block" : "hidden")}
+          style={{ display: currentTab === 'personal' ? 'block' : 'none' }}
+          aria-hidden={currentTab !== 'personal'}
+        >
+          <PageTransition transitionKey="personal">
+            <Suspense fallback={<PersonalSkeleton />}>
+              <PersonalView 
+                user={currentUser} 
+                onUpdateUser={onUpdateUser} 
+                onLogout={handleLogout} 
+              />
+            </Suspense>
+          </PageTransition>
+        </div>
+      )}
 
-              <Route path="/personal" element={
-                hasPermission(PERMISSIONS.VIEW_PERSONAL) ?
-                <PersonalView user={currentUser} onUpdateUser={onUpdateUser} onLogout={handleLogout} /> :
-                <Navigate to="/" replace />
-              } />
+      {/* 6. Users / Account Management Tab */}
+      {visitedTabs.has('users') && hasPermission(PERMISSIONS.MANAGE_USERS) && (
+        <div 
+          className={cn("w-full h-full", currentTab === 'users' ? "block" : "hidden")}
+          style={{ display: currentTab === 'users' ? 'block' : 'none' }}
+          aria-hidden={currentTab !== 'users'}
+        >
+          <PageTransition transitionKey="users">
+            <Suspense fallback={<AccountSkeleton />}>
+              <AccountPage />
+            </Suspense>
+          </PageTransition>
+        </div>
+      )}
 
+      {/* 7. Permissions Tab */}
+      {visitedTabs.has('permissions') && hasPermission(PERMISSIONS.MANAGE_PERMISSIONS) && (
+        <div 
+          className={cn("w-full h-full", currentTab === 'permissions' ? "block" : "hidden")}
+          style={{ display: currentTab === 'permissions' ? 'block' : 'none' }}
+          aria-hidden={currentTab !== 'permissions'}
+        >
+          <PageTransition transitionKey="permissions">
+            <Suspense fallback={<PermissionsSkeleton />}>
+              <PermissionsPage />
+            </Suspense>
+          </PageTransition>
+        </div>
+      )}
 
-              <Route path="/permissions" element={
-                hasPermission(PERMISSIONS.MANAGE_PERMISSIONS) ?
-                <PermissionsPage /> :
-                <Navigate to="/" replace />
-              } />
-
-              <Route path="/sandbox" element={
-                PermissionService.isAdmin(currentUser?.role) ?
-                <SandboxPage /> :
-                <Navigate to="/" replace />
-              } />
-
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-        </PageTransition>
-      </AnimatePresence>
+      {/* 8. Sandbox Tab */}
+      {visitedTabs.has('sandbox') && PermissionService.isAdmin(currentUser?.role) && (
+        <div 
+          className={cn("w-full h-full", currentTab === 'sandbox' ? "block" : "hidden")}
+          style={{ display: currentTab === 'sandbox' ? 'block' : 'none' }}
+          aria-hidden={currentTab !== 'sandbox'}
+        >
+          <PageTransition transitionKey="sandbox">
+            <Suspense fallback={<DefaultPageSkeleton />}>
+              <SandboxPage />
+            </Suspense>
+          </PageTransition>
+        </div>
+      )}
     </div>
   );
 };

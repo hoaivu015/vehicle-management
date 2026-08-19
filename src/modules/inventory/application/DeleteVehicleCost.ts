@@ -1,11 +1,14 @@
 import { Vehicle } from '../../../shared/domain/types';
 import { VehicleRepository } from '../domain/VehicleRepository';
 import { StaffRepository } from '../../staff/domain/StaffRepository';
+import { PermissionService, PERMISSIONS } from '../../auth/domain/PermissionService';
+import { UnauthorizedError } from '../../../shared/domain/errors';
 
 export interface DeleteVehicleCostRequest {
   vehicleId: number;
   costIndex: number;
   user?: string;
+  userRole?: string;
   reason?: string;
 }
 
@@ -16,6 +19,11 @@ export class DeleteVehicleCost {
   ) {}
 
   async execute(request: DeleteVehicleCostRequest): Promise<Vehicle> {
+    // 1. Rào chắn Zero Trust: Kiểm tra quyền chỉnh sửa / xóa chi phí xe
+    if (request.userRole && !PermissionService.hasPermission(request.userRole, PERMISSIONS.EDIT_INVENTORY)) {
+      throw new UnauthorizedError('Bạn không có quyền xóa chi phí xe.');
+    }
+
     const vehicle = await this.vehicleRepository.getById(request.vehicleId.toString());
     if (!vehicle) throw new Error('Vehicle not found');
 

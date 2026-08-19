@@ -15,6 +15,8 @@ import { AnimatePresence, MotionConfig } from 'motion/react';
 
 // Lazy-load Login, AppSplashScreen and global modal to minimize initial bundle size
 import { AppSplashScreen } from '@/src/shared/presentation/components/Layout/AppSplashScreen';
+import { initIdleTabPreloader } from '@/src/shared/utils/tabPreloader';
+
 const Login = React.lazy(() => 
   import('@/src/modules/auth/presentation/views/Login').then(m => ({ default: m.Login }))
 );
@@ -58,6 +60,13 @@ export default function App() {
     presenter.loadVehicles();
     return () => presenter.detachView();
   }, [isGlobalExpenseOpen, createStaffPresenter]);
+
+  // Preload remaining tab chunks during idle time to make tab transitions instantaneous
+  useEffect(() => {
+    if (isAuthed) {
+      initIdleTabPreloader();
+    }
+  }, [isAuthed]);
 
   // Derive activeTab from URL path
   const activeTab = location.pathname.split('/')[1] || 'dashboard';

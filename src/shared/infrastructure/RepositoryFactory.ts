@@ -14,8 +14,19 @@ export const createValidatedRepository = <Domain, DTO = Domain>(
   mapper?: {
     toDomain: (dto: DTO) => Domain;
     toDTO: (domain: Partial<Domain>) => Partial<DTO>;
+  },
+  options?: {
+    cacheTTLMs?: number;
   }
 ): Repository<Domain> => {
+  let cachedData: Domain[] | null = null;
+  let cacheExpiry = 0;
+  const ttl = options?.cacheTTLMs ?? 30000; // 30 seconds TTL default
+
+  const invalidateCache = () => {
+    cachedData = null;
+    cacheExpiry = 0;
+  };
   
   const sanitize = (data: unknown): Domain => {
     try {
@@ -29,13 +40,21 @@ export const createValidatedRepository = <Domain, DTO = Domain>(
 
   return {
     async getAll(): Promise<Domain[]> {
+      const now = Date.now();
+      if (cachedData && now < cacheExpiry) {
+        return cachedData;
+      }
+
       const { data, error } = await supabase
         .from(tableName)
         .select('*')
         .order('id', { ascending: false });
         
       if (error) throw error;
-      return (data || []).map(sanitize);
+      const sanitized = (data || []).map(sanitize);
+      cachedData = sanitized;
+      cacheExpiry = now + ttl;
+      return sanitized;
     },
 
     async getById(id: string | number): Promise<Domain | null> {
@@ -50,6 +69,7 @@ export const createValidatedRepository = <Domain, DTO = Domain>(
     },
 
     async create(item: Partial<Domain>): Promise<Domain> {
+      invalidateCache();
       const dtoInput = mapper ? mapper.toDTO(item) : (item as unknown as Partial<DTO>);
       
       const { data, error } = await supabase
@@ -63,6 +83,7 @@ export const createValidatedRepository = <Domain, DTO = Domain>(
     },
 
     async update(id: string | number, item: Partial<Domain>): Promise<Domain> {
+      invalidateCache();
       const dtoInput = mapper ? mapper.toDTO(item) : (item as unknown as Partial<DTO>);
 
       const { data, error } = await supabase
@@ -77,6 +98,7 @@ export const createValidatedRepository = <Domain, DTO = Domain>(
     },
 
     async delete(id: string | number): Promise<void> {
+      invalidateCache();
       const { error } = await supabase
         .from(tableName)
         .delete()

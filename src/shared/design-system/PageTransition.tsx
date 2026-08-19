@@ -10,19 +10,20 @@ import { motion, Variants } from 'motion/react';
 export const LIQUID_VARIANTS: Variants = {
   initial: { 
     opacity: 0, 
-    y: 16, 
-    scale: 0.99
+    y: 6, 
+    scale: 0.995
   },
   animate: { 
     opacity: 1, 
     y: 0, 
-    scale: 1
+    scale: 1,
+    transition: { duration: 0.15, ease: "easeOut" }
   },
   exit: { 
     opacity: 0, 
-    y: -12, 
-    scale: 1.01,
-    transition: { duration: 0.2, ease: "easeIn" }
+    y: -4, 
+    scale: 1.005,
+    transition: { duration: 0.1, ease: "easeIn" }
   },
 };
 
@@ -44,14 +45,8 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
       initial="initial"
       animate="animate"
       exit="exit"
-      transition={{ 
-        type: "spring", 
-        damping: 30, 
-        stiffness: 200,
-        mass: 1,
-        opacity: { duration: 0.4 }
-      }}
       className={className}
+      style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
     >
       {children}
     </motion.div>

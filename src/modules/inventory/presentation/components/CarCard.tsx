@@ -21,6 +21,7 @@ interface CarCardProps {
   isCompact?: boolean;
   financials: ReturnType<typeof calculateVehicleFinancials>;
   canSeeFullInfo: boolean;
+  priority?: boolean;
 }
 
 export const CarCard: React.FC<CarCardProps> = React.memo(({ 
@@ -30,7 +31,8 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
   variant = 'standard', 
   isCompact = false,
   financials,
-  canSeeFullInfo
+  canSeeFullInfo,
+  priority = false
 }) => {
   const agingTier = getInventoryAgingTier(car.days || 0);
   const isAging = agingTier.isAging;
@@ -51,11 +53,12 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
         {/* Thumbnail square - Clean 1 Hero Badge */}
         <div className="relative shrink-0 w-[110px] h-[110px] rounded-l-[20px] overflow-hidden bg-slate-100">
           <img
-            src={optimizeCloudinaryUrl(car.image_url, { width: 400 })}
+            src={optimizeCloudinaryUrl(car.image_url, { width: priority ? 400 : 320 })}
             alt={car.name}
             className="w-full h-full object-cover"
-            loading="lazy"
-            decoding="async"
+            loading={priority ? "eager" : "lazy"}
+            decoding={priority ? "sync" : "async"}
+            fetchPriority={priority ? "high" : "auto"}
           />
           {/* Status badge - Single hero badge on image */}
           <div className="absolute top-2 left-2">
@@ -175,11 +178,12 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
         >
           <CardImageSection isLarge={isLarge} className="relative">
             <img
-              src={optimizeCloudinaryUrl(car.image_url, { width: 800 })}
+              src={optimizeCloudinaryUrl(car.image_url, { width: isLarge ? 1000 : 700 })}
               alt={car.name}
               className="w-full h-full object-cover transition-transform duration-[3000ms] group-hover:scale-105 rounded-[20px]"
-              loading="lazy"
-              decoding="async"
+              loading={priority ? "eager" : "lazy"}
+              decoding={priority ? "sync" : "async"}
+              fetchPriority={priority ? "high" : "auto"}
             />
 
             {/* Single Hero Status Badge (Góc trên bên trái) */}

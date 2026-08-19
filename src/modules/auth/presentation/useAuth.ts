@@ -4,14 +4,66 @@ import { PermissionService, Permission } from '@/src/modules/auth/domain/Permiss
 import { useNotification } from '@/src/shared/presentation/useNotification';
 import { Staff, Vehicle } from '@/src/shared/domain/types';
 
+const CACHE_KEY_USER = 'AUTO28_CACHED_USER';
+const CACHE_KEY_PERMS = 'AUTO28_CACHED_PERMISSIONS';
+
+import { StaffSchema } from '@/src/modules/staff/domain/StaffSchema';
+
+const getInitialCachedUser = (): Staff | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(CACHE_KEY_USER);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const validation = StaffSchema.safeParse(parsed);
+    if (!validation.success) {
+      localStorage.removeItem(CACHE_KEY_USER);
+      return null;
+    }
+    return validation.data as unknown as Staff;
+  } catch {
+    return null;
+  }
+};
+
+const getInitialCachedPermissions = (): import('@/src/modules/auth/domain/PermissionService').RolePermission[] | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(CACHE_KEY_PERMS);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      localStorage.removeItem(CACHE_KEY_PERMS);
+      return null;
+    }
+    return parsed as import('@/src/modules/auth/domain/PermissionService').RolePermission[];
+  } catch {
+    return null;
+  }
+};
+
 export const useAuth = () => {
   const { authRepo, staffRepo, permissionRepo } = useDependencies();
-  const [currentUser, setCurrentUser] = useState<Staff | null>(null);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
-  const [isAuthed, setIsAuthed] = useState(false);
+  
+  // Instant SWR Boot: Initialize state from local cache to eliminate 1.5s splash screen delay
+  const initialCached = getInitialCachedUser();
+  const initialPerms = getInitialCachedPermissions();
+  if (initialPerms && initialPerms.length > 0) {
+    PermissionService.setDynamicPermissions(initialPerms);
+  }
+
+  const [currentUser, setCurrentUser] = useState<Staff | null>(initialCached);
+  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(!initialCached);
+  const [isAuthed, setIsAuthed] = useState<boolean>(!!initialCached);
   const notification = useNotification();
 
   const handleLogout = useCallback(async () => {
+    try {
+      localStorage.removeItem(CACHE_KEY_USER);
+      localStorage.removeItem(CACHE_KEY_PERMS);
+    } catch {
+      // Ignore storage errors
+    }
     setCurrentUser(null);
     setIsAuthed(false);
     await authRepo.signOut();
@@ -22,6 +74,11 @@ export const useAuth = () => {
       const data = await permissionRepo.getAllPermissions();
       if (data) {
         PermissionService.setDynamicPermissions(data);
+        try {
+          localStorage.setItem(CACHE_KEY_PERMS, JSON.stringify(data));
+        } catch {
+          // Ignore quota/storage errors
+        }
       }
     } catch (err) {
       console.error("Error fetching permissions:", err);
@@ -38,10 +95,20 @@ export const useAuth = () => {
 
       if (data) {
         setCurrentUser(data);
+        try {
+          localStorage.setItem(CACHE_KEY_USER, JSON.stringify(data));
+        } catch {
+          // Ignore quota/storage errors
+        }
       } else {
         console.error("Authenticated user has no employee profile. Cleaning up session.");
         notification.error("Tài khoản của bạn không có hồ sơ hợp lệ. Vui lòng liên hệ Admin.");
-
+        try {
+          localStorage.removeItem(CACHE_KEY_USER);
+          localStorage.removeItem(CACHE_KEY_PERMS);
+        } catch {
+          // Ignore storage errors
+        }
         await handleLogout();
       }
     } catch (err: unknown) {
@@ -57,6 +124,13 @@ export const useAuth = () => {
       if (email) {
         fetchProfile(email);
       } else {
+        try {
+          localStorage.removeItem(CACHE_KEY_USER);
+          localStorage.removeItem(CACHE_KEY_PERMS);
+        } catch {
+          // Ignore storage errors
+        }
+        setCurrentUser(null);
         setIsAuthLoading(false);
       }
     });
@@ -66,6 +140,12 @@ export const useAuth = () => {
       if (email) {
         fetchProfile(email);
       } else {
+        try {
+          localStorage.removeItem(CACHE_KEY_USER);
+          localStorage.removeItem(CACHE_KEY_PERMS);
+        } catch {
+          // Ignore storage errors
+        }
         setCurrentUser(null);
         setIsAuthLoading(false);
       }

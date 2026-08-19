@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { cn } from '@/src/shared/utils/cn';
 import { NavItem } from '@/src/shared/presentation/hooks/useNavigation';
 import { haptics } from '@/src/shared/utils/haptics';
+import { preloadTab } from '@/src/shared/utils/tabPreloader';
 
 export const MobileBottomNav = ({ navItems, activeTab }: { navItems: NavItem[], activeTab: string }) => {
   const rawVisibleItems = navItems.filter(item => item.visible !== false && !item.hideOnMobile);
@@ -59,6 +60,8 @@ export const MobileBottomNav = ({ navItems, activeTab }: { navItems: NavItem[], 
           return (
             <button 
               key={item.id} 
+              onTouchStart={() => preloadTab(item.id)}
+              onMouseEnter={() => preloadTab(item.id)}
               onClick={async () => {
                 try { await haptics.light(); } catch { /* ignore haptics error */ }
                 item.onClick();

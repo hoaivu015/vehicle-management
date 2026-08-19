@@ -10,24 +10,18 @@ interface AttemptRecord {
 
 export class QuickPinService {
   /**
-   * Băm mã PIN kèm Salt theo chuẩn SHA-256
+   * Băm mã PIN kèm Salt theo chuẩn công nghiệp Web Crypto SHA-256
    */
   static async hashPin(pin: string, salt: string): Promise<string> {
-    const rawData = `${salt}:auto28_secret_salt:${pin}`;
-    if (typeof crypto !== 'undefined' && crypto.subtle) {
+    const rawData = `${salt}:auto28_secret_salt_v2_${salt.length}:${pin}`;
+    const subtle = typeof globalThis !== 'undefined' ? globalThis.crypto?.subtle : undefined;
+    if (subtle) {
       const buffer = new TextEncoder().encode(rawData);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+      const hashBuffer = await subtle.digest('SHA-256', buffer);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
     }
-    // Fallback hash for environments without crypto.subtle (e.g. testing)
-    let hash = 0;
-    for (let i = 0; i < rawData.length; i++) {
-      const char = rawData.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash |= 0;
-    }
-    return Math.abs(hash).toString(16);
+    throw new Error('Yêu cầu môi trường bảo mật (HTTPS/Web Crypto API) để mã hóa mã PIN.');
   }
 
   /**

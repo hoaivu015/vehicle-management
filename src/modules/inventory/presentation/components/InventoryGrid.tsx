@@ -110,6 +110,7 @@ export const InventoryGrid: React.FC<InventoryGridProps> = ({
                   isCompact={isCompact}
                   financials={financials}
                   canSeeFullInfo={canSeeFullInfo}
+                  priority={index < 2}
                   onClick={handleCardClick}
                 />
               </motion.div>

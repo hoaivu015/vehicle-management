@@ -8,6 +8,7 @@ import { motion } from 'motion/react';
 const logo = "/logo_auto28.jpg";
 
 import { Staff } from '@/src/shared/domain/types';
+import { preloadTab } from '@/src/shared/utils/tabPreloader';
 
 interface HeaderProps {
   currentUser: Staff | null;
@@ -41,7 +42,11 @@ export const Header = ({ currentUser, activeTab, setActiveTab, onLogout, onInven
             <Bell size={18} />
             <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-kraft-red rounded-full border-2 border-white" />
           </button>
-          <div onClick={() => setActiveTab('personal')} className="w-9 h-9 rounded-xl glass-purity-surface flex items-center justify-center text-kraft-accent font-black shadow-sm active-press ml-1 overflow-hidden">
+          <div 
+            onMouseEnter={() => preloadTab('personal')}
+            onClick={() => setActiveTab('personal')} 
+            className="w-9 h-9 rounded-xl glass-purity-surface flex items-center justify-center text-kraft-accent font-black shadow-sm active-press ml-1 overflow-hidden cursor-pointer"
+          >
             {currentUser?.name?.charAt(0) || 'N'}
           </div>
         </div>
@@ -50,7 +55,11 @@ export const Header = ({ currentUser, activeTab, setActiveTab, onLogout, onInven
       {/* Desktop Header */}
       <header className="hidden xl:flex items-center justify-between px-8 py-3.5 relative border-b border-black/[0.04] bg-white z-[90]">
         <div className="flex items-center gap-8 shrink-0">
-          <div className="flex items-center gap-3 cursor-pointer select-none shrink-0" onClick={() => setActiveTab('dashboard')}>
+          <div 
+            className="flex items-center gap-3 cursor-pointer select-none shrink-0" 
+            onMouseEnter={() => preloadTab('dashboard')}
+            onClick={() => setActiveTab('dashboard')}
+          >
             <div className="bg-white p-1 rounded-xl shadow-md border border-kraft-accent/10 w-9 h-9 flex items-center justify-center overflow-hidden shrink-0">
               <img src={logo} alt="Logo" className="w-full h-full object-cover" />
             </div>
@@ -64,6 +73,7 @@ export const Header = ({ currentUser, activeTab, setActiveTab, onLogout, onInven
               return (
                 <button
                   key={item.id}
+                  onMouseEnter={() => preloadTab(item.id)}
                   onClick={item.onClick}
                   className="relative flex items-center justify-center h-8 px-4 rounded-full transition-all active:scale-95 cursor-pointer z-10 group"
                 >

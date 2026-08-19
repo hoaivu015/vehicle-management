@@ -21,9 +21,10 @@ graph LR
     Router --> D["🔍 @diag: deep-diagnostic-engine"]
 ```
 
-### 1. 🏗️ DOMAIN 1: @arch (`clean-architecture-engine`)
-* **Định nghĩa:** [.agents/skills/clean-architecture-engine/SKILL.md](file:///.agents/skills/clean-architecture-engine/SKILL.md)
-* **Chuyên trách:** Phân tầng Clean Architecture (Domain/Application/Presentation/Infra), Inversion of Control (IoC), TypeScript Strict Zero-Any, Zod Schema Parity (Anti-Data-Truncation), React 19 State Lifecycle, SSoT Finance và Kiểm định chất lượng nhị phân.
+### 1. 🏗️ DOMAIN 1: @arch & @rbac (`clean-architecture-engine` & `rbac-access-governance`)
+* **Định nghĩa:** [.agents/skills/clean-architecture-engine/SKILL.md](file:///.agents/skills/clean-architecture-engine/SKILL.md) & [.agents/skills/rbac-access-governance/SKILL.md](file:///.agents/skills/rbac-access-governance/SKILL.md)
+* **Agent Chuyên Trách:** [.agents/agents/rbac_access_control_sentinel.md](file:///.agents/agents/rbac_access_control_sentinel.md) & [.agents/agents/standards_inspector.md](file:///.agents/agents/standards_inspector.md)
+* **Chuyên trách:** Phân tầng Clean Architecture (Domain/Application/Presentation/Infra), Inversion of Control (IoC), TypeScript Strict Zero-Any, Zod Schema Parity (Anti-Data-Truncation), React 19 State Lifecycle, SSoT Finance, Ma trận Phân quyền Đa tầng (3-Tier RBAC/ABAC), Route Guarding & Skeleton State trong `MainContent.tsx` và Kiểm định chất lượng nhị phân.
 
 ### 2. 🎨 DOMAIN 2: @design / @swiss (`design-system-core` & `swiss-precision-executive`)
 * **Định nghĩa:** [.agents/skills/design-system-core/SKILL.md](file:///.agents/skills/design-system-core/SKILL.md) & [.agents/skills/swiss-precision-executive/SKILL.md](file:///.agents/skills/swiss-precision-executive/SKILL.md)
