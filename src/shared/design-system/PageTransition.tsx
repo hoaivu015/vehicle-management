@@ -10,22 +10,19 @@ import { motion, Variants } from 'motion/react';
 export const LIQUID_VARIANTS: Variants = {
   initial: { 
     opacity: 0, 
-    y: 20, 
-    scale: 0.98,
-    filter: 'blur(10px)'
+    y: 16, 
+    scale: 0.99
   },
   animate: { 
     opacity: 1, 
     y: 0, 
-    scale: 1,
-    filter: 'blur(0px)'
+    scale: 1
   },
   exit: { 
     opacity: 0, 
-    y: -15, 
-    scale: 1.02,
-    filter: 'blur(10px)',
-    transition: { duration: 0.3, ease: "easeIn" }
+    y: -12, 
+    scale: 1.01,
+    transition: { duration: 0.2, ease: "easeIn" }
   },
 };
 

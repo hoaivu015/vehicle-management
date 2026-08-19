@@ -21,11 +21,11 @@ export const VEHICLE_STATUS_LABELS: Record<VehicleStatus, string> = {
 export const VEHICLE_STATUS_CONFIG: Record<VehicleStatus, { label: string; badgeClass: string }> = {
   [VehicleStatus.DEPOSIT_BUY]: { label: 'Cọc mua', badgeClass: 'glass-badge-orange' },
   [VehicleStatus.SPA]: { label: 'Dọn/Spa', badgeClass: 'glass-badge-sky' },
-  [VehicleStatus.IN_STOCK]: { label: 'Trong kho', badgeClass: 'glass-badge-emerald' },
-  [VehicleStatus.DEPOSIT_SALE]: { label: 'Cọc trả thẳng', badgeClass: 'glass-badge-purple' },
+  [VehicleStatus.IN_STOCK]: { label: 'Trong kho', badgeClass: 'glass-badge-blue' },
+  [VehicleStatus.DEPOSIT_SALE]: { label: 'Cọc trả thẳng', badgeClass: 'glass-badge-orange' },
   [VehicleStatus.BANK_DEPOSIT]: { label: 'Cọc trả góp', badgeClass: 'glass-badge-orange' },
-  [VehicleStatus.BANK_CONFIRMED]: { label: 'Thông báo giải ngân', badgeClass: 'glass-badge-blue' },
-  [VehicleStatus.SOLD]: { label: 'Đã bán', badgeClass: 'glass-badge-red' },
+  [VehicleStatus.BANK_CONFIRMED]: { label: 'Thông báo giải ngân', badgeClass: 'glass-badge-sky' },
+  [VehicleStatus.SOLD]: { label: 'Đã bán', badgeClass: 'glass-badge-emerald' },
 };
 
 export const ADMIN_EMAILS = [

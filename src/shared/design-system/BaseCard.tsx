@@ -16,7 +16,7 @@ interface BaseCardProps {
 
 /**
  * BaseCard - Thành phần cốt lõi cho mọi loại thẻ (Inventory, Staff, Cashflow).
- * Tuân thủ chuẩn Meta 2026: Nền trắng, bo góc 32px/40px, viền hairline.
+ * Tuân thủ chuẩn Pure Light Canvas: Nền trắng kính mờ, bo góc 32px/40px, viền hairline.
  */
 export const BaseCard: React.FC<BaseCardProps> = ({
   children,
@@ -40,15 +40,15 @@ export const BaseCard: React.FC<BaseCardProps> = ({
   const glowClasses = {
     stable: "shadow-neural-t3 border-neon-blue/20 animate-breathe-glow",
     warning: "shadow-coral-pulse border-coral/15 hover:border-coral/30 transition-all duration-300",
-    none: "shadow-neural-t2 border-white/50 hover:shadow-kraft-deep"
+    none: "shadow-neural-t2 border-white/60 hover:shadow-kraft-deep"
   };
 
   return (
     <div
       onClick={handleClick}
       className={cn(
-        "group bg-white/60 hover:bg-white/75 backdrop-blur-xl overflow-hidden flex flex-col transition-all duration-300",
-        "border shadow-[inset_1px_1px_0_rgba(255,255,255,0.4)]",
+        "group bg-white/70 hover:bg-white/85 backdrop-blur-xl overflow-hidden flex flex-col transition-all duration-300",
+        "border border-white/60 shadow-[inset_1px_1px_0_rgba(255,255,255,0.6)]",
         glowClasses[glowState],
         isLargeVariant ? "rounded-t1" : "rounded-t2",
         !isLargeVariant && !isCompact && (minHeight || "md:min-h-[380px] min-h-0"),
@@ -69,7 +69,7 @@ export const CardImageSection: React.FC<{ children: React.ReactNode; isLarge?: b
 }) => (
   <div className={cn(
     "relative overflow-hidden shrink-0 transition-all duration-300",
-    "mx-g2 mt-g2 rounded-[16px] border border-white/40 shadow-sm bg-kraft-folder",
+    "mx-g2 mt-g2 rounded-[20px] border border-white/60 shadow-sm bg-kraft-folder",
     isLarge ? "aspect-video md:h-auto" : "aspect-[1.5/1] md:aspect-none md:h-[180px]",
     className
   )}>
@@ -122,14 +122,14 @@ export const PriceBadge: React.FC<{ label: string; value: string; className?: st
   className
 }) => (
   <div className={cn(
-    "absolute bottom-g2 right-g2 md:bottom-g3 md:right-g3",
-    "px-g2 py-g1 md:px-g3 md:py-g2 bg-kraft-bg text-kraft-ink rounded-t4 md:rounded-t3 shadow-kraft border border-hairline-soft flex flex-col items-end",
+    "absolute bottom-2.5 right-2.5 md:bottom-3 md:right-3",
+    "px-3 py-1.5 md:px-3.5 md:py-2 bg-slate-900/85 text-white rounded-[14px] backdrop-blur-xl shadow-lg border border-white/20 flex flex-col items-end transition-transform group-hover:scale-105 duration-300",
     className
   )}>
-    <span className="text-[10px] font-bold uppercase tracking-widest text-kraft-ink/40 mb-0">
+    <span className="text-[8.5px] font-bold uppercase tracking-widest text-slate-300 mb-0.5 leading-none">
       {label}
     </span>
-    <span className="text-sm md:text-xl font-black tracking-tight whitespace-nowrap">
+    <span className="text-sm md:text-[17px] font-black tracking-tight whitespace-nowrap leading-tight text-white">
       {value}
     </span>
   </div>
@@ -144,11 +144,11 @@ export const InfoTag: React.FC<{ icon: React.ElementType; label: string | number
   className
 }) => (
   <div className={cn(
-    "px-g1 py-0.5 md:px-g2 md:py-1 bg-kraft-ink/[0.04] rounded-t4 flex items-center gap-gs md:gap-g1",
+    "px-2.5 py-1 bg-slate-100/90 rounded-full flex items-center gap-1.5 border border-slate-200/60 shadow-2xs",
     className
   )}>
-    <Icon size={12} className="text-kraft-accent md:w-3 md:h-3" strokeWidth={2} />
-    <span className="text-[10px] font-black text-kraft-ink/70 uppercase tracking-tight">
+    <Icon size={11} className="text-kraft-accent shrink-0" strokeWidth={2.5} />
+    <span className="text-[10px] font-bold text-slate-700 tracking-tight whitespace-nowrap">
       {label}
     </span>
   </div>

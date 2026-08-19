@@ -80,7 +80,7 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
       
       // Calculate monthly finance and overview in memory with 0 duplicate DB requests
       const [monthlyData, overviewData] = await Promise.all([
-        this.getMonthlyFinance.execute(this.currentMonth, { allOpExpenses, vehicles, staff }),
+        this.getMonthlyFinance.execute(this.currentMonth, { allOpExpenses, vehicles, staff, settings }),
         this.getFinancialOverview.execute(this.currentMonth, { settings, vehicles, staff, allOpExpenses })
       ]);
       

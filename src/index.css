@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
+@variant dark (&:not(*));
+
 :root {
+  color-scheme: light;
+
   /* Kích thước chữ (Font Sizes) - Neural Expressive Spec */
   --font-size-metric: 2.5rem;      /* 40px */
   --font-size-title: 1.5rem;       /* 24px */
@@ -24,39 +28,44 @@
   --font-heading: "Plus Jakarta Sans", "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   
-  /* Meta 2026 Design System Palette - Refined with OKLCH */
-  --color-kraft-bg: oklch(100% 0 0); /* Pure Canvas */
-  --color-kraft-folder: oklch(96.25% 0 0); /* Soft Cloud */
-  --color-kraft-paper: oklch(100% 0 0);
-  --color-kraft-accent: oklch(45% 0.18 260); /* Cobalt Primary */
-  --color-kraft-ink: oklch(15% 0 0); /* Deep Ink (Non-pure black) */
-  --color-kraft-blue: oklch(45% 0.18 260);
-  --color-kraft-red: oklch(60% 0.22 25); /* Critical Red */
-  
-  /* Neural Expressive Colors - Google Standard */
-  --color-neon-blue: oklch(75% 0.15 200); /* Neon Blue */
-  --color-neon-mint: oklch(85% 0.15 160); /* Neon Mint */
-  --color-coral: oklch(65% 0.22 25);       /* Vibrant Coral */
-  --color-amber: oklch(80% 0.15 75);       /* Vibrant Amber */
-  --color-warm-bone: oklch(98% 0.01 60);   /* Warm Bone background */
-  
-  /* Semantic Financial Colors (SSOT) */
-  --color-income: oklch(70% 0.18 150);    /* Emerald Success */
-  --color-expense: oklch(60% 0.22 25);    /* Critical Red */
-  --color-warning: oklch(80% 0.15 75);    /* Amber Warning */
-  --color-accent-soft: oklch(45% 0.18 260 / 0.1); /* Primary Soft */
-  --color-surface-pure: oklch(98.5% 0 0); /* Off-white */
-  --color-hairline: oklch(90% 0 0);
-  --color-hairline-soft: oklch(95% 0 0);
+  /* 🇨🇭 GENEVA-META EXECUTIVE COLOR SYSTEM (SSOT) */
+  /* 🏷️ TẦNG 1: NỀN TẢNG & MẶT THẺ (60% Canvas & Surfaces) */
+  --color-kraft-bg: #F0F2F6;                     /* Geneva Wash: Nền xám sương mù dịu mắt */
+  --color-surface-pure: #FFFFFF;                 /* Pure Surface: Nền thẻ trắng tinh khiết */
+  --color-kraft-folder: #E4E6EB;                 /* Meta Sub-container: Hộp phụ / Bộ lọc */
+  --color-kraft-paper: #FFFFFF;
+  --color-hairline: #E4E6EB;                     /* Hairline Divider: Viền siêu mảnh 0.5px */
+  --color-hairline-soft: #EEF0F3;
+  --color-warm-bone: #F0F2F6;
+
+  /* 🏷️ TẦNG 2: MỰC CHỮ SẮC NÉT (30% Typography & Ink) */
+  --color-kraft-ink: #050505;                    /* Deep Charcoal Ink: Chữ chính tương phản AAA */
+  --color-sub-label: #65676B;                    /* Meta Neutral Gray: Thông số phụ thanh mảnh */
+
+  /* 🏷️ TẦNG 3: THƯƠNG HIỆU & HÀNH ĐỘNG (10% Brand & CTAs) */
+  --color-kraft-accent: #1877F2;                 /* Meta Royal Blue: Nút Lưu / Thêm xe / Active */
+  --color-kraft-blue: #1877F2;
+  --color-accent-soft: #E7F3FF;                  /* Soft Tint: Nền mờ thương hiệu */
+  --color-brand-glow: #1877F2;
+
+  /* 🏷️ TẦNG 4: NGỮ NGHĨA TÀI CHÍNH & VÒNG ĐỜI XE (SSoT Financials) */
+  --color-income: #31A24C;                       /* Online Emerald: Thu tiền / Lợi nhuận / Đã bán */
+  --color-expense: #FA383E;                      /* Alert Crimson: Chi tiền / Lỗ / Giá vốn / Hủy */
+  --color-kraft-red: #FA383E;
+  --color-coral: #FA383E;
+  --color-warning: #F7B125;                      /* Sunburst Amber: Cọc mua/bán / Tồn kho >30d */
+  --color-amber: #F7B125;
+  --color-neon-blue: #0099FF;                    /* Messenger Cyan: Kiểm định / Spa / Sắp về */
+  --color-neon-mint: #31A24C;
   
   /* Elevation - Claymorphism & Glassmorphism Shadows */
-  --shadow-kraft: 0 4px 20px -4px oklch(0% 0 0 / 0.04);
-  --shadow-kraft-deep: 0 10px 40px -10px oklch(0% 0 0 / 0.08);
+  --shadow-kraft: 0 4px 20px -4px rgba(0, 0, 0, 0.04);
+  --shadow-kraft-deep: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
   --shadow-glass-glow: none;
   --shadow-neural-t2: inset 2px 2px 5px rgba(255, 255, 255, 0.7), 8px 8px 16px rgba(0, 0, 0, 0.06);
-  --shadow-neural-t3: 0px 20px 40px rgba(79, 172, 254, 0.25);
-  --shadow-neon-glow: 0px 0px 40px rgba(0, 242, 254, 0.4);
-  --shadow-coral-pulse: 0px 4px 16px rgba(255, 8, 68, 0.06);
+  --shadow-neural-t3: 0px 20px 40px rgba(24, 119, 242, 0.25);
+  --shadow-neon-glow: 0px 0px 40px rgba(0, 153, 255, 0.4);
+  --shadow-coral-pulse: 0px 4px 16px rgba(250, 56, 62, 0.06);
 
   /* Design Tier Radii - Meta Standard */
   --radius-t1: 2.5rem;   /* 40px - Feature/Hero */
@@ -71,7 +80,13 @@
     --radius-t1: 1.5rem; /* 24px - Mobile Container */
     --radius-t2: 1.25rem; /* 20px - Mobile Component */
     --spacing-g5: 1.25rem; /* 20px - Mobile Page Margin (was 64px desktop) */
+    --bottom-nav-height: calc(62px + env(safe-area-inset-bottom, 16px));
+    --bottom-nav-clearance: calc(62px + env(safe-area-inset-bottom, 16px) + 24px); /* ~102px khoảng trống dừng chuẩn xác */
   }
+}
+
+.scroll-safe-bottom {
+  scroll-padding-bottom: var(--bottom-nav-clearance, 102px);
 }
 
 @theme {
@@ -614,26 +629,17 @@
   /* Scroll-Driven Reveal (Tăng cường lũy tiến) */
   @keyframes reveal-cascade {
     from {
-      opacity: 0;
-      transform: translateY(24px) scale(0.97);
-      filter: blur(4px);
+      opacity: 0.2;
+      transform: translateY(12px);
     }
     to {
       opacity: 1;
-      transform: translateY(0) scale(1);
-      filter: blur(0px);
+      transform: translateY(0);
     }
   }
 
   .scroll-reveal-item {
-    @media (prefers-reduced-motion: no-preference) {
-      @supports (animation-timeline: view()) {
-        animation: reveal-cascade auto cubic-bezier(0.25, 0.8, 0.25, 1) both;
-        animation-timeline: view();
-        animation-range: entry 5% cover 32%;
-        will-change: transform, opacity;
-      }
-    }
+    will-change: transform, opacity;
   }
 
   /* Chuyển tiếp Discrete Native (display: none -> display: block) */
@@ -755,4 +761,15 @@ html {
     overscroll-behavior: none;
     overscroll-behavior-y: none;
   }
+}
+
+/* Tiện ích ẩn thanh cuộn chuẩn mọi trình duyệt */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

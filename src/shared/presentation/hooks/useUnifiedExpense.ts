@@ -73,7 +73,7 @@ export const useUnifiedExpense = ({ scope, staffId, vehicleId, onSuccess }: UseU
     );
   };
 
-  const resetForm = () => {
+  const resetForm = React.useCallback(() => {
     setForm({
       name: '',
       amount: 0,
@@ -84,7 +84,7 @@ export const useUnifiedExpense = ({ scope, staffId, vehicleId, onSuccess }: UseU
       vehicleId: vehicleId ? String(vehicleId) : undefined,
     });
     setErrors({});
-  };
+  }, [scope, staffId, vehicleId]);
 
   return {
     form,

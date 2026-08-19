@@ -56,14 +56,14 @@ export const CarTable: React.FC<CarTableProps> = ({ cars, onUpdateVehicle, userR
               <div className="flex justify-between items-start">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className={cn("px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border", getBadgeStyle(car._type))}>
+                    <span className={cn("px-2.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border", getBadgeStyle(car._type))}>
                       {getLabel(car._type)}
                     </span>
                     <p className="text-[10px] font-bold text-sub-label opacity-40">#{car.code}</p>
                   </div>
                   <h4 className="text-sm font-black uppercase text-kraft-ink truncate tracking-tight">{car.name}</h4>
                 </div>
-                <span className="px-2 py-1 bg-surface-soft border border-hairline-soft rounded-lg text-[10px] font-black text-sub-label uppercase whitespace-nowrap tracking-widest">
+                <span className="px-2.5 py-0.5 bg-surface-soft border border-hairline-soft rounded-full text-[10px] font-black text-sub-label uppercase whitespace-nowrap tracking-widest">
                   {date}
                 </span>
               </div>
@@ -77,9 +77,13 @@ export const CarTable: React.FC<CarTableProps> = ({ cars, onUpdateVehicle, userR
                   <p className="text-[10px] font-black uppercase tracking-widest text-sub-label opacity-40">Thu nhập</p>
                   <span className={cn(
                     "inline-block text-sm font-black tracking-tighter px-3 py-1 rounded-xl border tabular-nums shadow-sm",
-                    income >= 0 ? "text-income bg-income/5 border-income/10" : "text-expense bg-expense/5 border-expense/10"
+                    income > 0 
+                      ? "text-income bg-income/5 border-income/15" 
+                      : income === 0
+                      ? "text-sub-label bg-black/[0.03] border-black/5"
+                      : "text-expense bg-expense/5 border-expense/15"
                   )}>
-                    {income >= 0 ? '+' : ''}{formatCurrency(income)}
+                    {income > 0 ? `+${formatCurrency(income)}` : formatCurrency(income)}
                   </span>
                 </div>
               </div>
@@ -105,7 +109,7 @@ export const CarTable: React.FC<CarTableProps> = ({ cars, onUpdateVehicle, userR
                 <div className="flex items-center justify-between p-3 bg-surface-soft rounded-2xl border border-hairline-soft">
                   <span className="text-[10px] font-black text-sub-label uppercase tracking-widest opacity-60">Trạng thái vốn</span>
                   <span className={cn(
-                    "text-[10px] font-black uppercase px-2 py-1 rounded-md border tracking-widest shadow-sm",
+                    "text-[10px] font-black uppercase px-2.5 py-1 rounded-full border tracking-widest shadow-sm",
                     car.partner_capital_repaid ? "text-income bg-income/5 border-income/10" : "text-warning bg-warning/5 border-warning/10"
                   )}>
                     {car.partner_capital_repaid ? 'Đã hoàn' : 'Chờ hoàn'}
@@ -158,11 +162,13 @@ export const CarTable: React.FC<CarTableProps> = ({ cars, onUpdateVehicle, userR
                     <div className="flex flex-col items-end gap-2">
                       <span className={cn(
                         "text-[13px] font-black tracking-tighter px-4 py-1.5 rounded-xl border tabular-nums shadow-sm",
-                        income >= 0 
+                        income > 0 
                           ? (car._type === 'collaboration' && !car.partner_profit_shared ? "text-warning bg-warning/5 border-warning/10" : "text-income bg-income/5 border-income/10")
+                          : income === 0
+                          ? "text-sub-label bg-black/[0.03] border-black/5"
                           : "text-expense bg-expense/5 border-expense/10"
                       )}>
-                        {income >= 0 ? '+' : ''}{formatCurrency(income)}
+                        {income > 0 ? `+${formatCurrency(income)}` : formatCurrency(income)}
                       </span>
                       
                       {/* Sub-actions/Badges */}
@@ -176,7 +182,7 @@ export const CarTable: React.FC<CarTableProps> = ({ cars, onUpdateVehicle, userR
                             {onUpdateVehicle && !car.buying_bonus_paid && canApprovePayout && (
                               <button 
                                 onClick={() => onUpdateVehicle(car.id, { buying_bonus_paid: true })}
-                                className="ml-3 px-2 py-0.5 bg-warning text-white rounded-md text-[9px] font-black uppercase tracking-widest hover:bg-warning/80 transition-colors shadow-sm"
+                                className="ml-3 px-3 py-1 bg-warning text-white rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-warning/80 transition-colors shadow-sm"
                               >
                                 Chi ngay
                               </button>

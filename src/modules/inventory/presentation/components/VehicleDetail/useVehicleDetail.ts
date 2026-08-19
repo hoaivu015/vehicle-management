@@ -126,8 +126,12 @@ export const useVehicleDetail = (
       notes: vehicle.notes,
       image_url: vehicle.image_url,
       seller: vehicle.seller,
+      customer_name: vehicle.customer_name,
       buying_bonus: vehicle.buying_bonus,
       buying_bonus_paid: vehicle.buying_bonus_paid,
+      battery_type: vehicle.battery_type || 'None',
+      license_plate: vehicle.license_plate || '',
+      show_on_landing: vehicle.show_on_landing !== false,
     });
     setIsEditing(true);
   };

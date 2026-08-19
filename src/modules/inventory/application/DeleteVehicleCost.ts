@@ -5,6 +5,8 @@ import { StaffRepository } from '../../staff/domain/StaffRepository';
 export interface DeleteVehicleCostRequest {
   vehicleId: number;
   costIndex: number;
+  user?: string;
+  reason?: string;
 }
 
 export class DeleteVehicleCost {
@@ -35,10 +37,21 @@ export class DeleteVehicleCost {
       }
     }
 
-    // 2. Remove from vehicle
-    const updatedHistory = costHistory.filter((_, i) => i !== request.costIndex);
+    // 2. Remove from vehicle and append an immutable Audit Log into history
+    const updatedCostHistory = costHistory.filter((_, i) => i !== request.costIndex);
+    const updatedHistoryLogs = [
+      ...(vehicle.history || []),
+      {
+        date: new Date().toISOString().split('T')[0],
+        status: vehicle.status,
+        user: request.user || 'Kế toán',
+        note: `Đã xóa chi phí: "${costToRemove.note || 'Chi phí'}" (${(costToRemove.amount || 0).toLocaleString('vi-VN')}đ)${request.reason ? ` - Lý do: ${request.reason}` : ''}`
+      }
+    ];
+
     return await this.vehicleRepository.update(vehicle.id.toString(), {
-      cost_history: updatedHistory
+      cost_history: updatedCostHistory,
+      history: updatedHistoryLogs
     });
   }
 }

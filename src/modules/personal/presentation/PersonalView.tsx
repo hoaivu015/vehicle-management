@@ -3,12 +3,11 @@ import { PersonalWebView } from './PersonalWebView';
 import { PersonalMobileView } from './PersonalMobileView';
 import { useIsMobile } from '@/src/shared/presentation/hooks/useIsMobile';
 import { Staff } from '@/src/shared/domain/types';
-
 import { usePersonalState } from './usePersonalState';
 
 interface PersonalViewProps {
   user: Staff | null;
-  onUpdateUser?: (docId: string, data: Partial<Staff>) => void;
+  onUpdateUser?: (email: string, data: Partial<Staff> & { password?: string }) => void;
   onLogout?: () => void;
 }
 

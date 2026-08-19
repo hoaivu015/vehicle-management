@@ -49,13 +49,14 @@ export class RecordExpense {
       const vehicle = await this.vehicleRepository.getById(dto.vehicleId.toString());
       if (!vehicle) throw new Error('Không tìm thấy xe');
 
+      const uniqueCostId = staffExpenseId || generateUUID();
       const updatedCostHistory = [
         ...(vehicle.cost_history || []),
         {
           amount: dto.amount,
           note: dto.staffId ? `[NV ứng] ${dto.name}` : dto.name,
           date: dto.date,
-          staff_expense_id: staffExpenseId || '',
+          staff_expense_id: uniqueCostId,
           staff_id: dto.staffId?.toString() || ''
         }
       ];
@@ -65,7 +66,7 @@ export class RecordExpense {
       });
     }
 
-    // 4. Nếu là chi phí vận hành Showroom, ghi vào bảng operating_expenses
+    // 4. Nếu là chi phí vận hành Showroom, ghi nhận vào bảng operating_expenses
     if (dto.type === 'operating') {
       await this.expenseRepository.add({
         name: dto.staffId ? `[NV ứng] ${dto.name}` : dto.name,

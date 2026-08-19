@@ -17,32 +17,36 @@ export const EconomicSection: React.FC<EconomicSectionProps> = ({
   staffList 
 }) => {
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-g2">
+    <div className="space-y-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         <SmartAmountInput 
           label="Giá vốn nhập" 
+          required
           value={formData.purchase_price} 
           onChange={(v) => setFormData(prev => ({ ...prev, purchase_price: v }))} 
+          variant="dense"
         />
         <BaseInput 
           label="Ngày cọc mua"
           type="date"
+          required
           value={formData.purchase_date}
           onChange={(e) => setFormData(prev => ({ ...prev, purchase_date: e.target.value }))}
           icon={Calendar}
-          className="!h-14"
+          variant="dense"
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-g2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         <BaseSelect 
           label="Nhân viên thu mua"
+          required
           value={formData.buyer}
           onChange={(e) => setFormData(prev => ({ ...prev, buyer: e.target.value }))}
           icon={Users}
-          className="!h-14"
+          variant="dense"
         >
-          <option value="">Nhân viên...</option>
+          <option value="">Chọn nhân viên...</option>
           {staffList.map((s) => (
             <option key={s.id} value={s.code}>{s.name} ({s.code})</option>
           ))}
@@ -52,6 +56,7 @@ export const EconomicSection: React.FC<EconomicSectionProps> = ({
           label="Hoa hồng nhập (Lương mua)" 
           value={formData.buying_commission} 
           onChange={(v) => setFormData(prev => ({ ...prev, buying_commission: v ?? 0 }))} 
+          variant="dense"
         />
       </div>
     </div>

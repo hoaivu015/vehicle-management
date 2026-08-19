@@ -78,7 +78,7 @@ const StaffAddExpenseForm: React.FC<StaffAddExpenseFormProps> = ({
                 type="button"
                 onClick={() => setFormData({ ...formData, type: 'vehicle' })}
                 className={cn(
-                  "h-16 md:h-20 rounded-t2 border flex flex-col items-center justify-center gap-1 md:gap-2 transition-all shadow-sm",
+                  "h-16 md:h-20 rounded-t2 border flex flex-col items-center justify-center gap-1 md:gap-2 transition-all shadow-sm cursor-pointer",
                   formData.type === 'vehicle'
                     ? "bg-warning/5 border-warning/30 text-warning shadow-warning/10"
                     : "bg-surface-soft/60 border-hairline-soft text-sub-label opacity-40 hover:opacity-100"
@@ -92,7 +92,7 @@ const StaffAddExpenseForm: React.FC<StaffAddExpenseFormProps> = ({
                 type="button"
                 onClick={() => setFormData({ ...formData, type: 'operating' })}
                 className={cn(
-                  "h-16 md:h-20 rounded-t2 border flex flex-col items-center justify-center gap-1 md:gap-2 transition-all shadow-sm",
+                  "h-16 md:h-20 rounded-t2 border flex flex-col items-center justify-center gap-1 md:gap-2 transition-all shadow-sm cursor-pointer",
                   formData.type === 'operating'
                     ? "bg-brand/5 border-brand/30 text-brand shadow-brand/10"
                     : "bg-surface-soft/60 border-hairline-soft text-sub-label opacity-40 hover:opacity-100"
@@ -104,15 +104,67 @@ const StaffAddExpenseForm: React.FC<StaffAddExpenseFormProps> = ({
             </div>
           </div>
 
-          <div className="space-y-5 pt-6 border-t border-hairline-soft">
-            <SmartAmountInput
-              label="Số tiền thực chi"
-              value={formData.amount}
-              onChange={(v) => setFormData({ ...formData, amount: v })}
-              placeholder="VD: 1.5tr"
-              variant="dense"
-              error={errors.amount}
-            />
+          {/* Quick Category Chips */}
+          <div className="space-y-2">
+            <span className="text-[10px] font-black uppercase tracking-wider text-sub-label block px-1">
+              Gợi ý hạng mục nhanh
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {(formData.type === 'vehicle' ? [
+                { label: '🧴 Rửa xe & Dọn nội thất', note: 'Rửa xe và dọn dẹp nội thất' },
+                { label: '🎨 Sơn dặm / Đánh bóng', note: 'Sơn dặm và đánh bóng' },
+                { label: '🛢️ Thay dầu / Bảo dưỡng', note: 'Thay dầu và bảo dưỡng xe' },
+                { label: '📋 Phí đăng kiểm / Đường bộ', note: 'Phí đăng kiểm và bảo trì đường bộ' },
+                { label: '🛞 Thay lốp / Phụ tùng', note: 'Thay lốp và phụ tùng' },
+              ] : [
+                { label: '💡 Điện / Nước / Net', category: 'Tiền điện/nước', note: 'Tiền điện, nước, internet' },
+                { label: '📢 Marketing & QC', category: 'Marketing', note: 'Chi phí quảng cáo / Marketing' },
+                { label: '☕ Tiếp khách', category: 'Tiếp khách', note: 'Chi phí tiếp khách showroom' },
+                { label: '🛠️ Sửa chữa trang TB', category: 'Sửa chữa', note: 'Sửa chữa, bảo trì thiết bị' },
+                { label: '📦 Văn phòng phẩm', category: 'Khác', note: 'Văn phòng phẩm & vật dụng' },
+              ]).map((preset) => (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({
+                      ...prev,
+                      note: preset.note,
+                      category: 'category' in preset ? preset.category : prev.category
+                    }));
+                  }}
+                  className="px-3 py-1.5 rounded-full text-[11px] font-bold bg-surface-soft/80 text-kraft-ink hover:bg-surface-soft border border-hairline-soft cursor-pointer transition-all active:scale-95"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-5 pt-4 border-t border-hairline-soft">
+            <div className="space-y-1.5">
+              <SmartAmountInput
+                label="Số tiền thực chi"
+                value={formData.amount}
+                onChange={(v) => setFormData({ ...formData, amount: v })}
+                placeholder="VD: 1.5tr"
+                variant="dense"
+                error={errors.amount}
+              />
+              <div className="flex items-center gap-1.5 pt-1 px-1">
+                <span className="text-[9px] font-black uppercase text-sub-label tracking-wider mr-1">Cộng nhanh:</span>
+                {[500000, 1000000, 2000000, 5000000].map(val => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, amount: (prev.amount || 0) + val }))}
+                    className="px-2.5 py-1 rounded-full bg-surface-soft hover:bg-black/5 text-[10px] font-mono font-bold text-kraft-ink border border-hairline-soft cursor-pointer transition-colors active:scale-95"
+                  >
+                    +{val >= 1000000 ? `${val / 1000000}tr` : `${val / 1000}k`}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <BaseInput
@@ -138,7 +190,7 @@ const StaffAddExpenseForm: React.FC<StaffAddExpenseFormProps> = ({
                   variant="dense"
                   error={errors.vehicleId}
                 >
-                  <option value="">--</option>
+                  <option value="">-- Chọn xe --</option>
                   {activeVehicles.map(v => (
                     <option key={v.id} value={v.id}>{v.name} ({v.code})</option>
                   ))}

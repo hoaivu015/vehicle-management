@@ -1,87 +1,185 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BaseModal as Modal, ModalBody, ModalFooter } from '@/src/shared/design-system/BaseModal';
-import { Plus, FileText, Car } from 'lucide-react';
+import { Plus, FileText, Car, Sparkles } from 'lucide-react';
 import { SmartAmountInput } from '@/src/shared/design-system/SmartAmountInput';
 import { BaseInput } from '@/src/shared/design-system/FormElements';
 import { SectionHeader } from '@/src/shared/design-system/BaseCard';
-import { useUnifiedExpense } from '@/src/shared/presentation/hooks/useUnifiedExpense';
+import { Vehicle, CostItem } from '@/src/shared/domain/types';
+import { formatCurrency } from '@/src/shared/utils/currency';
+import { haptics } from '@/src/shared/utils/haptics';
+import { motion } from 'motion/react';
 
 interface AddCostOverlayProps {
    isOpen: boolean;
    onClose: () => void;
    onAdd: (name: string, amount: number) => Promise<void>;
    isSubmitting: boolean;
+   vehicle?: Vehicle;
    initialForm?: { name: string; amount: number };
 }
+
+const VEHICLE_COST_PRESETS = [
+   { label: '🧴 Rửa xe & Dọn dẹp', name: 'Rửa xe và dọn dẹp nội thất' },
+   { label: '🎨 Sơn dặm & Đánh bóng', name: 'Sơn dặm và đánh bóng' },
+   { label: '🛢️ Thay dầu & Bảo dưỡng', name: 'Thay dầu và bảo dưỡng định kỳ' },
+   { label: '📋 Đăng kiểm & Đường bộ', name: 'Phí đăng kiểm và đường bộ' },
+   { label: '🛞 Thay lốp / Phụ tùng', name: 'Thay lốp và phụ tùng xe' },
+];
+
+const QUICK_AMOUNTS = [
+   { label: '+500k', value: 500000 },
+   { label: '+1tr', value: 1000000 },
+   { label: '+2tr', value: 2000000 },
+   { label: '+5tr', value: 5000000 },
+];
 
 export const AddCostOverlay: React.FC<AddCostOverlayProps> = ({
    isOpen,
    onClose,
    onAdd,
-   isSubmitting
+   isSubmitting,
+   vehicle,
+   initialForm
 }) => {
-   const { form, setForm, resetForm } = useUnifiedExpense({
-      scope: 'vehicle'
-   });
+   const [name, setName] = useState<string>(initialForm?.name || '');
+   const [amount, setAmount] = useState<number>(initialForm?.amount || 0);
+   const [error, setError] = useState<string | null>(null);
 
-   const [error, setError] = React.useState<string | null>(null);
-
-   React.useEffect(() => {
+   useEffect(() => {
       if (isOpen) {
-         resetForm();
          // eslint-disable-next-line react-hooks/set-state-in-effect
+         setName(initialForm?.name || '');
+         setAmount(initialForm?.amount || 0);
          setError(null);
       }
-   }, [isOpen, resetForm]);
+   }, [isOpen, initialForm]);
+
+   const handleSelectPreset = (preset: typeof VEHICLE_COST_PRESETS[0]) => {
+      haptics.light();
+      setName(preset.name);
+      if (error) setError(null);
+   };
+
+   const handleAddQuickAmount = (val: number) => {
+      haptics.light();
+      setAmount(prev => (prev || 0) + val);
+      if (error) setError(null);
+   };
 
    const handleConfirm = async () => {
-      if (!form.name || form.name.trim() === '') {
+      if (!name || name.trim() === '') {
          setError("Tên chi phí không được để trống");
          return;
       }
-      if (!form.amount || form.amount <= 0) {
-         setError("Số tiền phải lớn hơn 0");
+      if (!amount || amount <= 0) {
+         setError("Số tiền phải lớn hơn 0 ₫");
          return;
       }
 
-      await onAdd(form.name, form.amount);
+      setError(null);
+      await onAdd(name.trim(), amount);
       onClose();
    };
 
+   // Financial Simulation
+   const currentTotalCost = vehicle?.total_cost ?? (vehicle?.cost_history || []).reduce((sum: number, c: CostItem) => sum + (c.amount || 0), 0);
+   const currentCOGS = (vehicle?.purchase_price || 0) + currentTotalCost;
+   const newCOGS = currentCOGS + (amount || 0);
+   const hasSalePrice = vehicle?.sale_price && vehicle.sale_price > 0;
+   const currentProfit = hasSalePrice ? (vehicle!.sale_price! - currentCOGS) : null;
+   const newProfit = hasSalePrice ? (vehicle!.sale_price! - newCOGS) : null;
 
    return (
       <Modal
          isOpen={isOpen}
          onClose={onClose}
          maxWidth="lg"
-         title="Ghi nhận chi phí"
-         subtitle="Hạng mục Spa, dọn dẹp, sửa chữa cho xe"
+         title="Ghi nhận chi phí xe"
+         subtitle={vehicle ? `Hạng mục làm đẹp, bảo dưỡng cho xe ${vehicle.name} (${vehicle.code})` : "Hạng mục Spa, dọn dẹp, sửa chữa cho xe"}
          icon={Plus}
          height="auto"
       >
          <form onSubmit={(e) => { e.preventDefault(); handleConfirm(); }} className="flex-1 flex flex-col overflow-hidden">
             <ModalBody className="flex-1">
-               <div className="space-y-3 md:space-y-6 py-0.5">
-                  <div className="space-y-3 md:space-y-5">
-                     <SectionHeader accentColor="bg-warning" noMargin className="mb-2 md:mb-6">Thông tin chi phí</SectionHeader>
+               <div className="space-y-4 md:space-y-5 py-0.5">
+                  {/* Quick Category Chips */}
+                  <div className="space-y-2">
+                     <div className="flex items-center gap-1.5 px-1">
+                        <Sparkles size={12} className="text-warning" />
+                        <span className="text-[10px] font-black uppercase tracking-wider text-sub-label">
+                           Gợi ý làm đẹp nhanh
+                        </span>
+                     </div>
+                     <div className="flex flex-wrap gap-1.5">
+                        {VEHICLE_COST_PRESETS.map((preset) => {
+                           const isSelected = name === preset.name;
+                           return (
+                              <motion.button
+                                 key={preset.label}
+                                 type="button"
+                                 whileTap={{ scale: 0.95 }}
+                                 onClick={() => handleSelectPreset(preset)}
+                                 className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border cursor-pointer ${
+                                    isSelected
+                                       ? 'bg-amber-500 text-white border-amber-500 shadow-xs'
+                                       : 'bg-surface-soft/80 text-kraft-ink hover:bg-surface-soft border-hairline-soft'
+                                 }`}
+                              >
+                                 {preset.label}
+                              </motion.button>
+                           );
+                        })}
+                     </div>
+                  </div>
+
+                  {/* Form fields */}
+                  <div className="space-y-3.5 pt-1">
+                     <SectionHeader accentColor="bg-warning" noMargin className="mb-1 md:mb-3">
+                        Thông tin chi phí
+                     </SectionHeader>
 
                      <BaseInput
                         label="Tên hạng mục chi phí"
                         placeholder="VD: Thay dầu, Sơn dặm, Rửa xe..."
-                        value={form.name || ''}
-                        onChange={e => setForm({ ...form, name: e.target.value })}
+                        value={name}
+                        onChange={e => {
+                           setName(e.target.value);
+                           if (error) setError(null);
+                        }}
                         icon={FileText}
                         autoFocus
                         variant="dense"
-                      />
-
-                     <SmartAmountInput
-                        label="Số tiền thực chi"
-                        value={form.amount ?? 0}
-                        onChange={v => setForm({ ...form, amount: v })}
-                        placeholder="VD: 500k, 1.5tr..."
-                        variant="dense"
+                        error={error && !name ? error : undefined}
                      />
+
+                     <div className="space-y-1.5">
+                        <SmartAmountInput
+                           label="Số tiền thực chi"
+                           value={amount}
+                           onChange={v => {
+                              setAmount(v);
+                              if (error) setError(null);
+                           }}
+                           placeholder="VD: 500k, 1.5tr..."
+                           variant="dense"
+                           error={error && amount <= 0 ? error : undefined}
+                        />
+
+                        {/* Quick Add Amount Buttons */}
+                        <div className="flex items-center gap-1.5 pt-1 px-1">
+                           <span className="text-[9px] font-black uppercase text-sub-label tracking-wider mr-1">Cộng nhanh:</span>
+                           {QUICK_AMOUNTS.map(q => (
+                              <button
+                                 key={q.label}
+                                 type="button"
+                                 onClick={() => handleAddQuickAmount(q.value)}
+                                 className="px-2.5 py-1 rounded-full bg-surface-soft hover:bg-black/5 text-[10px] font-mono font-bold text-kraft-ink border border-hairline-soft cursor-pointer transition-colors active:scale-95"
+                              >
+                                 {q.label}
+                              </button>
+                           ))}
+                        </div>
+                     </div>
                   </div>
 
                   {error && (
@@ -90,13 +188,39 @@ export const AddCostOverlay: React.FC<AddCostOverlayProps> = ({
                      </div>
                   )}
 
-                  <div className="p-3 md:p-5 bg-amber-50/50 rounded-xl md:rounded-[2rem] border border-amber-100/50 flex items-center gap-3">
-                     <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
-                        <Car size={14} />
+                  {/* Real-time Financial Impact Simulation */}
+                  <div className="p-3.5 md:p-4 bg-amber-50/60 rounded-2xl border border-amber-200/50 space-y-2">
+                     <div className="flex items-center gap-2 text-amber-900">
+                        <div className="w-6 h-6 rounded-lg bg-amber-500/15 flex items-center justify-center text-amber-700 shrink-0">
+                           <Car size={13} />
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-wider">
+                           Mô phỏng tác động giá vốn & P&L
+                        </span>
                      </div>
-                     <p className="text-[10px] font-bold text-amber-900/60 leading-relaxed uppercase tracking-tight">
-                        Chi phí này sẽ cộng vào giá vốn và trừ trực tiếp vào lợi nhuận xe.
-                     </p>
+
+                     <div className="grid grid-cols-2 gap-2 pt-1 border-t border-amber-200/40 text-[11px]">
+                        <div className="space-y-0.5">
+                           <span className="text-[9px] font-black uppercase tracking-wider text-amber-900/60 block">
+                              Tổng giá vốn mới
+                           </span>
+                           <span className="font-black text-expense">
+                              {formatCurrency(newCOGS)}
+                              {amount > 0 && <span className="text-[9px] font-normal text-sub-label ml-1">(+{formatCurrency(amount)})</span>}
+                           </span>
+                        </div>
+
+                        {hasSalePrice && currentProfit !== null && newProfit !== null && (
+                           <div className="space-y-0.5">
+                              <span className="text-[9px] font-black uppercase tracking-wider text-amber-900/60 block">
+                                 Lợi nhuận gộp mới
+                              </span>
+                              <span className={`font-black ${newProfit >= 0 ? 'text-emerald-700' : 'text-expense'}`}>
+                                 {formatCurrency(newProfit)}
+                              </span>
+                           </div>
+                        )}
+                     </div>
                   </div>
                </div>
             </ModalBody>
@@ -111,3 +235,4 @@ export const AddCostOverlay: React.FC<AddCostOverlayProps> = ({
       </Modal>
    );
 };
+

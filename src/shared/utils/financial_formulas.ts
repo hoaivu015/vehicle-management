@@ -75,6 +75,14 @@ export const calcTotalSalary = (
   return Math.round(baseSalary + (salesCommissions * kpiMultiplier) + otherCommissions);
 };
 
+export const calcNetSalaryWithAdvances = (
+  totalSalary: number,
+  totalReimbursements: number = 0,
+  totalAdvances: number = 0
+): number => {
+  return Math.round(totalSalary + totalReimbursements - totalAdvances);
+};
+
 /**
  * COMPANY & FINANCE MATH
  */

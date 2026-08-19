@@ -1,142 +1,82 @@
-# 🛡️ CẨM NĂNG SỬ DỤNG HỆ THỐNG SKILLS & AGENTS — AUTO 28 SHOWROOM MANAGER
+# 🛡️ CẨM NĂNG SỬ DỤNG HỆ THỐNG 4 DOMAIN HUBS & MASTER ROUTER — AUTO 28
 
-Chào mừng bạn đến với **Cẩm nang Vận hành Kỹ thuật & Chuẩn hóa Hệ thống** của **Auto 28 Showroom Manager**. Tài liệu này tổng hợp toàn bộ các Core Skills và Subagents chuyên trách tại thư mục `.agents/`, nhằm phục vụ tối đa việc phát triển, kiểm định kiến trúc Clean Architecture, và thực thi trải nghiệm người dùng cao cấp chuẩn Apple Native / Liquid Glass 2.0.
-
----
-
-## 🤖 HỆ THỐNG SUBAGENTS CHUYÊN TRÁCH (.agents/agents/)
-
-| Agent Identifier | Tên Chuyên Môn & Trách Nhiệm | Link Định Nghĩa |
-| :--- | :--- | :--- |
-| **`app_industrial_lead`** | **Kỹ Sư Trưởng Chuẩn Hóa Toàn Diện Web & Mobile App:** Chỉ huy tổng thể 6 trụ cột công nghiệp: Clean Arch, Core Web Vitals, UX 3 tầng, OWASP ASVS/RBAC, CI/CD Gate và Mobile Native. | [app_industrial_lead.md](file:///.agents/agents/app_industrial_lead.md) |
-| **`industrial_standardizer`** | **Kỹ Sư Trưởng Chuẩn Hóa Doanh Nghiệp:** Phân tầng Clean Architecture, dọn dẹp mã nguồn, giải quyết triệt để Zod Schemas & Zero Any, tối ưu hóa vòng đời State React 19. | [industrial_standardizer.md](file:///.agents/agents/industrial_standardizer.md) |
-| **`standards_inspector`** | **Thanh Tra Trưởng Độc Lập:** Kiểm tra nhị phân (PASS/FAIL) 6 tiêu chuẩn vàng Auto 28 (Type Safety, Clean Arch, Mã Xe SSoT, RBAC Kế toán/Admin, SSoT Finance, iPhone Native UI). | [standards_inspector.md](file:///.agents/agents/standards_inspector.md) |
-| **`ux_standardizer`** | **Kỹ Sư Trưởng Trải Nghiệm Người Dùng:** Thẩm định & thực thi UX/UI 3 tầng (Standard $\rightarrow$ Advanced $\rightarrow$ Enterprise), kiểm soát độ trễ 0ms, Spring Physics, Haptic Matrix và Liquid Glass 2.0. | [ux_standardizer.md](file:///.agents/agents/ux_standardizer.md) |
-| **`card_modal_sentinel`** | **Kỹ Sư Trưởng Card & Modal UI/UX:** Chuyên trách chống gãy dòng (Anti-Truncation), bảo vệ điểm chạm Fitts's Law, chống che khuất nội dung dưới Bottom Bar cho toàn bộ Card & Popup. | [card_modal_sentinel.md](file:///.agents/agents/card_modal_sentinel.md) |
-| **`navigation_ui_sentinel`** | **Kỹ Sư Trưởng Thanh Điều Hướng & Tab Bar:** Chuyên trách chuẩn 3-5 tabs, Safe Area ≥ 34px, nút trung tâm (+) Hero FAB nhô cao, viên thuốc Active Pill nảy lò xo, chống che khuất nội dung. | [navigation_ui_sentinel.md](file:///.agents/agents/navigation_ui_sentinel.md) |
+Chào mừng bạn đến với **Cẩm nang Vận hành Kỹ thuật & Chuẩn hóa Hệ thống** phiên bản mới của **Auto 28 Showroom Manager**. Hệ thống đã được nâng cấp toàn diện lên **Mô hình Hợp nhất Phân tầng (Hierarchical Domain Consolidation & Router Pattern)**, tinh giản từ hơn 35 kỹ năng phân mảnh thành **1 Bộ Điều Phối Trung Tâm (Master Router)** và **4 Domain Hubs Chuyên Môn Tối Cao**.
 
 ---
 
-## 🗺️ BẢN ĐỒ PHÂN NHÓM SKILLS CỐT LÕI
+## 🧭 CƠ CHẾ ĐỊNH TUYẾN TỰ ĐỘNG (MASTER ROUTER)
+
+Bạn có thể ra lệnh bằng tiếng Việt tự nhiên hoặc sử dụng các tiền tố kích hoạt nhanh (**Quick Triggers**):
 
 ```mermaid
 graph TD
-    %% Nhóm Tư duy & Chẩn đoán
-    subgraph "🧠 NHÓM TƯ DUY & CHẨN ĐOÁN"
-        TP["Thinking Protocol & Task Breakdown"]
-        CR["Counterfactual Reasoning"]
-        RC["Deep Root Cause Analysis (5 Whys)"]
-        KP["Andrej Karpathy (Simplicity & Precision)"]
-        DG["Diagnose & TDD"]
-    end
-
-    %% Nhóm Kiến trúc & Doanh nghiệp
-    subgraph "🏗️ NHÓM KIẾN TRÚC & DOANH NGHIỆP"
-        CS["Clean Surgical NextJS"]
-        IS["Industrial Standardization"]
-        ZS["Zod Schema Sentinel (Zero Any)"]
-        SO["State Lifecycle Optimizer"]
-        SA["Standards Auditor"]
-        CA["Clean Architecture & DDD Hexagon"]
-    end
-
-    %% Nhóm Trải nghiệm & Giao diện
-    subgraph "🎨 NHÓM TRẢI NGHIỆM & GIAO DIỆN"
-        UX["UX Standards Enforcer (3-Tier UX)"]
-        DS["Design System Guide (Neural Expressive)"]
-        IP["iPhone Native UI Enforcer"]
-        NV["Navigation & Surface UI Sentinel"]
-    end
-
-    %% Luồng phối hợp
-    TP --> CS
-    RC --> CR
-    CS --> IS
-    IS --> ZS
-    ZS --> SO
-    SO --> UX
-    UX --> DS
-    DS --> IP
-    IP --> NV
+    User["👤 Người dùng ra lệnh"] --> Router["🧭 Master Router (.agents/ROUTER.md)"]
+    
+    Router -->|@arch / Kiến trúc / Type / State / DB| D1["🏗️ @arch (clean-architecture-engine)"]
+    Router -->|@design / UI / Màu / Bo góc / Icon / Input| D2["🎨 @design (design-system-core)"]
+    Router -->|@mobile / iOS / Safe Area / Haptic / Văn phong| D3["📱 @mobile (mobile-ux-sentinel)"]
+    Router -->|@diag / Bug / 5 Whys / So sánh / Lập plan| D4["🔍 @diag (deep-diagnostic-engine)"]
 ```
 
 ---
 
-## 🛠️ CHI TIẾT CÁC CORE SKILLS CHUYÊN DỤNG
+## 🛠️ CHI TIẾT 4 DOMAIN HUBS & CÚ PHÁP KÍCH HOẠT
 
-### 1. 🧠 Thinking Protocol & Task Decomposition Engine
-* **Mục tiêu:** Phân tích rủi ro, phân loại độ phức tạp và lập kế hoạch nguyên tử trước khi viết code.
-* **Kích hoạt:** *"Phân tích rủi ro và lên kế hoạch chi tiết cho tính năng này"*.
-
-### 2. 🛡️ Clean Surgical NextJS (Master Standard)
-* **Mục tiêu:** Hiến pháp kỹ thuật tối cao: Zero Any, Dumb UI, Zod Boundary, State Machine Gateway.
-* **Kích hoạt:** *"Viết tính năng chuẩn Clean Surgical NextJS"*.
-
-### 3. ⚖️ Counterfactual Reasoning (Lập luận phản thực)
-* **Mục tiêu:** Ép buộc so sánh ít nhất 2–3 phương án kiến trúc và loại trừ có lý do trước khi chốt giải pháp.
-* **Kích hoạt:** *"So sánh phản thực các phương án kiến trúc giúp tôi"*.
-
-### 4. 🔍 Deep Root Cause Analysis (5 Whys)
-* **Mục tiêu:** Chẩn đoán lỗi tận gốc rễ bằng phương pháp 5 Whys, lập Fix Plan và chờ phê duyệt.
-* **Kích hoạt:** *"Chẩn đoán Root Cause và lập Fix Plan cho lỗi này"*.
-
-### 5. 🎨 UX Standards Enforcer (Tiêu Chuẩn Trải Nghiệm 3 Tầng)
-* **Mục tiêu:** Thực thi và thẩm định UX từ Tiêu chuẩn (ISO 9241, WCAG 2.2, Core Web Vitals) đến Nâng cao (Neuro-UX, Fitts/Hick Laws, Zero-Latency, Optimistic UI) và Cao cấp Doanh nghiệp (Liquid Glass, Spring Physics, Haptic Matrix, SSoT Finance).
-* **Kích hoạt:** *"Audit UX/UI theo chuẩn công nghiệp"*, *"Tối ưu hóa trải nghiệm người dùng"*.
-
-### 6. 🎨 Design System Code Guide (Neural Expressive 2.0)
-* **Mục tiêu:** Sử dụng các thành phần giao diện chuẩn từ `src/shared/design-system/` (`BaseCard`, `BaseInput`, `DataDisplay`, `SmartAmountInput`, `BaseModal`).
-* **Kích hoạt:** *"Thiết kế UI chuẩn Neural Expressive 2.0"*.
-
-### 7. 🍎 iPhone Native UI Enforcer (Apple Standard V2.0)
-* **Mục tiêu:** Đảm bảo Safe Area `env(safe-area-inset-top/bottom)`, Touch target $\ge 44\text{px}$, co giãn `active:scale-95`, chống khuyết chữ.
-* **Kích hoạt:** *"Tối ưu giao diện iPhone Native UI"*.
-
-### 8. 🧭 Navigation & Surface UI Sentinel (Thanh Điều Hướng & Tab Bar)
-* **Mục tiêu:** Kiểm soát thanh `MobileBottomNav`, Safe Area $\ge 34\text{px}$, Hero FAB (+), Active Pill trượt nảy lò xo, Haptic feedback, Header đỉnh và Segmented Tabs.
-* **Kích hoạt:** *"Audit thanh điều hướng"*, *"Tối ưu thanh Bottom Nav và Tab Bar"*.
-
-### 9. 🚀 Andrej Karpathy (Karpathy Precision)
-* **Mục tiêu:** Giữ code tối giản, phẫu thuật chính xác đúng dòng cần sửa, chống over-engineering.
-* **Kích hoạt:** *"Viết code Karpathy Mode, phẫu thuật chính xác"*.
-
-### 10. 🏭 Industrial Standardization (Chuẩn Hóa Doanh Nghiệp)
-* **Mục tiêu:** 5 giai đoạn chuẩn hóa: Dọn dẹp dependencies rác, Zero Any Zod schemas, phân tầng IoC, tối ưu State, tự động hóa kiểm thử.
-* **Kích hoạt:** *"Chuẩn hóa dự án đạt chuẩn công nghiệp"*.
-
-### 11. 🛡️ Zod Schema Sentinel (Bảo Vệ Toàn Vẹn Dữ Liệu)
-* **Mục tiêu:** Chống Zod strip dữ liệu (`license_plate`, `phone`, `auth_id`), loại bỏ `as any`, đồng bộ DB $\leftrightarrow$ Domain Type $\leftrightarrow$ Zod.
-* **Kích hoạt:** *"Đồng bộ Zod Schema và loại bỏ as any"*.
-
-### 12. ⚡ State Lifecycle Optimizer (Tối Ưu Vòng Đời & Hiệu Năng)
-* **Mục tiêu:** Nâng state lên Dispatcher Page, loại bỏ cascading renders trong `useEffect`, debounce real-time sync.
-* **Kích hoạt:** *"Tối ưu hóa state lifecycle và chống giật lag"*.
-
-### 13. 🛡️ Standards Auditor (Thanh Tra Tiêu Chuẩn)
-* **Mục tiêu:** Chạy lệnh `npm run audit:standards` kiểm tra 6 tiêu chuẩn vàng Auto 28 đạt 100/100 điểm.
-* **Kích hoạt:** *"Kiểm tra tiêu chuẩn dự án"*, *"Chạy audit standards"*.
-
-### 14. 🎴 Card & Modal UI/UX Sentinel (Bảo Vệ Card & Popup)
-* **Mục tiêu:** Chống gãy dòng chữ/tiền tệ (`whitespace-nowrap`), đảm bảo vùng chạm Fitts $\ge 44\text{px}$, chống che nội dung đáy Bottom Sheet, Liquid Glass Action Bar.
-* **Kích hoạt:** *"Audit Card và Popup"*, *"Fix giao diện Card và Modal"*.
+### 1. 🏗️ DOMAIN 1: `@arch` — Clean Architecture & Code Integrity Hub
+* **File Skill:** [clean-architecture-engine](file:///.agents/skills/clean-architecture-engine/SKILL.md)
+* **Nhiệm vụ:**
+  * Phân tầng 4 lớp: `Domain` $\leftarrow$ `Application` $\leftarrow$ `Presentation` $\rightarrow$ `Infrastructure`.
+  * Quản trị Inversion of Control (IoC Container) và Dependency Inversion.
+  * Đảm bảo **Zero Any (Strict 100%)** và **Zod Schema Parity 2 chiều** (không rớt trường dữ liệu).
+  * Tối ưu hóa vòng đời State React 19 (Dispatcher Hook, triệt tiêu cascading re-renders).
+  * Bảo vệ SSoT Tài chính & Phân quyền RBAC (Chỉ Kế toán/Admin sửa xe, Sale chỉ đọc).
+* **Cú pháp kích hoạt:**
+  * `@arch: Phân tầng Clean Architecture cho tính năng [Tên tính năng]`
+  * `@arch: Fix lỗi type TypeScript và kiểm tra Zod Schema`
+  * `@arch: Tối ưu state React 19 và sync Supabase`
 
 ---
 
-## ⚡ BỘ LỆNH KIỂM ĐỊNH TOÀN DIỆN (CI/CD VERIFICATION)
+### 2. 🎨 DOMAIN 2: `@design` — Design System & Visual Semantics Hub
+* **File Skill:** [design-system-core](file:///.agents/skills/design-system-core/SKILL.md)
+* **Nhiệm vụ:**
+  * Quản trị và tái sử dụng bộ component SSoT tại `src/shared/design-system/` (`BaseCard`, `BaseModal`, `FormElements`, `SmartAmountInput`, `DataDisplay`).
+  * Thực thi bảng màu công nghiệp 60-30-10, kính mờ nhiều lớp Liquid Glass 2.0.
+  * Bo góc siêu elip sinh học Squircle (`rounded-[20px]` đến `rounded-[32px]`) và Pill Shapes (`rounded-full`).
+  * Chuẩn hóa 3 tầng kích thước ô nhập liệu ($56\text{px}$ / $48\text{px}$ / $40\text{px}$) theo hệ lưới 8pt.
+  * Ngữ nghĩa biểu tượng sinh học hữu cơ (Bio-Morphology Iconography).
+  * Chống cắt cụt số tiền và gãy dòng văn bản (Anti-Truncation).
+* **Cú pháp kích hoạt:**
+  * `@design: Thiết kế component thẻ xe mới chuẩn Liquid Glass`
+  * `@design: Chuẩn hóa lại ô nhập liệu và bảng màu theo Design Tokens`
+  * `@design: Audit chống tràn chữ và kiểm tra độ tương phản WCAG 2.2`
 
-```bash
-# 1. Kiểm tra Linter
-npx eslint src
+---
 
-# 2. Kiểm tra biên dịch TypeScript (Zero Errors)
-npx tsc --noEmit
+### 3. 📱 DOMAIN 3: `@mobile` — Mobile & Native UX Sentinel Hub
+* **File Skill:** [mobile-ux-sentinel](file:///.agents/skills/mobile-ux-sentinel/SKILL.md)
+* **Nhiệm vụ:**
+  * Bảo vệ không gian an toàn iPhone Native: `env(safe-area-inset-top)` và `env(safe-area-inset-bottom)`.
+  * Thiết kế thanh điều hướng chuẩn 3–5 tabs, nút trung tâm Hero FAB (`+`) nảy lò xo.
+  * Tích hợp phản hồi xúc giác Capacitor Haptic Matrix (`light`, `selection`, `success`, `warning`).
+  * Chuẩn hóa 100% Ngôn ngữ viết & Từ điển nghiệp vụ Showroom ô tô (Mã xe SSoT, Giá vốn COGS, Lợi nhuận gộp).
+  * Bảo đảm vùng chạm Fitts's Law ($\ge 44\text{px} \times 44\text{px}$) và công thái học ngón tay cái.
+* **Cú pháp kích hoạt:**
+  * `@mobile: Kiểm tra Safe Area và tối ưu hiển thị cho iPhone`
+  * `@mobile: Tích hợp haptic feedback cho luồng ghi nhận chi phí xe`
+  * `@mobile: Audit văn phong và chuẩn hóa thuật ngữ chuyên ngành ô tô`
 
-# 3. Kiểm tra ranh giới phân tầng kiến trúc
-npm run lint:arch
+---
 
-# 4. Chạy Unit Tests
-npm test
-
-# 5. Chạy bộ thẩm định tiêu chuẩn độc lập Auto 28
-npm run audit:standards
-```
+### 4. 🔍 DOMAIN 4: `@diag` — Deep Diagnostic & Reasoning Protocol Hub
+* **File Skill:** [deep-diagnostic-engine](file:///.agents/skills/deep-diagnostic-engine/SKILL.md)
+* **Nhiệm vụ:**
+  * Phân tích nguyên nhân gốc rễ bằng phương pháp **5 Whys**, truy vết tận nguồn dữ liệu.
+  * Lập luận phản thực (**Counterfactual Reasoning A/B**), so sánh tối thiểu 2 phương án trước khi chốt giải pháp.
+  * Phân rã công việc nguyên tử (**Thinking Protocol**) theo 3 cấp độ phức tạp.
+  * Nguyên tắc phẫu thuật Karpathy (**Surgical Edits**): sửa đúng điểm gây lỗi, bảo toàn code và comment không liên quan.
+  * Vòng lặp phát triển hướng kiểm thử (**TDD** Red $\rightarrow$ Green $\rightarrow$ Refactor).
+* **Cú pháp kích hoạt:**
+  * `@diag: Chẩn đoán 5 Whys và lập Fix Plan cho lỗi này`
+  * `@diag: So sánh phản thực các phương án kiến trúc giúp tôi`
+  * `/0: Chuyển sang chế độ Siêu tư duy sâu toàn diện`

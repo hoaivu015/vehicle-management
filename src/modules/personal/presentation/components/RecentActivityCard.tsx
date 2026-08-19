@@ -24,14 +24,14 @@ export const RecentActivityCard: React.FC<RecentActivityCardProps> = ({ activiti
       transition={{ delay: 0.7 }}
       className="liquid-card border-white/60 !p-0 shadow-[var(--shadow-kraft-deep)] overflow-hidden rounded-t1"
     >
-      <div className="p-4 md:p-8 border-b border-black/5 bg-indigo-500/5 flex items-center justify-between">
-        <h3 className="text-lg md:text-xl font-black uppercase flex items-center gap-3 md:gap-4 text-indigo-600 font-heading tracking-tighter">
-          <div className="p-2.5 md:p-3 rounded-t3 bg-indigo-500/10 shrink-0">
+      <div className="p-4 md:p-8 border-b border-black/5 bg-kraft-accent/5 flex items-center justify-between">
+        <h3 className="text-lg md:text-xl font-black uppercase flex items-center gap-3 md:gap-4 text-kraft-accent font-heading tracking-tighter">
+          <div className="p-2.5 md:p-3 rounded-t3 bg-kraft-accent/10 shrink-0">
             <Clock size={20} className="md:w-6 md:h-6" strokeWidth={2.5} />
           </div>
           Hoạt động gần đây
         </h3>
-        <button className="text-sub-label !text-indigo-600 hover:opacity-60 transition-opacity whitespace-nowrap">Xem tất cả</button>
+        <button className="text-sub-label !text-kraft-accent hover:opacity-60 transition-opacity whitespace-nowrap">Xem tất cả</button>
       </div>
       
       <div className="p-4 md:p-8 space-y-4 md:space-y-5 max-h-[600px] overflow-y-auto custom-scrollbar">

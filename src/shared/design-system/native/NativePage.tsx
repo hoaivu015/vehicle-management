@@ -18,9 +18,9 @@ export const NativePage: React.FC<NativePageProps> = ({
 }) => {
   return (
     <div className={cn(
-      "flex flex-col w-full h-full min-h-screen bg-kraft-bg relative",
+      "flex flex-col w-full h-full min-h-screen bg-kraft-bg relative scroll-safe-bottom",
       "pt-2", 
-      "pb-20", // Tab bar space
+      "pb-28 md:pb-20", // Dành vừa đúng ~112px để card dừng ngay trên thanh Bottom Nav, không bị hở khoảng trống lớn
       "px-g5", // Golden Margin: 20px on mobile (64px desktop) — see index.css @media override
       scrollable ? "overflow-y-auto scrollbar-hidden" : "overflow-hidden",
       className

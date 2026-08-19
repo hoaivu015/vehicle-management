@@ -1,14 +1,12 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { User, Calendar } from 'lucide-react';
-import { calculateStaffSalaryDetails } from '@/src/shared/utils/finance';
-import { UserRole } from '@/src/shared/domain/constants';
-import { BaseModal as Modal, ModalBody, ModalFooter } from '@/src/shared/design-system/BaseModal';
-import { StaffAddExpenseModal } from '@/src/modules/staff/presentation/components/StaffAddExpenseModal';
-import { VehicleDetailModal } from '@/src/modules/inventory/presentation/components/VehicleDetailModal';
-import { PersonalState, usePersonalState } from '@/src/modules/personal/presentation/usePersonalState';
+import { StaffSalaryService } from '@/src/modules/staff/domain/StaffSalaryService';
+import { UserRole, VehicleStatus } from '@/src/shared/domain/constants';
+import { PersonalState } from '@/src/modules/personal/presentation/usePersonalState';
 import { useDependencies } from '@/src/shared/ioc/DependencyContext';
 import { UpdateVehicleInput } from '@/src/modules/inventory/domain/VehicleSchema';
-
+import { PageShell, PageHeaderShell } from '@/src/shared/design-system/PageShell';
+import { PersonalMetricRibbon } from './components/PersonalMetricRibbon';
 import { PersonalSidebar } from './components/PersonalSidebar';
 import { SalaryBreakdownCard } from './components/SalaryBreakdownCard';
 import { PersonalAdvancesCard } from './components/PersonalAdvancesCard';
@@ -18,16 +16,33 @@ import { Staff } from '@/src/shared/domain/types';
 import { cn } from '@/src/shared/utils/cn';
 import { PersonalSkeleton } from './components/PersonalSkeleton';
 
+// Lazy-load modals for desktop performance
+const VehicleDetailModal = React.lazy(() => 
+  import('@/src/modules/inventory/presentation/components/VehicleDetailModal').then(m => ({ default: m.VehicleDetailModal }))
+);
+const StaffAddExpenseModal = React.lazy(() => 
+  import('@/src/modules/staff/presentation/components/StaffAddExpenseModal').then(m => ({ default: m.StaffAddExpenseModal }))
+);
+const PasswordModal = React.lazy(() => 
+  import('./components/PersonalModals').then(m => ({ default: m.PasswordModal }))
+);
+const ProfileModal = React.lazy(() => 
+  import('./components/PersonalModals').then(m => ({ default: m.ProfileModal }))
+);
+
 interface PersonalWebViewProps {
   user: Staff | null;
-  onUpdateUser?: (docId: string, data: Partial<Staff>) => void;
+  onUpdateUser?: (email: string, data: Partial<Staff> & { password?: string }) => void;
   onLogout?: () => void;
-  state?: PersonalState;
+  state: PersonalState;
 }
 
-export const PersonalWebView = ({ user, onUpdateUser, onLogout, state: propState }: PersonalWebViewProps) => {
-  const internalState = usePersonalState(user as Staff, onUpdateUser);
-  const state = propState || internalState;
+export const PersonalWebView: React.FC<PersonalWebViewProps> = ({ 
+  user, 
+  onUpdateUser, 
+  onLogout, 
+  state 
+}) => {
   const {
     allVehicles, selectedMonth, setSelectedMonth, staffData, 
     isExpenseModalOpen, setIsExpenseModalOpen,
@@ -51,7 +66,8 @@ export const PersonalWebView = ({ user, onUpdateUser, onLogout, state: propState
     handleAddStaffExpense,
     handleUpdateExpense,
     handleDeleteExpense,
-    loading
+    loading,
+    isSubmitting
   } = state;
 
   const { staffRepo } = useDependencies();
@@ -72,48 +88,89 @@ export const PersonalWebView = ({ user, onUpdateUser, onLogout, state: propState
 
   if (!user) return null;
 
-  const salaryDetails = staffData?.salaryDetails || calculateStaffSalaryDetails(user, allVehicles, selectedMonth);
+  const salaryDetails = staffData?.salaryDetails || StaffSalaryService.calculateMonthlySalary(user, allVehicles, selectedMonth);
   const { soldCars, boughtCars, coinvestedCars } = salaryDetails;
 
+  const unreimbursedAmount = (staffData?.expenses || [])
+    .filter(e => !e.is_reimbursed)
+    .reduce((sum, e) => sum + e.amount, 0);
+
   return (
-    <div className="h-full space-y-8 md:space-y-14 overflow-y-auto px-4 md:px-12 py-6 md:py-12 custom-scrollbar pb-32 max-w-[1700px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <header className="flex flex-col lg:flex-row justify-between items-center gap-8 border-b border-black/5 pb-8 md:pb-10">
-        <div className="text-left w-full">
-          <h2 className="text-3xl sm:text-5xl md:text-7xl font-black tracking-tighter text-kraft-ink uppercase flex items-center gap-4 sm:gap-6 justify-start font-heading">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-t2 bg-kraft-accent/10 flex items-center justify-center text-kraft-accent border border-kraft-accent/20 shrink-0">
-              <User size={28} className="sm:w-10 sm:h-10" strokeWidth={2.5} />
+    <PageShell scrollable maxWidth="max-w-[1700px]" animate={true} className="slide-in-from-bottom-4">
+      {/* Header */}
+      <PageHeaderShell>
+        <div className="text-left w-full sm:w-auto">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-kraft-ink uppercase flex items-center gap-4 justify-start font-heading">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-t2 bg-kraft-accent/10 flex items-center justify-center text-kraft-accent border border-kraft-accent/20 shrink-0">
+              <User size={28} strokeWidth={2.5} />
             </div>
             Cá nhân
           </h2>
-          <p className="text-[10px] sm:text-sub-label !opacity-30 mt-3 flex items-center gap-2 sm:gap-3 justify-start tracking-widest uppercase font-bold">
-            <span className="w-1.5 h-1.5 rounded-full bg-kraft-accent animate-pulse" />
-            Hiệu suất và thu nhập
+          <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-sub-label opacity-50 mt-2 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-kraft-accent animate-pulse" />
+            Hiệu suất và thu nhập • Auto 28
           </p>
         </div>
-        <div className="flex items-center gap-4 bg-white/40 backdrop-blur-md rounded-t2 px-6 py-4 border border-white/60 shadow-xl h-14 md:h-16 w-full sm:w-auto min-w-[220px]">
-          <Calendar size={18} className="text-kraft-accent" />
-          <input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="text-[11px] font-black outline-none bg-transparent text-kraft-ink uppercase tracking-widest w-full cursor-pointer" />
-        </div>
-      </header>
 
-      <div className="relative">
-        <div className={cn("transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]", isSubsequentLoading && "opacity-50 blur-[2px] pointer-events-none")}>
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-            <PersonalSidebar user={user} onLogout={onLogout} setIsEditModalOpen={setIsEditModalOpen} setIsModalOpen={setIsModalOpen} onUpdateUser={onUpdateUser} />
-            <div className="lg:col-span-3 space-y-12">
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
-                <SalaryBreakdownCard salaryDetails={salaryDetails} selectedMonth={selectedMonth} />
-                <PersonalAdvancesCard 
-                  expenses={staffData?.expenses || []} 
-                  selectedMonth={selectedMonth}
-                  onAddClick={() => { setEditingExpense(null); setIsExpenseModalOpen(true); }} 
-                  onEditClick={(e) => { setEditingExpense(e); setIsExpenseModalOpen(true); }} 
-                  onDeleteClick={handleDeleteExpense} 
-                />
-              </div>
+        {/* Month Selector */}
+        <div className="flex items-center gap-3 bg-white/70 backdrop-blur-md rounded-full px-5 py-3 border border-hairline-soft shadow-sm w-full sm:w-auto min-w-[200px]">
+          <Calendar size={16} className="text-kraft-accent shrink-0" />
+          <input 
+            type="month" 
+            value={selectedMonth} 
+            onChange={(e) => setSelectedMonth(e.target.value)} 
+            className="text-xs font-black outline-none bg-transparent text-kraft-ink uppercase tracking-wider w-full cursor-pointer" 
+          />
+        </div>
+      </PageHeaderShell>
+
+      <div className="relative space-y-8 md:space-y-10">
+        <div className={cn(
+          "transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-8 md:space-y-10",
+          isSubsequentLoading && "opacity-50 blur-[2px] pointer-events-none"
+        )}>
+          {/* 1. Hero KPI Metric Ribbon */}
+          <PersonalMetricRibbon
+            netSalary={salaryDetails.netSalary}
+            isPaid={salaryDetails.isPaid}
+            totalCommission={salaryDetails.totalCommission}
+            soldCarsCount={salaryDetails.soldCount}
+            targetCount={user.target || 0}
+            completionRate={salaryDetails.completionRate}
+            unreimbursedAmount={unreimbursedAmount}
+            selectedMonth={selectedMonth}
+          />
+
+          {/* 2. Main Workspace Split Layout (12 cols) */}
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-stretch">
+            {/* Left: Personal Profile & Actions (4 cols) */}
+            <div className="xl:col-span-4 h-full">
+              <PersonalSidebar 
+                user={user} 
+                onLogout={onLogout} 
+                setIsEditModalOpen={setIsEditModalOpen} 
+                setIsModalOpen={setIsModalOpen} 
+                onUpdateUser={onUpdateUser} 
+              />
+            </div>
+
+            {/* Right: Salary Breakdown & Advances (8 cols) */}
+            <div className="xl:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8 h-full">
+              <SalaryBreakdownCard 
+                salaryDetails={salaryDetails} 
+                selectedMonth={selectedMonth} 
+              />
+              <PersonalAdvancesCard 
+                expenses={staffData?.expenses || []} 
+                selectedMonth={selectedMonth}
+                onAddClick={() => { setEditingExpense(null); setIsExpenseModalOpen(true); }} 
+                onEditClick={(e) => { setEditingExpense(e); setIsExpenseModalOpen(true); }} 
+                onDeleteClick={handleDeleteExpense} 
+              />
             </div>
           </div>
 
+          {/* 3. Detailed Transaction Ledger (Full Width) */}
           <PersonalVehiclesSection 
             soldCars={soldCars} 
             boughtCars={boughtCars} 
@@ -127,124 +184,84 @@ export const PersonalWebView = ({ user, onUpdateUser, onLogout, state: propState
           />
         </div>
 
-        {/* LỚP PHỦ KÍNH THỞ (Liquid Flow Glass Overlay) */}
+        {/* Liquid Flow Glass Overlay during month switch */}
         {isSubsequentLoading && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-white/5 backdrop-blur-[6px] border border-white/10 rounded-[2.5rem] flex items-center justify-center z-50 pointer-events-none"
-            style={{
-              animation: 'breathe-glow 3s ease-in-out infinite'
-            }}
+            className="absolute inset-0 bg-white/10 backdrop-blur-[4px] border border-white/20 rounded-t2 flex items-center justify-center z-50 pointer-events-none"
           >
-            {/* Volumetric Mesh Gradient */}
-            <div className="absolute inset-0 -z-10 opacity-30 mix-blend-color-dodge pointer-events-none overflow-hidden rounded-[2.5rem]">
-              <motion.div
-                animate={{
-                  scale: [1, 1.12, 1],
-                  rotate: [0, 90, 0],
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="absolute -inset-10 bg-[radial-gradient(circle_at_30%_30%,#00f2fe_0%,transparent_50%),radial-gradient(circle_at_70%_70%,#4facfe_0%,transparent_50%)] blur-[40px]"
-              />
-            </div>
-            
-            <div className="w-2.5 h-2.5 rounded-full bg-kraft-accent shadow-neon-glow" />
+            <div className="w-3 h-3 rounded-full bg-kraft-accent animate-ping" />
           </motion.div>
         )}
       </div>
 
       {/* Modals */}
-      <AnimatePresence>
-        {isExpenseModalOpen && (
-          <StaffAddExpenseModal 
-            isOpen={isExpenseModalOpen} 
-            onClose={() => { setIsExpenseModalOpen(false); setEditingExpense(null); }} 
-            staffName={user.name} 
-            expense={editingExpense as import('@/src/shared/domain/types').StaffExpense | undefined} 
-            onAdd={(data) => editingExpense ? handleUpdateExpense(String(editingExpense.id), { ...data, id: String(editingExpense.id) }) : handleAddStaffExpense(data)} 
-            onDelete={(id) => handleDeleteExpense(String(id))}
-            vehicles={allVehicles}
+      <Suspense fallback={null}>
+        <AnimatePresence>
+          {isExpenseModalOpen && (
+            <StaffAddExpenseModal 
+              isOpen={isExpenseModalOpen} 
+              onClose={() => { setIsExpenseModalOpen(false); setEditingExpense(null); }} 
+              staffName={user.name} 
+              expense={editingExpense || undefined} 
+              onAdd={(data) => editingExpense 
+                ? handleUpdateExpense(String(editingExpense.id), { ...data, id: String(editingExpense.id) }) 
+                : handleAddStaffExpense(data)
+              } 
+              onDelete={(id) => handleDeleteExpense(String(id))}
+              vehicles={allVehicles}
+            />
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {isVehicleDetailOpen && selectedVehicle && (
+            <VehicleDetailModal 
+              isOpen={isVehicleDetailOpen}
+              vehicle={selectedVehicle}
+              onClose={() => setIsVehicleDetailOpen(false)}
+              onUpdateStatus={(id, nextStatus, extra) => handleUpdateStatus(id, nextStatus, extra || {})}
+              onDeleteVehicle={handleDeleteVehicle}
+              onUpdateVehicle={(id, data) => handleUpdateVehicle(id, data as UpdateVehicleInput)}
+              onAddCost={handleAddCost}
+              onDeleteCost={handleDeleteCost}
+              onPin={handlePin}
+              onAddPurchasePayment={handleAddPurchasePayment}
+              onAddSalePayment={(id, amount, note, receiver, status, seller, bName, sPrice, comm, bBonus) => 
+                handleAddSalePayment(id, amount, note, receiver, status as VehicleStatus, seller, bName, sPrice, comm, bBonus)
+              }
+              onCancelSale={handleCancelSale}
+              staffList={staffList}
+              userRole={user.role}
+              userCode={user.code}
+            />
+          )}
+        </AnimatePresence>
+
+        {isModalOpen && (
+          <PasswordModal 
+            isOpen={isModalOpen} 
+            onClose={() => setIsModalOpen(false)} 
+            value={newPassword} 
+            onChange={setNewPassword} 
+            onSubmit={handleChangePassword} 
+            isSubmitting={isSubmitting}
           />
         )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {isVehicleDetailOpen && selectedVehicle && (
-          <VehicleDetailModal 
-            isOpen={isVehicleDetailOpen}
-            vehicle={selectedVehicle}
-            onClose={() => setIsVehicleDetailOpen(false)}
-            onUpdateStatus={(id, nextStatus, extra) => handleUpdateStatus(id, nextStatus, extra || {})}
-            onDeleteVehicle={handleDeleteVehicle}
-            onUpdateVehicle={(id, data) => handleUpdateVehicle(id, data as unknown as UpdateVehicleInput)}
-            onAddCost={handleAddCost}
-            onDeleteCost={handleDeleteCost}
-            onPin={handlePin}
-            onAddPurchasePayment={handleAddPurchasePayment}
-            onAddSalePayment={(...args) => handleAddSalePayment(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9])}
-            onCancelSale={handleCancelSale}
-            staffList={staffList}
-            userRole={user.role}
-            userCode={user.code}
+        
+        {isEditModalOpen && (
+          <ProfileModal 
+            isOpen={isEditModalOpen} 
+            onClose={() => setIsEditModalOpen(false)} 
+            data={editFormData} 
+            onChange={(data) => setEditFormData({ ...editFormData, ...data })} 
+            onSubmit={handleUpdateProfile} 
+            isSubmitting={isSubmitting}
           />
         )}
-      </AnimatePresence>
-
-      <PasswordModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} value={newPassword} onChange={setNewPassword} onSubmit={handleChangePassword} />
-      <ProfileModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} data={editFormData} onChange={(data) => setEditFormData({ ...editFormData, ...data })} onSubmit={handleUpdateProfile} />
-    </div>
+      </Suspense>
+    </PageShell>
   );
 };
-
-// --- Sub-components (Copied for preservation) ---
-interface PasswordModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  value: string;
-  onChange: (val: string) => void;
-  onSubmit: () => void;
-}
-
-const PasswordModal = ({ isOpen, onClose, value, onChange, onSubmit }: PasswordModalProps) => (
-  <Modal isOpen={isOpen} onClose={onClose} title="Đổi mật khẩu" maxWidth="sm">
-    <ModalBody>
-      <div className="space-y-2">
-        <label className="text-sub-label ml-1">Mật khẩu mới</label>
-        <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className="liquid-input h-14 px-6 text-sm w-full" placeholder="Mật khẩu mới..." />
-      </div>
-    </ModalBody>
-    <ModalFooter onCancel={onClose} onSubmit={onSubmit} submitLabel="Lưu" />
-  </Modal>
-);
-
-interface ProfileModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  data: { name: string; phone: string; department?: string };
-  onChange: (data: { name: string; phone: string; department?: string }) => void;
-  onSubmit: () => void;
-}
-
-const ProfileModal = ({ isOpen, onClose, data, onChange, onSubmit }: ProfileModalProps) => (
-  <Modal isOpen={isOpen} onClose={onClose} title="Chỉnh sửa hồ sơ" maxWidth="md">
-    <ModalBody>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-3">
-          <label className="text-sub-label ml-1">Họ và tên</label>
-          <input type="text" value={data.name} onChange={(e) => onChange({...data, name: e.target.value})} className="liquid-input h-14 px-6 text-sm w-full font-black tracking-tight" />
-        </div>
-        <div className="space-y-3">
-          <label className="text-sub-label ml-1">Số điện thoại</label>
-          <input type="text" value={data.phone} onChange={(e) => onChange({...data, phone: e.target.value})} className="liquid-input h-14 px-6 text-sm w-full font-black tracking-tight" />
-        </div>
-      </div>
-    </ModalBody>
-    <ModalFooter onCancel={onClose} onSubmit={onSubmit} submitLabel="Lưu" />
-  </Modal>
-);

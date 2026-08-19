@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  LayoutDashboard, 
+  BarChart3, 
   Car, 
   Users, 
   CircleDollarSign, 
@@ -37,7 +37,7 @@ export const MobileBottomNavContainer: React.FC<MobileBottomNavContainerProps> =
     {
       id: 'dashboard',
       label: 'Báo cáo',
-      icon: LayoutDashboard,
+      icon: BarChart3,
       onClick: () => setActiveTab('dashboard'),
       visible: hasPermission('VIEW_DASHBOARD')
     },

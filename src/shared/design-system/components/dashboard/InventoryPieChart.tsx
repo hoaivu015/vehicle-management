@@ -14,7 +14,12 @@ interface InventoryPieChartProps {
   cars: Vehicle[];
 }
 
-const COLORS = ['#10b981', '#2563eb', '#eb5e28']; // income, brand, brand-accent
+// Bảng màu SSoT chuẩn Swiss Precision Executive cho biểu đồ trạng thái kho xe
+const STATUS_COLORS: Record<string, string> = {
+  'Trong kho': '#2563eb', // Cobalt Primary Brand
+  'Đang cọc': '#f59e0b',  // Vibrant Amber Warning
+  'Sắp về': '#0ea5e9',    // Tech Cyan
+};
 
 export const InventoryPieChart: React.FC<InventoryPieChartProps> = ({ cars }) => {
   const data = React.useMemo(() => {
@@ -55,8 +60,8 @@ export const InventoryPieChart: React.FC<InventoryPieChartProps> = ({ cars }) =>
             animationDuration={1500}
             stroke="none"
           >
-            {data.map((_entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.name] || '#2563eb'} />
             ))}
           </Pie>
           <Tooltip 

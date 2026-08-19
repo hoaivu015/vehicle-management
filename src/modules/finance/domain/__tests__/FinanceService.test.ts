@@ -41,4 +41,27 @@ describe('FinanceService', () => {
     // 150000 (sale) - 100000 (purchase) = 50000
     expect(profit).toBe(50000);
   });
+
+  it('should calculate opening cash balance before current month correctly', () => {
+    const pastVehicles = [
+      createMockVehicle({
+        id: 10,
+        code: 'CAR-OLD',
+        name: 'Old Car',
+        purchase_price: 50000,
+        purchase_payment_history: [{ amount: 50000, date: '2024-03-15', receiver: '', staff_id: '', staff_expense_id: '', note: '' }],
+        sale_price: 80000,
+        sale_payment_history: [{ amount: 80000, date: '2024-03-28', receiver: '', staff_id: '', staff_expense_id: '', note: '' }],
+      })
+    ];
+
+    const pastExpenses = [
+      { id: 1, name: 'Electricity March', amount: 10000, date: '2024-03-20', category: 'Vận hành', created_at: null },
+      { id: 2, name: 'Electricity April', amount: 15000, date: '2024-04-05', category: 'Vận hành', created_at: null },
+    ];
+
+    // Initial capital 1,000,000 + March Inflow 80,000 - March Purchase 50,000 - March Expense 10,000 = 1,020,000
+    const openingBalanceApril = FinanceService.calculateOpeningCashBalance(1_000_000, pastVehicles, pastExpenses, '2024-04');
+    expect(openingBalanceApril).toBe(1_020_000);
+  });
 });

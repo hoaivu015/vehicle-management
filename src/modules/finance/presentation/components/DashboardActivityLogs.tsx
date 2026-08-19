@@ -19,8 +19,8 @@ export const DashboardActivityLogs: React.FC<DashboardActivityLogsProps> = ({ ac
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 render-boundary-isolated">
       <motion.div 
-        initial={{ opacity: 0, y: 30, x: 15, filter: 'blur(4px)' }}
-        animate={{ opacity: 1, y: 0, x: 0, filter: 'blur(0px)' }}
+        initial={{ opacity: 0, y: 20, x: 10 }}
+        animate={{ opacity: 1, y: 0, x: 0 }}
         transition={{ type: 'spring' as const, stiffness: 100, damping: 18, delay: 0.2 }}
         className="glass-l3-aux p-10 rounded-[4rem]"
       >

@@ -301,7 +301,7 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
         <span className="text-[10px] font-black text-sub-label uppercase tracking-widest">{date}</span>
         <div className="flex items-center gap-g1">
           {category && (
-            <span className="text-[9px] font-black text-kraft-accent bg-kraft-accent/10 px-g1 py-0.5 rounded-full uppercase tracking-widest">
+            <span className="text-[9.5px] font-mono font-bold text-sub-label bg-black/5 border border-black/5 px-2 py-0.5 rounded-full tracking-wider">
               {category}
             </span>
           )}

@@ -1,8 +1,7 @@
 import React, { Suspense } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
 import { Plus, Users, Calendar } from 'lucide-react';
 import { Skeleton } from '@/src/shared/design-system/Skeleton';
-import { cn } from '@/src/shared/utils/cn';
 
 import { useStaffState, StaffState } from './useStaffState';
 import { StaffList } from './components/StaffList';
@@ -20,29 +19,25 @@ const StaffMobileSkeleton = () => (
     {/* Header skeleton */}
     <div className="flex items-center justify-between">
       <div className="space-y-2">
-        <Skeleton variant="text" width={80} height={10} className="animate-pulse bg-black/5" />
+        <Skeleton variant="text" width={100} height={10} className="animate-pulse bg-black/5" />
         <Skeleton variant="text" width={80} height={28} className="animate-pulse bg-black/5" />
       </div>
-      <Skeleton variant="rectangle" width={44} height={44} className="rounded-2xl animate-pulse bg-black/5" />
+      <Skeleton variant="circle" width={48} height={48} className="rounded-full animate-pulse bg-black/5" />
     </div>
-    {/* Month picker skeleton */}
-    <Skeleton variant="rectangle" width={160} height={48} className="rounded-full animate-pulse bg-black/5" />
+    {/* Month selector skeleton */}
+    <Skeleton variant="rectangle" width={140} height={48} className="rounded-full animate-pulse bg-black/8" />
     {/* Staff card skeletons */}
     <div className="space-y-4">
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="bg-white border border-black/5 rounded-[2rem] p-5 space-y-4 shadow-sm">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="bg-white p-5 rounded-[2rem] border border-black/5 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Skeleton variant="circle" width={48} height={48} className="rounded-full animate-pulse bg-black/5" />
-            <div className="flex-1 space-y-1.5">
-              <Skeleton variant="text" width="60%" height={16} className="animate-pulse bg-black/5" />
-              <Skeleton variant="text" width="40%" height={10} className="animate-pulse bg-black/5" />
+            <div className="space-y-2">
+              <Skeleton variant="text" width={120} height={14} className="animate-pulse bg-black/5" />
+              <Skeleton variant="text" width={80} height={10} className="animate-pulse bg-black/5" />
             </div>
-            <Skeleton variant="rectangle" width={70} height={28} className="rounded-xl animate-pulse bg-black/5" />
           </div>
-          <div className="flex items-center justify-between pt-2 border-t border-black/5">
-            <Skeleton variant="text" width={80} height={10} className="animate-pulse bg-black/5" />
-            <Skeleton variant="text" width={100} height={16} className="animate-pulse bg-black/5" />
-          </div>
+          <Skeleton variant="text" width={60} height={18} className="animate-pulse bg-black/5" />
         </div>
       ))}
     </div>
@@ -57,6 +52,7 @@ interface StaffMobileViewProps {
 
 /**
  * 🍎 iPhone Native Staff View.
+ * Implements high-end native feel with safe areas and premium interactions.
  */
 export const StaffMobileView: React.FC<StaffMobileViewProps> = ({ userRole, hasPermission, state: propState }) => {
   const internalState = useStaffState(new Date().toISOString().slice(0, 7), userRole);
@@ -98,7 +94,6 @@ export const StaffMobileView: React.FC<StaffMobileViewProps> = ({ userRole, hasP
   };
 
   const isInitialLoading = loading && !staffList.length;
-  const isSubsequentLoading = loading && !!staffList.length;
 
   if (isInitialLoading) return <StaffMobileSkeleton />;
 
@@ -140,7 +135,7 @@ export const StaffMobileView: React.FC<StaffMobileViewProps> = ({ userRole, hasP
       </NativeHeader>
 
       <div className="relative mt-2">
-        <div className={cn("transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]", isSubsequentLoading && "opacity-50 blur-[2px] pointer-events-none")}>
+        <div className="transition-all duration-500">
           <StaffList 
             loading={loading}
             staffList={staffList}
@@ -155,26 +150,6 @@ export const StaffMobileView: React.FC<StaffMobileViewProps> = ({ userRole, hasP
             setIsAddOpen={setIsAddOpen}
           />
         </div>
-
-        {/* LỚP PHỦ KÍNH THỞ (Liquid Flow Glass Overlay) */}
-        {isSubsequentLoading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-white/5 backdrop-blur-[6px] border border-white/10 rounded-[2.5rem] flex items-center justify-center z-50 pointer-events-none"
-            style={{ animation: 'breathe-glow 3s ease-in-out infinite' }}
-          >
-            <div className="absolute inset-0 -z-10 opacity-30 mix-blend-color-dodge pointer-events-none overflow-hidden rounded-[2.5rem]">
-              <motion.div
-                animate={{ scale: [1, 1.12, 1], rotate: [0, 90, 0] }}
-                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -inset-10 bg-[radial-gradient(circle_at_30%_30%,#00f2fe_0%,transparent_50%),radial-gradient(circle_at_70%_70%,#4facfe_0%,transparent_50%)] blur-[40px]"
-              />
-            </div>
-            <div className="w-2.5 h-2.5 rounded-full bg-kraft-accent shadow-neon-glow" />
-          </motion.div>
-        )}
       </div>
 
       <AnimatePresence>

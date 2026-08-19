@@ -39,7 +39,7 @@ export interface StaffExpense {
   amount: number;
   note: string;
   date: string;
-  type: 'vehicle' | 'operating';
+  type: 'vehicle' | 'operating' | 'advance' | string;
   vehicleId?: number;
   vehicle_code?: string;
   category?: string;
@@ -69,9 +69,6 @@ export interface Vehicle {
   id: number;
   name: string;
   code: string;
-  license_plate?: string;
-  battery_type?: string;
-  show_on_landing?: boolean;
   status: VehicleStatus;
   year: string;
   odo?: number;
@@ -112,6 +109,10 @@ export interface Vehicle {
   partner_capital_repaid?: boolean;
   partner_profit_shared?: boolean;
 
+  battery_type?: string;
+  license_plate?: string;
+  show_on_landing?: boolean;
+
   created_at?: string;
   updated_at?: string;
 }
@@ -140,11 +141,14 @@ export interface SalaryDetails {
   boughtCars: Vehicle[];
   coinvestedCars: Vehicle[];
   totalReimbursements: number;
+  totalAdvances: number;
   carryOverAdvances: number;
   netSalary: number;
   isPaid: boolean;
   targetExpenseIds: string[];
   targetVehicleIds: number[];
+  targetCoinvestVehicleIds: number[];
+  snapshot?: Record<string, unknown> | null;
 }
 
 export interface StaffWithSalary extends Staff {

@@ -122,7 +122,7 @@ interface MainContentProps {
   handleLogout: () => void;
   hasPermission: (p: string) => boolean;
   onUpdateUser: (email: string, data: Partial<import('@/src/shared/domain/types').Staff> & { password?: string }) => void;
-  financePresenter: import('@/src/modules/finance/presentation/FinancePresenter').FinancePresenter;
+  financePresenter?: import('@/src/modules/finance/presentation/FinancePresenter').FinancePresenter;
   handleDashboardAction: (tab: string, search?: string, filter?: string, action?: string) => void;
   loading: boolean;
 }

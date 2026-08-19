@@ -27,7 +27,7 @@ export const SandboxPage = () => {
   };
 
   return (
-    <div className="min-h-screen pb-20 px-4 md:px-8 pt-8 space-y-8 max-w-7xl mx-auto custom-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="min-h-screen pb-36 md:pb-20 px-4 md:px-8 pt-8 space-y-8 max-w-7xl mx-auto custom-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* 🔮 Showroom Header */}
       <div className="bg-white/40 backdrop-blur-xl border border-white/60 p-8 rounded-[2.5rem] shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1.5">

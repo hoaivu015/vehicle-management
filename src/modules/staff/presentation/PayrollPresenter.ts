@@ -54,7 +54,24 @@ export class PayrollPresenter extends BasePresenter<PayrollView> {
         targetExpenseIds: targetExpenseIds,
         targetVehicleIds: targetVehicleIds,
         targetCoinvestVehicleIds: targetCoinvestVehicleIds,
-        paymentDate
+        paymentDate,
+        snapshot: {
+          baseSalary: staff.salaryDetails.base,
+          salesCommission: staff.salaryDetails.salesCommission,
+          buyingCommission: staff.salaryDetails.buyingCommission,
+          buyingBonus: staff.salaryDetails.buyingBonus,
+          coinvestProfitShare: staff.salaryDetails.coinvestProfitShare,
+          kpiBonusMultiplier: staff.salaryDetails.kpiBonusMultiplier,
+          totalSalary: staff.salaryDetails.totalSalary,
+          totalReimbursements: staff.salaryDetails.totalReimbursements,
+          totalAdvances: staff.salaryDetails.totalAdvances,
+          netSalary: staff.salaryDetails.netSalary,
+          soldCount: staff.salaryDetails.soldCount,
+          boughtCount: staff.salaryDetails.boughtCount,
+          soldCars: staff.salaryDetails.soldCars.map(c => ({ id: c.id, code: c.code, name: c.name, commission: c.commission })),
+          boughtCars: staff.salaryDetails.boughtCars.map(c => ({ id: c.id, code: c.code, name: c.name, buying_commission: c.buying_commission, buying_bonus: c.buying_bonus })),
+          coinvestedCars: staff.salaryDetails.coinvestedCars.map(c => ({ id: c.id, code: c.code, name: c.name }))
+        }
       });
     }
   }

@@ -50,8 +50,7 @@ describe('AddVehicle Use Case', () => {
     coinvestor_code: '',
     coinvest_amount: 0,
     notes: 'Xe đẹp, máy zin',
-    buying_commission: 3000000,
-    battery_type: 'None'
+    buying_commission: 3000000
   };
 
   it('nên tạo xe mới thành công với mã xe tự động', async () => {

@@ -74,7 +74,7 @@ export const MatrixLedger: React.FC<{ children: React.ReactNode; className?: str
   className 
 }) => (
   <div className={cn("lg:col-span-7", className)}>
-    <div className="bg-[#f8fafc] rounded-[3rem] p-8 border border-[#e2e8f0] min-h-[400px] flex flex-col shadow-sm relative overflow-hidden">
+    <div className="bg-slate-50 rounded-[3rem] p-8 border border-slate-200 min-h-[400px] flex flex-col shadow-sm relative overflow-hidden">
       {children}
     </div>
   </div>

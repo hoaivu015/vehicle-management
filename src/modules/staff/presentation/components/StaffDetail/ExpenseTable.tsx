@@ -95,12 +95,12 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
             </span>
           </div>
           {expense.type === 'vehicle' && expense.vehicle_code && (
-            <span className="text-[9px] font-black text-warning bg-warning/5 px-2 py-0.5 rounded-md w-fit border border-warning/10 shadow-sm">
+            <span className="text-[9px] font-black text-warning bg-warning/5 px-2.5 py-0.5 rounded-full w-fit border border-warning/10 shadow-sm">
               #{expense.vehicle_code}
             </span>
           )}
           {expense.type === 'operating' && expense.category && (
-            <span className="text-[9px] font-black text-sub-label opacity-40 bg-slate-100 px-2 py-0.5 rounded-md uppercase tracking-widest">
+            <span className="text-[9px] font-black text-sub-label opacity-40 bg-slate-100 px-2.5 py-0.5 rounded-full uppercase tracking-widest">
               {expense.category}
             </span>
           )}

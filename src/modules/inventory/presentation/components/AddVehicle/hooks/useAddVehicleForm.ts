@@ -18,8 +18,7 @@ const getInitialFormState = (): AddVehicleRequest => ({
   coinvest_amount: 0,
   notes: '',
   image_url: '',
-  buying_commission: 0,
-  battery_type: 'None'
+  buying_commission: 3000000
 });
 
 export const useAddVehicleForm = (

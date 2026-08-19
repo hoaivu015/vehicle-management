@@ -60,6 +60,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ member, filterMonth, isAdmin, 
               {member.department || 'Kinh doanh'}
             </p>
             <p className="text-[9px] font-bold text-kraft-ink/40 truncate">{member.email}</p>
+            {member.phone && (
+              <p className="text-[9px] font-bold text-kraft-accent/70 truncate">SĐT: {member.phone}</p>
+            )}
           </div>
         </div>
       </div>
@@ -101,18 +104,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ member, filterMonth, isAdmin, 
           {/* Financial Snapshot - High Density Grid */}
           <div className="flex flex-col gap-3">
             {/* Hero: Thực lĩnh */}
-            <div className="p-5 bg-kraft-ink rounded-[1.5rem] shadow-xl flex items-center justify-between group relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none" />
+            <div className="p-5 bg-white rounded-[1.5rem] border border-hairline-soft shadow-kraft-deep flex items-center justify-between group relative overflow-hidden">
               <div className="space-y-0.5 relative z-10">
-                <p className="text-[9px] font-black uppercase tracking-widest text-white/40">Thực lĩnh</p>
-                <p className="text-2xl font-black text-white tracking-tighter leading-none">{formatCurrency(salaryDetails.netSalary)}</p>
-                {salaryDetails.totalReimbursements > 0 && (
-                  <p className="text-[9px] font-bold text-white/25 uppercase tracking-widest mt-1">
-                    +{formatCurrency(salaryDetails.totalReimbursements)} hoàn ứng
-                  </p>
-                )}
+                <p className="text-[9px] font-black uppercase tracking-widest text-sub-label">Thực lĩnh</p>
+                <p className="text-2xl font-black text-kraft-ink tracking-tighter leading-none">{formatCurrency(salaryDetails.netSalary)}</p>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {salaryDetails.totalReimbursements > 0 && (
+                    <p className="text-[9px] font-bold text-income uppercase tracking-widest">
+                      +{formatCurrency(salaryDetails.totalReimbursements)} hoàn ứng
+                    </p>
+                  )}
+                  {salaryDetails.totalAdvances > 0 && (
+                    <p className="text-[9px] font-bold text-expense uppercase tracking-widest">
+                      -{formatCurrency(salaryDetails.totalAdvances)} tạm ứng
+                    </p>
+                  )}
+                </div>
               </div>
-              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-white/40 relative z-10 shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-kraft-accent/10 flex items-center justify-center text-kraft-accent relative z-10 shrink-0 border border-kraft-accent/20">
                 <DollarSign size={24} strokeWidth={2.5} />
               </div>
             </div>
@@ -120,31 +129,57 @@ export const Sidebar: React.FC<SidebarProps> = ({ member, filterMonth, isAdmin, 
             {/* Grid for other stats */}
             <div className="grid grid-cols-2 gap-3">
               <div className="p-4 bg-white rounded-[1.5rem] border border-black/5 shadow-sm flex flex-col justify-between group h-24 relative overflow-hidden">
-                <div className="w-8 h-8 rounded-lg bg-black/5 flex items-center justify-center text-black/20 mb-1">
+                <div className="w-8 h-8 rounded-lg bg-black/5 flex items-center justify-center text-black/40 mb-1">
                   <PieChart size={16} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <p className="text-[9px] font-black uppercase tracking-widest opacity-30 truncate">Lương CB</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-sub-label truncate">Lương CB</p>
                   <p className="text-lg font-black text-kraft-ink tracking-tighter truncate">{formatCurrency(salaryDetails.base)}</p>
                 </div>
               </div>
 
               <div className="p-4 bg-white rounded-[1.5rem] border border-black/5 shadow-sm flex flex-col justify-between group h-24 relative overflow-hidden">
-                <div className="w-8 h-8 rounded-lg bg-kraft-accent/10 flex items-center justify-center text-kraft-accent mb-1">
+                <div className={cn(
+                  "w-8 h-8 rounded-lg flex items-center justify-center mb-1",
+                  salaryDetails.totalCommission > 0 ? "bg-income/10 text-income" : "bg-black/5 text-sub-label"
+                )}>
                   <TrendingUp size={16} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <p className="text-[9px] font-black uppercase tracking-widest opacity-30 truncate">Hoa hồng</p>
-                  <p className="text-lg font-black text-kraft-accent tracking-tighter truncate">{formatCurrency(salaryDetails.totalCommission)}</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-sub-label truncate">Hoa hồng</p>
+                  <p className={cn(
+                    "text-lg font-black tracking-tighter truncate",
+                    salaryDetails.totalCommission > 0 ? "text-income" : "text-sub-label"
+                  )}>
+                    {formatCurrency(salaryDetails.totalCommission)}
+                  </p>
                 </div>
               </div>
 
-              <div className="col-span-2 p-4 bg-red-500/[0.03] rounded-[1.5rem] border border-red-500/10 shadow-sm flex items-center justify-between group relative overflow-hidden">
+              <div className={cn(
+                "col-span-2 p-4 rounded-[1.5rem] border shadow-sm flex items-center justify-between group relative overflow-hidden",
+                totalUnreimbursed > 0 
+                  ? "bg-expense/5 border-expense/20" 
+                  : "bg-surface-soft border-hairline-soft"
+              )}>
                 <div className="space-y-0 relative z-10">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-red-500/40">Nợ tạm ứng</p>
-                  <p className="text-xl font-black text-red-500 tracking-tighter leading-none">{formatCurrency(totalUnreimbursed)}</p>
+                  <p className={cn(
+                    "text-[9px] font-black uppercase tracking-widest",
+                    totalUnreimbursed > 0 ? "text-expense" : "text-sub-label"
+                  )}>
+                    Chưa quyết toán
+                  </p>
+                  <p className={cn(
+                    "text-xl font-black tracking-tighter leading-none",
+                    totalUnreimbursed > 0 ? "text-expense" : "text-kraft-ink"
+                  )}>
+                    {formatCurrency(totalUnreimbursed)}
+                  </p>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500/40 relative z-10 shrink-0">
+                <div className={cn(
+                  "w-10 h-10 rounded-xl flex items-center justify-center relative z-10 shrink-0",
+                  totalUnreimbursed > 0 ? "bg-expense/10 text-expense" : "bg-black/5 text-sub-label"
+                )}>
                   <DollarSign size={20} strokeWidth={2.5} />
                 </div>
               </div>

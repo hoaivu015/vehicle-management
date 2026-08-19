@@ -17,7 +17,7 @@ export const StaffSkeleton: React.FC<StaffSkeletonProps> = ({ hideHeader = false
               <Skeleton variant="circle" width={40} height={40} className="md:w-16 md:h-16 rounded-xl md:rounded-t2" />
               <div className="space-y-1 md:space-y-3 flex-1">
                 <div className="flex items-center gap-1.5 md:gap-3">
-                   <Skeleton variant="text" width={40} height={12} className="md:w-12 md:h-4 rounded md:rounded-lg opacity-10" />
+                   <Skeleton variant="text" width={40} height={12} className="md:w-12 md:h-4 rounded-full opacity-10" />
                 </div>
                 <Skeleton variant="text" width="80%" height={16} className="md:h-8 rounded-lg" />
               </div>

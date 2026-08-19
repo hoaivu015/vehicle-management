@@ -22,8 +22,8 @@ export const ReceivableDebtsList: React.FC<ReceivableDebtsListProps> = ({
 }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30, x: 15, filter: 'blur(4px)' }}
-      animate={{ opacity: 1, y: 0, x: 0, filter: 'blur(0px)' }}
+      initial={{ opacity: 0, y: 20, x: 10 }}
+      animate={{ opacity: 1, y: 0, x: 0 }}
       transition={{ type: 'spring' as const, stiffness: 100, damping: 18, delay: 0.1 }}
       className="flex-1 w-full"
     >
@@ -36,27 +36,27 @@ export const ReceivableDebtsList: React.FC<ReceivableDebtsListProps> = ({
             </SectionHeader>
 
             {/* Sum Display section with Wow premium style */}
-            <div className="mb-8 p-6 bg-emerald-50/50 rounded-2xl border border-emerald-100 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+            <div className="mb-6 p-4 sm:p-5 bg-emerald-50/60 rounded-[20px] border border-emerald-200/60 flex items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-xs">
                   <TrendingUp size={20} strokeWidth={2.5} />
                 </div>
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-kraft-accent/40 leading-none">
+                <div className="min-w-0">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800/60 leading-none block whitespace-nowrap">
                     Tổng khách nợ xe
                   </span>
-                  <h3 className="text-2xl font-black tracking-tight text-emerald-600 mt-1 leading-none">
+                  <h3 className="text-xl sm:text-2xl font-black tracking-tight text-emerald-600 mt-1 leading-none whitespace-nowrap">
                     {formatCurrency(total)}
                   </h3>
                 </div>
               </div>
-              <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">
+              <span className="text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100/90 border border-emerald-200/80 px-3 py-1.5 rounded-full shrink-0 whitespace-nowrap shadow-xs">
                 {debts.length} xe
               </span>
             </div>
 
             {/* List render */}
-            <div className="divide-y divide-hairline-soft max-h-[360px] overflow-y-auto pr-1 render-boundary-isolated">
+            <div className="divide-y divide-hairline-soft md:max-h-[360px] md:overflow-y-auto overflow-visible pr-1 pb-2 render-boundary-isolated">
               {debts.length === 0 ? (
                 <EmptyState
                   icon={CheckCircle2}

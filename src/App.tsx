@@ -1,11 +1,9 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { Header } from '@/src/shared/presentation/components/Layout/Header';
-import { Login } from '@/src/modules/auth/presentation/views/Login';
 import { Toaster } from 'sonner';
 import { cn } from "@/src/shared/utils/cn";
 import { UserRole } from '@/src/shared/domain/constants';
 import { useAuth } from '@/src/modules/auth/presentation/useAuth';
-import { useFinance } from '@/src/modules/finance/presentation/useFinance';
 import { MainContent } from '@/src/shared/presentation/components/Layout/MainContent';
 import { MobileBottomNavContainer } from '@/src/shared/presentation/components/Layout/MobileBottomNavContainer';
 import { SpeedInsights } from "@vercel/speed-insights/react";
@@ -15,7 +13,11 @@ import { NotificationInitializer } from '@/src/shared/presentation/components/No
 import { useDependencies } from '@/src/shared/ioc/DependencyContext';
 import { AnimatePresence, MotionConfig } from 'motion/react';
 
-// Lazy-load global modal to avoid bloat on startup
+// Lazy-load Login, AppSplashScreen and global modal to minimize initial bundle size
+import { AppSplashScreen } from '@/src/shared/presentation/components/Layout/AppSplashScreen';
+const Login = React.lazy(() => 
+  import('@/src/modules/auth/presentation/views/Login').then(m => ({ default: m.Login }))
+);
 const StaffAddExpenseModal = React.lazy(() => 
   import('@/src/modules/staff/presentation/components/StaffAddExpenseModal').then(m => ({ default: m.StaffAddExpenseModal }))
 );
@@ -31,8 +33,6 @@ export default function App() {
     handleLogout,
     handleUpdateUser
   } = useAuth();
-  
-  const { financePresenter } = useFinance();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -40,13 +40,12 @@ export default function App() {
   const [isGlobalExpenseOpen, setIsGlobalExpenseOpen] = useState(false);
   const [vehicles, setVehicles] = useState<import('@/src/shared/domain/types').Vehicle[]>([]);
 
-  const staffPresenter = useState(() => createStaffPresenter())[0];
-
   // Defer vehicle loading until user actually opens global expense modal
   useEffect(() => {
     if (!isGlobalExpenseOpen) return;
 
-    staffPresenter.attachView({
+    const presenter = createStaffPresenter();
+    presenter.attachView({
       showStaffList: () => {},
       onStaffAdded: () => {},
       onStaffUpdated: () => {},
@@ -56,9 +55,9 @@ export default function App() {
       hideLoading: () => {},
       showError: () => {}
     });
-    staffPresenter.loadVehicles();
-    return () => staffPresenter.detachView();
-  }, [isGlobalExpenseOpen, staffPresenter]);
+    presenter.loadVehicles();
+    return () => presenter.detachView();
+  }, [isGlobalExpenseOpen, createStaffPresenter]);
 
   // Derive activeTab from URL path
   const activeTab = location.pathname.split('/')[1] || 'dashboard';
@@ -135,11 +134,19 @@ export default function App() {
   };
 
   const userRole = currentUser?.role || UserRole.STAFF;
-  const isLoading = isAuthLoading || (isAuthed && !currentUser);
-
-  if (!currentUser && !isAuthLoading && !isAuthed) {
-    return <Login onLogin={setCurrentUser} />;
+  if (isAuthLoading) {
+    return <AppSplashScreen />;
   }
+
+  if (!currentUser && !isAuthed) {
+    return (
+      <Suspense fallback={<AppSplashScreen />}>
+        <Login onLogin={setCurrentUser} />
+      </Suspense>
+    );
+  }
+
+  const isLoading = isAuthed && !currentUser;
 
   return (
     <MotionConfig reducedMotion="user">
@@ -181,14 +188,13 @@ export default function App() {
               handleLogout={handleLogout}
               hasPermission={hasPermission}
               onUpdateUser={handleUpdateUser}
-              financePresenter={financePresenter}
               handleDashboardAction={handleDashboardAction}
               loading={isLoading}
             />
           </div>
 
-          <footer className="mt-12 pt-8 border-t border-white/20 hidden xl:block">
-            <div className="max-w-full mx-auto flex flex-col sm:flex-row justify-between items-center gap-6 text-[10px] text-kraft-accent font-black tracking-[0.25em] px-4 opacity-60">
+          <footer className="mt-12 pt-8 border-t border-hairline-soft hidden xl:block">
+            <div className="max-w-full mx-auto flex flex-col sm:flex-row justify-between items-center gap-6 text-[10px] text-sub-label/40 font-mono font-bold tracking-widest px-4">
               <p className="uppercase">© 2026 AUTO 28 Showroom Manager • Phanvu</p>
             </div>
           </footer>
@@ -214,7 +220,8 @@ export default function App() {
               onClose={() => setIsGlobalExpenseOpen(false)}
               staffName={currentUser.name}
               onAdd={async (data) => {
-                await staffPresenter.addStaffExpense(currentUser.id, data);
+                const presenter = createStaffPresenter();
+                await presenter.addStaffExpense(currentUser.id, data);
                 setIsGlobalExpenseOpen(false);
               }}
               vehicles={vehicles}

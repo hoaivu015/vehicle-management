@@ -61,7 +61,7 @@ export const SmartTable = <T extends { id?: string | number }>({
         <div className="p-6 border-b border-gray-50 flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50/30">
           <div className="flex items-center gap-4">
             {Icon && (
-              <div className="p-2.5 rounded-2xl bg-indigo-50 text-indigo-600">
+              <div className="p-2.5 rounded-2xl bg-accent-soft text-kraft-accent">
                 <Icon size={22} strokeWidth={2.5} />
               </div>
             )}
@@ -71,13 +71,13 @@ export const SmartTable = <T extends { id?: string | number }>({
           <div className="flex items-center gap-4 w-full md:w-auto">
             {searchPlaceholder && (
               <div className="relative flex-1 md:w-64 group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-kraft-accent transition-colors" size={18} />
                 <input
                   type="text"
                   placeholder={searchPlaceholder}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full h-11 pl-11 pr-4 bg-white border border-gray-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                  className="w-full h-11 pl-11 pr-4 bg-white border border-gray-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-kraft-accent/20 focus:border-kraft-accent transition-all"
                 />
               </div>
             )}
@@ -90,12 +90,12 @@ export const SmartTable = <T extends { id?: string | number }>({
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-gray-50/50">
+            <tr className="border-b border-gray-100 bg-gray-50/50">
               {columns.map((col, idx) => (
                 <th 
                   key={idx} 
                   className={cn(
-                    "py-4 px-6 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap",
+                    "py-4 px-6 text-xs font-bold text-gray-400 uppercase tracking-wider",
                     col.align === 'right' ? "text-right" : col.align === 'center' ? "text-center" : "text-left",
                     col.className
                   )}
@@ -126,7 +126,7 @@ export const SmartTable = <T extends { id?: string | number }>({
                     onClick={() => onRowClick?.(item)}
                     className={cn(
                       "group transition-colors",
-                      onRowClick ? "cursor-pointer hover:bg-indigo-50/30" : "hover:bg-gray-50/30"
+                      onRowClick ? "cursor-pointer hover:bg-blue-50/50" : "hover:bg-gray-50/30"
                     )}
                   >
                     {columns.map((col, colIdx) => (

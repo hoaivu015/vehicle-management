@@ -5,7 +5,8 @@ import {
   calcKPICompletion, 
   calcKPIMultiplier, 
   calcTotalSalary, 
-  calcStaffTotalCommissions 
+  calcStaffTotalCommissions,
+  calcNetSalaryWithAdvances
 } from '../../../shared/utils/financial_formulas';
 
 export interface SalaryDetails {
@@ -24,17 +25,29 @@ export interface SalaryDetails {
   soldCars: Vehicle[];
   boughtCars: Vehicle[];
   coinvestedCars: Vehicle[];
-  // Reimbursables & Net
+  // Reimbursables & Advances & Net
   totalReimbursements: number;
+  totalAdvances: number;
   carryOverAdvances: number;
   netSalary: number;
   isPaid: boolean;
   targetExpenseIds: string[];
   targetVehicleIds: number[];
   targetCoinvestVehicleIds: number[];
+  snapshot?: Record<string, unknown> | null;
 }
 
 export class StaffSalaryService {
+  /**
+   * Phân loại khoản chi phí là Tạm ứng lương (khấu trừ) hay Hoàn ứng chi hộ (cộng vào).
+   */
+  static isSalaryAdvance(expense: { type?: string; category?: string; note?: string }): boolean {
+    if (expense.type === 'advance') return true;
+    if (expense.category === 'Tạm ứng lương') return true;
+    const note = (expense.note || '').toLowerCase();
+    return note.startsWith('tạm ứng') || note.includes('ứng lương');
+  }
+
   /**
    * Tính toán chi tiết lương cho một nhân viên dựa trên danh sách xe trong một tháng.
    */
@@ -121,16 +134,28 @@ export class StaffSalaryService {
     );
 
     const expenses = member.expenses || [];
-    const currentMonthExpenses = expenses
-      .filter(e => e.date.startsWith(monthStr) && !e.is_reimbursed)
-      .reduce((acc, e) => acc + e.amount, 0);
+    
+    // 1. Phân loại Hoàn ứng chi hộ (Reimbursements) vs Tạm ứng lương (Advances)
+    const pendingExpenses = expenses.filter(e => !e.is_reimbursed && (e.date.startsWith(monthStr) || e.date < monthStr));
+    
+    let totalReimbursements = 0;
+    let totalAdvances = 0;
+    let carryOverExpenses = 0;
 
-    const carryOverExpenses = expenses
-      .filter(e => !e.is_reimbursed && e.date < monthStr)
-      .reduce((acc, e) => acc + e.amount, 0);
+    pendingExpenses.forEach(e => {
+      const isAdvance = this.isSalaryAdvance(e);
+      if (isAdvance) {
+        totalAdvances += e.amount;
+      } else {
+        totalReimbursements += e.amount;
+      }
 
-    const totalReimbursements = currentMonthExpenses + carryOverExpenses;
-    const netSalary = totalSalary + totalReimbursements;
+      if (e.date < monthStr) {
+        carryOverExpenses += e.amount;
+      }
+    });
+
+    const netSalary = calcNetSalaryWithAdvances(totalSalary, totalReimbursements, totalAdvances);
     const isPaid = (member.paid_months || []).includes(monthStr);
 
     return {
@@ -149,12 +174,11 @@ export class StaffSalaryService {
       boughtCars,
       coinvestedCars,
       totalReimbursements,
+      totalAdvances,
       carryOverAdvances: carryOverExpenses,
       netSalary,
       isPaid,
-      targetExpenseIds: expenses
-        .filter(e => !e.is_reimbursed && (e.date.startsWith(monthStr) || e.date < monthStr))
-        .map(e => e.id),
+      targetExpenseIds: pendingExpenses.map(e => e.id),
       targetVehicleIds: cars.filter(c => {
         const isBuyer = compareCode(c.buyer || '', member);
         if (!isBuyer) return false;
@@ -185,6 +209,7 @@ export class StaffSalaryService {
       boughtCars: [],
       coinvestedCars: [],
       totalReimbursements: 0,
+      totalAdvances: 0,
       carryOverAdvances: 0,
       netSalary: 0,
       isPaid: false,

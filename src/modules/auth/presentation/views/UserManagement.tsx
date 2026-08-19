@@ -11,7 +11,7 @@ export const UserManagement = () => {
   const { uniqueUsers, showAddModal, setShowAddModal, editingId, setEditingId, formData, setFormData, handleSubmit, handleUpdate, presenter } = useUserManagement();
 
   return (
-    <div className="space-y-8 md:space-y-12 py-4 md:py-6 px-1 md:px-2 max-w-full mx-auto overflow-y-auto pr-1 md:pr-2 custom-scrollbar pb-12 h-full">
+    <div className="space-y-8 md:space-y-12 py-4 md:py-6 px-1 md:px-2 max-w-full mx-auto overflow-y-auto pr-1 md:pr-2 custom-scrollbar pb-36 md:pb-12 h-full">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-8">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-kraft-accent p-3 md:p-4 shadow-lg flex items-center justify-center"><Shield className="text-white" size={24} /></div>

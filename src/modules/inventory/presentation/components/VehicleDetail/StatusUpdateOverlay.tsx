@@ -144,7 +144,7 @@ export const StatusUpdateOverlay: React.FC<StatusUpdateOverlayProps> = ({
                               setIsUpdatingStatus(false);
                            }
                         }}
-                        className="w-full flex items-center justify-between p-4 md:p-5 px-6 md:px-8 rounded-full bg-white border border-[#e5e7eb] hover:border-kraft-accent hover:bg-kraft-accent/5 transition-all group disabled:opacity-50"
+                        className="w-full flex items-center justify-between p-4 md:p-5 px-6 md:px-8 rounded-full bg-white border border-slate-200 hover:border-kraft-accent hover:bg-kraft-accent/5 transition-all group disabled:opacity-50"
                      >
                         <span className="text-xs font-black uppercase tracking-widest">{VEHICLE_STATUS_LABELS[status as VehicleStatus] || status}</span>
                         <div className="w-8 h-8 rounded-full bg-kraft-accent/10 flex items-center justify-center text-kraft-accent group-hover:bg-kraft-accent group-hover:text-white transition-all">

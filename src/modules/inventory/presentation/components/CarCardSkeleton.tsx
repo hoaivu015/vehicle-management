@@ -38,8 +38,8 @@ export const CarCardSkeleton: React.FC<CarCardSkeletonProps> = React.memo(({ isC
           </div>
           {!isCompact && (
             <div className="flex gap-1 md:gap-2 mt-1 md:mt-2.5 items-center">
-              <Skeleton variant="rectangle" width={40} height={14} className="md:w-16 md:h-5 rounded md:rounded-lg opacity-20" />
-              <Skeleton variant="rectangle" width={40} height={14} className="md:w-16 md:h-5 rounded md:rounded-lg opacity-20" />
+              <Skeleton variant="rectangle" width={40} height={14} className="md:w-16 md:h-5 rounded-full opacity-20" />
+              <Skeleton variant="rectangle" width={40} height={14} className="md:w-16 md:h-5 rounded-full opacity-20" />
             </div>
           )}
         </div>
@@ -47,11 +47,11 @@ export const CarCardSkeleton: React.FC<CarCardSkeletonProps> = React.memo(({ isC
         <CardFooter className={isCompact ? "pt-2 md:pt-3" : "pt-3 md:pt-4"}>
           <div className="space-y-1 md:space-y-1.5">
             {!isCompact && <Skeleton variant="text" width={20} height={8} className="opacity-10" />}
-            <Skeleton variant="text" width={40} height={12} className="md:w-12 md:h-4 rounded-md" />
+            <Skeleton variant="text" width={40} height={12} className="md:w-12 md:h-4 rounded-full" />
           </div>
           <div className="text-right space-y-1 md:space-y-1.5 items-end flex flex-col pl-4">
             {!isCompact && <Skeleton variant="text" width={30} height={8} className="opacity-10" />}
-            <Skeleton variant="text" width={60} height={12} className="md:w-20 md:h-4 rounded-md" />
+            <Skeleton variant="text" width={60} height={12} className="md:w-20 md:h-4 rounded-full" />
           </div>
         </CardFooter>
       </CardContentSection>

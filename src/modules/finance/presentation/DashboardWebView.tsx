@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   CircleDollarSign,
   TrendingUp,
@@ -19,11 +19,13 @@ import { PayableDebtsList } from './components/PayableDebtsList';
 import { DashboardHeader, DashboardStat } from './components/DashboardHeader';
 import { DashboardCharts } from './components/DashboardCharts';
 import { DashboardActivityLogs } from './components/DashboardActivityLogs';
+import { MetricDrillDownModal, DrillDownType } from './components/MetricDrillDownModal';
 import { DashboardStatGrid } from '@/src/shared/design-system/components/dashboard/DashboardStatGrid';
 import { useDashboardState, DashboardState } from './useDashboardState';
 import { motion } from 'motion/react';
 import { cn } from '@/src/shared/utils/cn';
 import { DashboardSkeleton } from '@/src/shared/design-system/components/dashboard/DashboardSkeleton';
+import { haptics } from '@/src/shared/utils/haptics';
 
 const MONTHLY_SALES_TARGET = 25;
 
@@ -35,7 +37,7 @@ interface DashboardWebViewProps {
 
 /**
  * Optimized for Desktop/Large Screens.
- * Uses wide layouts and multi-column grids.
+ * Uses wide layouts, Bento Grid and interactive drilldowns.
  */
 export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
   presenter,
@@ -56,21 +58,29 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
     totalPayables
   } = state;
 
+  const [drillDownType, setDrillDownType] = useState<DrillDownType>(null);
+
+  const openDrillDown = (type: DrillDownType) => {
+    haptics.light();
+    setDrillDownType(type);
+  };
+
   const stats: DashboardStat[] = useMemo(() => [
     {
       label: 'Lợi nhuận gộp (Showroom)',
       value: formatCurrency(overview?.grossProfit || 0),
       numericValue: overview?.grossProfit || 0,
       icon: CircleDollarSign,
-      subValue: 'Phần thực hưởng của Showroom',
-      tooltip: formatCurrency(overview?.grossProfit || 0, { showFull: true })
+      subValue: 'Bấm xem chi tiết xe bán',
+      tooltip: formatCurrency(overview?.grossProfit || 0, { showFull: true }),
+      onClick: () => openDrillDown('gross_profit')
     },
     {
       label: 'Lợi nhuận ròng',
       value: formatCurrency(overview?.netProfit || 0),
       numericValue: overview?.netProfit || 0,
       icon: TrendingUp,
-      subValue: 'Sau khi chia sẻ góp vốn & trừ CP',
+      subValue: 'Sau chia vốn & trừ CP vận hành',
       isNegative: (overview?.netProfit || 0) < 0,
       tooltip: formatCurrency(overview?.netProfit || 0, { showFull: true })
     },
@@ -95,7 +105,8 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
       label: 'Xe đã bán', 
       value: `${overview?.soldCount || 0} xe`, 
       icon: CheckCircle2, 
-      subValue: `Kế hoạch tháng: ${MONTHLY_SALES_TARGET} xe` 
+      subValue: `Bấm xem danh sách xe bán`,
+      onClick: () => openDrillDown('sold_vehicles')
     },
     { 
       label: 'Xe nhập mới', 
@@ -108,16 +119,17 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
       value: `${overview?.inventoryCount || 0} xe`,
       icon: Car,
       subValue: `Vốn tự có: ${formatCurrency(overview?.inventoryValue || 0)}`,
-      tooltip: `Tổng vốn tồn kho: ${formatCurrency(overview?.inventoryValue || 0, { showFull: true })}`
+      tooltip: `Tổng vốn tồn kho: ${formatCurrency(overview?.inventoryValue || 0, { showFull: true })}`,
+      onClick: () => openDrillDown('inventory_vehicles')
     },
     {
       label: `Tồn kho lâu (>${INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS} ngày)`,
       value: `${overview?.agingCount || 0} xe`,
       icon: AlertCircle,
-      subValue: 'Cần xử lý giá ngay',
+      subValue: 'Bấm xem xe cần xử lý giá',
       isWarning: (overview?.agingCount || 0) > 0,
       actionIcon: Edit3,
-      onClick: () => onNavigate('inventory', '', 'AGING_25', 'adjust_price'),
+      onClick: () => openDrillDown('aging_vehicles'),
       onActionClick: (e: React.MouseEvent) => {
         e.stopPropagation();
         onNavigate('inventory', '', 'AGING_25', 'adjust_price');
@@ -132,23 +144,24 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
     return <DashboardSkeleton />;
   }
 
-
   return (
     <div className="space-y-6 md:space-y-12 pt-8 pb-4 md:py-12 px-6 md:px-12 max-w-[1700px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 h-full overflow-y-auto scrollbar-hidden pb-24 md:pb-12">
       <DashboardHeader
         filterMonth={filterMonth}
         onMonthChange={handleMonthChange}
         stats={stats}
+        vehicles={vehicles}
       />
 
       <div className="relative">
         <div className={cn("transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] space-y-6 md:space-y-12", isSubsequentLoading && "opacity-50 blur-[2px] pointer-events-none")}>
+          {/* Stat Cards Bento Grid */}
           <div className="glass-l1 rounded-[2.5rem] p-2 md:p-3">
             <DashboardStatGrid stats={stats} />
           </div>
 
           {/* Grid 2 cột Báo cáo Công nợ chuẩn Design System */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-12">
             <ReceivableDebtsList
               debts={receivableDebts}
               total={totalReceivables}
@@ -175,11 +188,13 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
             />
           )}
 
+          {/* Advanced Visual Analytics Charts */}
           <DashboardCharts
             filterMonth={filterMonth}
             vehicles={vehicles}
             soldCount={overview?.soldCount || 0}
             target={MONTHLY_SALES_TARGET}
+            overview={overview}
           />
 
           <DashboardActivityLogs
@@ -218,6 +233,18 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
           </motion.div>
         )}
       </div>
+
+      {/* Drill-down Modal */}
+      <MetricDrillDownModal
+        type={drillDownType}
+        isOpen={!!drillDownType}
+        onClose={() => setDrillDownType(null)}
+        vehicles={vehicles}
+        filterMonth={filterMonth}
+        onSelectVehicle={(code) => {
+          onNavigate('inventory', code, 'ALL', 'view_vehicle');
+        }}
+      />
     </div>
   );
 };

@@ -1,9 +1,9 @@
 import React from 'react';
-import { ChevronRight, RefreshCw, X, FileText, BarChart3, Image as ImageIcon } from 'lucide-react';
+import { ChevronRight, RefreshCw, X, FileText, BarChart3, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '@/src/shared/utils/cn';
-import { DESIGN_TOKENS } from '@/src/shared/design-system/tokens';
 import { Staff } from '@/src/shared/domain/types';
+import { BaseTextArea } from '@/src/shared/design-system/FormElements';
 import { AddVehicleRequest } from '../../../application/AddVehicle';
 import { VehicleProfile } from './components/VehicleProfile';
 import { EconomicSection } from './components/EconomicSection';
@@ -37,70 +37,83 @@ export const AddVehicleForm: React.FC<AddVehicleFormProps> = ({
   } = useAddVehicleForm(isOpen, onSubmit, onClose, storageRepo);
 
   return (
-    <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden bg-[var(--meta-step-2)]">
-      {/* Body Area - 3 Columns Matrix */}
-      <div className={cn(
-        "flex-1 overflow-y-auto lg:overflow-hidden custom-scrollbar py-6 md:py-8",
-        DESIGN_TOKENS.layout.content_padding
-      )}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-g4 h-full">
-          {/* Column 1: Profile & Specs */}
+    <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden bg-slate-50/40">
+      {/* Body Area - Zero-Scroll Balanced 2-Column Bento Matrix */}
+      <div className="flex-1 overflow-y-auto lg:overflow-hidden custom-scrollbar p-3.5 md:p-5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
+          {/* Left Column (7/12): Vehicle Specs, Economics & Internal Notes */}
           <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="space-y-6"
-          >
-            <div className="flex items-center gap-3 text-kraft-accent mb-2 px-2">
-              <FileText size={14} strokeWidth={3} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Hồ sơ cơ bản</span>
-              <div className="h-px flex-1 bg-kraft-accent/10 ml-2" />
-            </div>
-            <VehicleProfile 
-              formData={formData} 
-              setFormData={setFormData} 
-            />
-          </motion.div>
-
-          {/* Column 2: Economics */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200, delay: 0.1 }}
-            className="space-y-6"
+            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+            className="lg:col-span-7 space-y-3"
           >
-             <div className="flex items-center gap-3 text-income mb-2 px-2">
-              <BarChart3 size={14} strokeWidth={3} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Kinh tế thu mua</span>
-              <div className="h-px flex-1 bg-income/10 ml-2" />
+            {/* Section 1: Vehicle Specs */}
+            <div className="bg-white p-3.5 md:p-4 rounded-[20px] border border-hairline-soft shadow-sm space-y-2.5">
+              <div className="flex items-center gap-2 text-kraft-ink">
+                <div className="w-7 h-7 rounded-full bg-kraft-accent/10 flex items-center justify-center text-kraft-accent">
+                  <Sparkles size={14} strokeWidth={2.5} />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-wider text-kraft-ink">Hồ sơ & Thông số xe</h3>
+              </div>
+
+              <VehicleProfile 
+                formData={formData} 
+                setFormData={setFormData} 
+              />
             </div>
-            <EconomicSection 
-              formData={formData} 
-              setFormData={setFormData} 
-              staffList={staffList} 
-            />
+
+            {/* Section 2: Purchase Economics */}
+            <div className="bg-white p-3.5 md:p-4 rounded-[20px] border border-hairline-soft shadow-sm space-y-2.5">
+              <div className="flex items-center gap-2 text-kraft-ink">
+                <div className="w-7 h-7 rounded-full bg-income/10 flex items-center justify-center text-income">
+                  <BarChart3 size={14} strokeWidth={2.5} />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-wider text-kraft-ink">Kinh tế thu mua</h3>
+              </div>
+
+              <EconomicSection 
+                formData={formData} 
+                setFormData={setFormData} 
+                staffList={staffList} 
+              />
+            </div>
+
+            {/* Section 3: Internal Notes */}
+            <div className="bg-white p-3 md:p-3.5 rounded-[20px] border border-hairline-soft shadow-sm space-y-1.5">
+              <div className="flex items-center gap-2 text-kraft-ink">
+                <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-kraft-ink/60">
+                  <FileText size={14} strokeWidth={2.5} />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-wider text-kraft-ink">Ghi chú nội bộ</h3>
+              </div>
+
+              <BaseTextArea 
+                placeholder="Nhập ghi chú chi tiết về xe, thỏa thuận cọc, lịch hẹn bảo dưỡng..."
+                value={formData.notes || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                className="min-h-[52px] h-13 text-xs"
+                variant="dense"
+              />
+            </div>
           </motion.div>
 
-          {/* Column 3: Collaboration, Image & Notes */}
+          {/* Right Column (5/12): Hero Media & Co-Investment Panel */}
           <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200, delay: 0.2 }}
-            className="space-y-6 flex flex-col"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 220, delay: 0.05 }}
+            className="lg:col-span-5 space-y-3"
           >
-            <div className="flex items-center gap-3 text-brand mb-2 px-2">
-              <ImageIcon size={14} strokeWidth={3} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Hợp tác & Hình ảnh</span>
-              <div className="h-px flex-1 bg-brand/10 ml-2" />
-            </div>
-            
-            <CoInvestModule 
-              formData={formData} 
-              setFormData={setFormData} 
-              staffList={staffList} 
-            />
+            {/* Media Uploader Box */}
+            <div className="bg-white p-3.5 md:p-4 rounded-[20px] border border-hairline-soft shadow-sm space-y-2">
+              <div className="flex items-center gap-2 text-kraft-ink">
+                <div className="w-7 h-7 rounded-full bg-kraft-accent/10 flex items-center justify-center text-kraft-accent">
+                  <ImageIcon size={14} strokeWidth={2.5} />
+                </div>
+                <h3 className="text-xs font-black uppercase tracking-wider text-kraft-ink">Hình ảnh đại diện</h3>
+              </div>
 
-            <div className="flex-1 pt-6">
               <ImageUploader 
                 imageUrl={formData.image_url || ''}
                 isUploading={isUploading}
@@ -109,48 +122,55 @@ export const AddVehicleForm: React.FC<AddVehicleFormProps> = ({
                 onUrlChange={(url: string) => setFormData(prev => ({ ...prev, image_url: url }))}
               />
             </div>
-            
-            {/* Form Error Display */}
+
+            {/* Co-Investment Module */}
+            <CoInvestModule 
+              formData={formData} 
+              setFormData={setFormData} 
+              staffList={staffList} 
+            />
+
+            {/* Form Error Alert */}
             {formError && (
               <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="p-4 rounded-t2 bg-expense-light border border-expense/20 flex items-center gap-3 shadow-sm"
+                className="p-3.5 rounded-[16px] bg-expense-light border border-expense/20 flex items-center gap-2.5 shadow-sm"
               >
-                <div className="w-8 h-8 rounded-full bg-expense/10 flex items-center justify-center text-expense">
+                <div className="w-7 h-7 rounded-full bg-expense/10 flex items-center justify-center text-expense shrink-0">
                   <X size={14} strokeWidth={3} />
                 </div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-expense">{formError}</p>
+                <p className="text-[11px] font-bold text-expense">{formError}</p>
               </motion.div>
             )}
           </motion.div>
         </div>
       </div>
 
-      {/* Footer Actions - Traditional Pattern */}
-      <div className={cn(
-        "p-6 border-t border-hairline-soft bg-white/80 backdrop-blur-2xl flex justify-end gap-g2 items-center z-30",
-        DESIGN_TOKENS.layout.content_padding
-      )}>
+      {/* Footer Actions - Compact Pill Buttons */}
+      <div className="py-2.5 px-4 md:px-6 border-t border-hairline-soft bg-white/90 backdrop-blur-2xl flex justify-end gap-2.5 items-center shrink-0 z-30 shadow-[0_-4px_16px_rgba(0,0,0,0.02)]">
         <motion.button 
-          whileTap={{ scale: 0.95 }}
+          whileTap={{ scale: 0.96 }}
           type="button"
           onClick={onClose}
-          className="px-8 h-12 rounded-xl font-black text-[10px] uppercase tracking-widest text-sub-label hover:bg-surface-soft transition-all"
+          disabled={loading || isUploading}
+          className="px-5 h-10 md:h-11 rounded-full font-black text-xs uppercase tracking-wider text-sub-label hover:text-kraft-ink hover:bg-black/5 transition-all cursor-pointer"
         >
           Hủy bỏ
         </motion.button>
         
         <motion.button
-          whileTap={{ scale: 0.95 }}
+          whileTap={{ scale: 0.96 }}
           type="submit"
           disabled={loading || isUploading}
           className={cn(
-            "px-10 h-14 rounded-xl font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 transition-all shadow-kraft-deep",
-            loading || isUploading ? "bg-kraft-accent/50 text-white cursor-not-allowed" : "bg-kraft-accent text-white shadow-kraft-accent/20"
+            "px-7 h-10 md:h-11 rounded-full font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer",
+            loading || isUploading 
+              ? "bg-kraft-accent/50 text-white cursor-not-allowed" 
+              : "bg-kraft-accent hover:bg-kraft-accent/90 text-white shadow-kraft-accent/25"
           )}
         >
-          {loading || isUploading ? <RefreshCw className="animate-spin" size={16} /> : <ChevronRight size={16} strokeWidth={3} />}
+          {loading || isUploading ? <RefreshCw className="animate-spin" size={15} /> : <ChevronRight size={15} strokeWidth={3} />}
           <span>{loading ? 'Đang tạo...' : 'Tạo hồ sơ'}</span>
         </motion.button>
       </div>

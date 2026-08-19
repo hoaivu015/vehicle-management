@@ -147,8 +147,9 @@ export class FinanceService {
           });
       }
 
+      // Chỉ trừ chi phí xe do Showroom trực tiếp chi tiền mặt (không bao gồm nhân viên ứng)
       (v.cost_history || [])
-        .filter(c => c.date?.startsWith(month))
+        .filter(c => !c.staff_id && c.date?.startsWith(month))
         .forEach(c => {
           const day = parseInt(c.date.split('-')[2]);
           const week = weeks.find(w => day >= w.start && day <= w.end) || weeks[3];
@@ -187,18 +188,68 @@ export class FinanceService {
       return acc + outflow;
     }, 0);
 
-    // 3. All-time Car Costs (Chi phí spa, sửa chữa thực tế đã chi)
+    // 3. All-time Direct Car Costs (Chi phí spa, sửa chữa do Showroom trực tiếp chi tiền)
+    // Khoản do NV ứng tiền (có staff_id) sẽ được trừ khi Showroom hoàn ứng qua allExpenses để tránh trừ sớm/trừ 2 lần
     const totalCarCosts = vehicles.reduce((acc, v) => {
-      const vehicleCosts = (v.cost_history || []).reduce((sum, c) => sum + (c.amount || 0), 0);
+      const vehicleCosts = (v.cost_history || [])
+        .filter(c => !c.staff_id)
+        .reduce((sum, c) => sum + (c.amount || 0), 0);
       return acc + vehicleCosts;
     }, 0);
 
-    // 4. All-time Operating Expenses (Chi phí vận hành showroom)
+    // 4. All-time Operating Expenses (Chi phí vận hành showroom & lương/hoàn ứng đã thực chi)
     const totalOpExpenses = allExpenses.reduce((acc, e) => acc + (e.amount || 0), 0);
 
-    // 5. Staff payments are now tracked via Operating Expenses ('Lương nhân sự')
-    // We no longer subtract commissions directly from vehicles to avoid double-counting.
-    
     return Math.round(totalCapital + totalIncomes - totalPurchaseOutflow - totalCarCosts - totalOpExpenses);
+  }
+
+  /**
+   * Tính toán số dư tiền mặt đầu kỳ (Opening Cash Balance) trước ngày 01 của tháng được chọn.
+   * Hỗ trợ chốt số dư bất biến (Fiscal Period Lock Anchor) nếu tháng trước đã được khóa sổ.
+   */
+  static calculateOpeningCashBalance(
+    totalCapital: number,
+    vehicles: Vehicle[],
+    allExpenses: Expense[],
+    month: string,
+    lockedPeriods?: Record<string, number>
+  ): number {
+    // Nếu tháng trước đã được khóa sổ, lấy thẳng số dư chốt làm mốc bất biến
+    const [year, mNum] = month.split('-').map(Number);
+    const prevDate = new Date(year, mNum - 2, 1);
+    const prevMonthStr = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
+    
+    if (lockedPeriods && lockedPeriods[prevMonthStr] !== undefined) {
+      return lockedPeriods[prevMonthStr];
+    }
+
+    const startOfMonth = `${month}-01`;
+
+    const pastIncomes = vehicles.reduce((acc, v) => {
+      const income = (v.sale_payment_history || [])
+        .filter(p => p.date && p.date < startOfMonth)
+        .reduce((sum, p) => sum + (p.amount || 0), 0);
+      return acc + income;
+    }, 0);
+
+    const pastPurchaseOutflow = vehicles.reduce((acc, v) => {
+      const outflow = (v.purchase_payment_history || [])
+        .filter(p => p.date && p.date < startOfMonth)
+        .reduce((sum, p) => sum + (p.amount || 0), 0);
+      return acc + outflow;
+    }, 0);
+
+    const pastCarCosts = vehicles.reduce((acc, v) => {
+      const vehicleCosts = (v.cost_history || [])
+        .filter(c => !c.staff_id && c.date && c.date < startOfMonth)
+        .reduce((sum, c) => sum + (c.amount || 0), 0);
+      return acc + vehicleCosts;
+    }, 0);
+
+    const pastOpExpenses = allExpenses
+      .filter(e => e.date && e.date < startOfMonth)
+      .reduce((acc, e) => acc + (e.amount || 0), 0);
+
+    return Math.round(totalCapital + pastIncomes - pastPurchaseOutflow - pastCarCosts - pastOpExpenses);
   }
 }

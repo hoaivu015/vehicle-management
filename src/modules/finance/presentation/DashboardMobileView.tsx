@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import {
   TrendingUp,
   Wallet,
@@ -9,12 +9,14 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '@/src/shared/utils/currency';
 import { FinancePresenter } from './FinancePresenter';
-import { useDashboardState } from './useDashboardState';
+import { useDashboardState, DashboardState } from './useDashboardState';
 import { NativePage, NativeHeader } from '@/src/shared/design-system/native/NativePage';
 import { LargeTitle, SecondaryLabel } from '@/src/shared/design-system/native/NativeTypography';
 import { cn } from '@/src/shared/utils/cn';
 import { Skeleton } from '@/src/shared/design-system/Skeleton';
 import { AnimatedNumber } from '@/src/shared/design-system/AnimatedNumber';
+import { MetricDrillDownModal, DrillDownType } from './components/MetricDrillDownModal';
+import { haptics } from '@/src/shared/utils/haptics';
 
 const ReceivableDebtsList = React.lazy(() =>
   import('./components/ReceivableDebtsList').then(module => ({
@@ -29,7 +31,7 @@ const PayableDebtsList = React.lazy(() =>
 );
 
 const DashboardMobileSkeleton = () => (
-  <NativePage className="bg-[#F8F9FA] px-4 py-6 space-y-6">
+  <NativePage className="bg-slate-50 px-4 py-6 space-y-6">
     {/* Header skeleton */}
     <div className="flex items-center justify-between">
       <div className="space-y-2">
@@ -77,8 +79,6 @@ const DashboardMobileSkeleton = () => (
   </NativePage>
 );
 
-import { DashboardState } from './useDashboardState';
-
 interface DashboardMobileViewProps {
   presenter: FinancePresenter;
   onNavigate: (tab: string, search?: string, filter?: string, action?: string) => void;
@@ -108,22 +108,28 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
     vehicles
   } = state;
 
+  const [drillDownType, setDrillDownType] = useState<DrillDownType>(null);
+
+  const openDrillDown = (type: DrillDownType) => {
+    haptics.light();
+    setDrillDownType(type);
+  };
+
   const isInitialLoading = loading && !overview;
-  const isSubsequentLoading = loading && !!overview;
 
   if (isInitialLoading) return <DashboardMobileSkeleton />;
 
-
   return (
-    <NativePage className="bg-[#F8F9FA]">
+    <NativePage className="bg-slate-50 pb-28">
       <NativeHeader>
         <div className="flex items-center gap-2">
           <SecondaryLabel>Hệ thống quản trị</SecondaryLabel>
-          <span className="bg-red-500 text-white text-[8px] px-1 rounded-sm animate-pulse">NATIVE</span>
+          <span className="bg-red-500 text-white text-[8px] font-black tracking-widest px-2 py-0.5 rounded-full animate-pulse">
+            NATIVE
+          </span>
         </div>
         <LargeTitle>Báo cáo</LargeTitle>
 
-        
         {/* Month Selector - Native Style */}
         <div className="mt-4 relative inline-flex items-center gap-3 px-6 h-12 rounded-full border border-white/40 bg-white/70 backdrop-blur-md shadow-neural-t2 active:scale-95 transition-transform w-fit overflow-hidden">
           <Calendar size={16} className="text-kraft-accent shrink-0" />
@@ -140,19 +146,30 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
       </NativeHeader>
 
       <div className="relative">
-        <div className={cn("transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]", isSubsequentLoading && "opacity-50 blur-[2px] pointer-events-none")}>
+        <div className="transition-all duration-500">
           <div className="space-y-4">
             {/* Primary Profit Card - The "Wow" Component */}
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-kraft-accent via-indigo-600 to-indigo-800 p-8 text-white shadow-2xl shadow-kraft-accent/30 expressive-reveal-card border border-white/20">
+            <div 
+              onClick={() => openDrillDown('gross_profit')}
+              className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-kraft-accent via-indigo-600 to-indigo-800 p-8 text-white shadow-2xl shadow-kraft-accent/30 expressive-reveal-card border border-white/20 active:scale-[0.98] transition-transform cursor-pointer"
+            >
               <div className="absolute top-0 right-0 w-40 h-40 bg-white/15 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-cyan-400/20 rounded-full -ml-12 -mb-12 blur-2xl pointer-events-none" />
-              <SecondaryLabel className="text-white/70">Lợi nhuận ròng</SecondaryLabel>
-              <div className="text-4xl font-black mt-2 tracking-tighter">
-                <AnimatedNumber value={overview?.netProfit || 0} isCurrency={true} />
+              
+              <div className="flex items-center justify-between">
+                <SecondaryLabel className="text-white/70">Lợi nhuận ròng cuối</SecondaryLabel>
+                <span className="text-[10px] font-bold text-white/80 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/10">
+                  Chạm để xem xe bán
+                </span>
               </div>
+
+              <div className="text-4xl font-black mt-2 tracking-tighter">
+                <AnimatedNumber value={overview?.finalNetProfit || 0} isCurrency={true} />
+              </div>
+
               <div className="flex items-center gap-2 mt-4 text-xs font-bold bg-white/10 w-fit px-3.5 py-1.5 rounded-full backdrop-blur-md border border-white/10">
                 <TrendingUp size={14} className="text-emerald-300" />
-                <span>Hiệu suất kinh doanh tháng</span>
+                <span>Lãi gộp: {formatCurrency(overview?.grossProfit || 0)}</span>
               </div>
             </div>
 
@@ -170,12 +187,14 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
                 value={`${overview?.soldCount || 0} xe`}
                 icon={CheckCircle2}
                 color="blue"
+                onClick={() => openDrillDown('sold_vehicles')}
               />
               <StatCard 
                 label="Tồn kho"
                 value={`${overview?.inventoryCount || 0} xe`}
                 icon={Car}
                 color="orange"
+                onClick={() => openDrillDown('inventory_vehicles')}
               />
               <StatCard 
                 label="Tồn lâu"
@@ -183,12 +202,24 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
                 icon={AlertCircle}
                 color="red"
                 isWarning={(overview?.agingCount || 0) > 0}
-                onClick={() => onNavigate('inventory', '', 'AGING_25', 'adjust_price')}
+                onClick={() => openDrillDown('aging_vehicles')}
               />
             </div>
 
+            {/* Quick Metrics Banner */}
+            <div className="grid grid-cols-2 gap-3 p-4 bg-white/80 backdrop-blur-md rounded-[2rem] border border-white/80 shadow-xs">
+              <div className="text-center p-2 border-r border-hairline-soft">
+                <span className="text-[9px] font-black uppercase tracking-wider text-sub-label block">Tồn kho bình quân (DSI)</span>
+                <span className="text-base font-black text-kraft-ink mt-0.5 block">{overview?.averageDSI || 0} ngày</span>
+              </div>
+              <div className="text-center p-2">
+                <span className="text-[9px] font-black uppercase tracking-wider text-sub-label block">Tỷ suất lãi gộp</span>
+                <span className="text-base font-black text-emerald-600 mt-0.5 block">{overview?.profitMarginPercent || 0}%</span>
+              </div>
+            </div>
+
             {/* Báo cáo Công nợ - Tách gói nạp động bằng Suspense */}
-            <div className="pt-6 space-y-6">
+            <div className="pt-4 space-y-6">
               <Suspense fallback={
                 <div className="bg-white p-5 rounded-[2rem] border border-black/5 flex items-center justify-between min-h-[96px] animate-pulse">
                   <div className="flex items-center gap-3">
@@ -235,22 +266,19 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
             </div>
           </div>
         </div>
-
-        {/* LỚP PHỦ KÍNH THỞ (Liquid Flow Glass Overlay) - Chạy 100% bằng GPU CSS animations */}
-        {isSubsequentLoading && (
-          <div
-            className="absolute inset-0 bg-white/5 backdrop-blur-[6px] border border-white/10 rounded-[2.5rem] flex items-center justify-center z-50 pointer-events-none"
-            style={{ animation: 'breathe-glow 3s ease-in-out infinite' }}
-          >
-            <div className="absolute inset-0 -z-10 opacity-30 mix-blend-color-dodge pointer-events-none overflow-hidden rounded-[2.5rem]">
-              <div
-                className="absolute -inset-10 bg-[radial-gradient(circle_at_30%_30%,#00f2fe_0%,transparent_50%),radial-gradient(circle_at_70%_70%,#4facfe_0%,transparent_50%)] blur-[40px] animate-ambient-flow"
-              />
-            </div>
-            <div className="w-2.5 h-2.5 rounded-full bg-kraft-accent shadow-neon-glow" />
-          </div>
-        )}
       </div>
+
+      {/* Drilldown Modal on Mobile */}
+      <MetricDrillDownModal
+        type={drillDownType}
+        isOpen={!!drillDownType}
+        onClose={() => setDrillDownType(null)}
+        vehicles={vehicles}
+        filterMonth={filterMonth}
+        onSelectVehicle={(code) => {
+          onNavigate('inventory', code, 'ALL', 'view_vehicle');
+        }}
+      />
     </NativePage>
   );
 };
@@ -270,7 +298,7 @@ const StatCard = ({ label, value, numericValue, isCurrency = true, icon: Icon, c
   <button 
     onClick={onClick}
     className={cn(
-      "flex flex-col gap-3 p-5 rounded-[2rem] border transition-all active:scale-95 text-left backdrop-blur-md",
+      "flex flex-col gap-3 p-5 rounded-[2rem] border transition-all active:scale-95 text-left backdrop-blur-md cursor-pointer",
       "bg-white/80 border-white/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] hover:bg-white",
       isWarning && "bg-red-50/60 border-red-100/80"
     )}

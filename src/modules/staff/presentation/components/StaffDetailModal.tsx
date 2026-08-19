@@ -59,8 +59,8 @@ export const StaffDetailModal: React.FC<StaffDetailModalProps> = ({
   const earningsCount = salaryDetails.soldCars.length + salaryDetails.boughtCars.length + salaryDetails.coinvestedCars.length;
 
   const tabs: { id: TabType, label: string, icon: LucideIcon, count: number }[] = [
-    { id: 'earnings', label: 'Thu nhập', icon: TrendingUp, count: earningsCount },
-    { id: 'advances', label: 'Tạm ứng', icon: DollarSign, count: (member.expenses || []).length },
+    { id: 'earnings', label: 'Thu nhập & Lương', icon: TrendingUp, count: earningsCount },
+    { id: 'advances', label: 'Chi phí & Ứng lương', icon: DollarSign, count: (member.expenses || []).length },
   ];
 
   const getUnifiedEarnings = () => {

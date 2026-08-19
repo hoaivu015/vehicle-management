@@ -1,10 +1,11 @@
 import React from 'react';
-import { User, Mail, Phone, Calendar, Briefcase, MoreHorizontal, Settings, Key, LogOut } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Briefcase, Settings, Key, LogOut, Shield } from 'lucide-react';
 import { motion } from 'motion/react';
 import { InfoItem } from './PersonalShared';
 import { formatDate } from '@/src/shared/utils/date';
-
 import { Staff } from '@/src/shared/domain/types';
+import { PillButton } from '@/src/shared/design-system/Buttons';
+import { haptics } from '@/src/shared/utils/haptics';
 
 interface PersonalSidebarProps {
   user: Staff;
@@ -21,72 +22,107 @@ export const PersonalSidebar: React.FC<PersonalSidebarProps> = ({
   onUpdateUser,
   setIsModalOpen
 }) => {
+  const handleEditClick = () => {
+    haptics.light();
+    setIsEditModalOpen(true);
+  };
+
+  const handlePasswordClick = () => {
+    haptics.light();
+    setIsModalOpen(true);
+  };
+
+  const handleLogoutClick = () => {
+    haptics.heavy();
+    if (onLogout) onLogout();
+  };
+
   return (
     <motion.div 
-      initial={{ opacity: 0, x: -30, rotate: -1, filter: 'blur(6px)' }}
-      animate={{ opacity: 1, x: 0, rotate: 0, filter: 'blur(0px)' }}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
       transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.15 }}
       style={{ willChange: 'transform, opacity' }}
-      className="lg:col-span-1"
+      className="h-full flex flex-col"
     >
-      <div className="liquid-card border-white/60 p-0 overflow-hidden shadow-[var(--shadow-kraft-deep)] transition-all duration-500 hover:shadow-kraft-accent/5 rounded-t1">
-        <div className="bg-kraft-accent/5 p-10 flex flex-col items-center text-center space-y-6 border-b border-black/5">
+      <div className="liquid-card border-hairline-soft p-0 overflow-hidden shadow-kraft-deep rounded-t2 flex flex-col justify-between h-full">
+        {/* Profile Header Hero */}
+        <div className="bg-gradient-to-b from-kraft-accent/10 via-kraft-accent/5 to-transparent p-6 sm:p-8 flex flex-col items-center text-center space-y-4 border-b border-hairline-soft relative">
           <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-tr from-kraft-accent to-indigo-400 rounded-[3rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
-            <div className="relative w-32 h-32 rounded-[2.5rem] bg-white flex items-center justify-center border-4 border-white shadow-2xl overflow-hidden">
-              <User size={64} className="text-kraft-accent" strokeWidth={1.5} />
+            <div className="absolute -inset-2 bg-gradient-to-tr from-kraft-accent to-indigo-400 rounded-[2.5rem] blur-md opacity-20 group-hover:opacity-40 transition duration-700" />
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-t2 bg-white flex items-center justify-center border-4 border-white shadow-xl overflow-hidden">
+              {user.name ? (
+                <span className="text-3xl sm:text-4xl font-black text-kraft-accent select-none">
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+              ) : (
+                <User size={48} className="text-kraft-accent" strokeWidth={1.5} />
+              )}
             </div>
           </div>
           
-          <div className="relative w-full">
-            <h2 className="text-3xl font-black text-kraft-ink tracking-tighter mb-2 flex items-center justify-center gap-3">
+          <div className="w-full space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-black text-kraft-ink tracking-tight font-heading truncate">
               {user.name}
-              <div className="relative group/menu">
-                <button className="p-2 hover:bg-black/5 rounded-full transition-colors">
-                  <MoreHorizontal size={20} className="text-kraft-ink/40" />
-                </button>
-                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-black/5 py-2 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-300 z-50 overflow-hidden">
-                  <button 
-                    onClick={() => setIsEditModalOpen(true)}
-                    className="w-full px-6 py-4 flex items-center gap-3 hover:bg-kraft-accent/5 transition-colors text-left"
-                  >
-                    <Settings size={14} strokeWidth={3} className="text-kraft-accent" />
-                    <span className="text-[11px] font-black uppercase tracking-widest text-kraft-ink">Chỉnh sửa hồ sơ</span>
-                  </button>
-                  {onUpdateUser && (
-                    <button 
-                      onClick={() => setIsModalOpen(true)}
-                      className="w-full px-6 py-4 flex items-center gap-3 hover:bg-kraft-accent/5 transition-colors text-left border-t border-black/5"
-                    >
-                      <Key size={14} strokeWidth={3} className="text-indigo-500" />
-                      <span className="text-[11px] font-black uppercase tracking-widest text-kraft-ink">Bảo mật</span>
-                    </button>
-                  )}
-                  {onLogout && (
-                    <button 
-                      onClick={onLogout}
-                      className="w-full px-6 py-4 flex items-center gap-3 hover:bg-red-50 transition-colors text-left border-t border-black/5 group/logout"
-                    >
-                      <LogOut size={14} strokeWidth={3} className="text-red-500 group-hover/logout:translate-x-1 transition-transform" />
-                      <span className="text-[11px] font-black uppercase tracking-widest text-red-500">Đăng xuất</span>
-                    </button>
-                  )}
-                </div>
-              </div>
             </h2>
-            <div className="flex items-center justify-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-kraft-accent px-3 py-1 bg-kraft-accent/10 rounded-full">{user.role}</span>
-              <span className="text-[10px] font-black uppercase tracking-widest text-kraft-ink/40">#{user.code}</span>
+            <div className="flex items-center justify-center flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-kraft-accent px-3 py-1 bg-kraft-accent/10 border border-kraft-accent/20 rounded-full shadow-sm">
+                <Shield size={10} />
+                {user.role}
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-sub-label px-2.5 py-0.5 bg-black/5 rounded-full">
+                #{user.code}
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="p-10 space-y-6">
+        {/* Contact Info List */}
+        <div className="p-6 sm:p-8 space-y-5 flex-1">
           <InfoItem icon={Mail} label="Email liên hệ" value={user.email} />
           <InfoItem icon={Phone} label="Số điện thoại" value={user.phone || '---'} />
           <InfoItem icon={Calendar} label="Ngày gia nhập" value={formatDate(user.created_at || '')} />
           <InfoItem icon={Briefcase} label="Phòng ban" value={user.department || 'Phòng Kinh doanh'} />
-          
+        </div>
+
+        {/* Action Buttons Dock */}
+        <div className="p-6 sm:p-8 pt-0 space-y-3 border-t border-hairline-soft bg-black/[0.01]">
+          <div className="grid grid-cols-2 gap-3">
+            <PillButton
+              variant="secondary"
+              size="sm"
+              icon={Settings}
+              onClick={handleEditClick}
+              fullWidth
+              className="text-[9px]"
+            >
+              Hồ sơ
+            </PillButton>
+            {onUpdateUser && (
+              <PillButton
+                variant="secondary"
+                size="sm"
+                icon={Key}
+                onClick={handlePasswordClick}
+                fullWidth
+                className="text-[9px]"
+              >
+                Mật khẩu
+              </PillButton>
+            )}
+          </div>
+          {onLogout && (
+            <PillButton
+              variant="ghost"
+              size="sm"
+              icon={LogOut}
+              onClick={handleLogoutClick}
+              fullWidth
+              className="text-[9px] !border-red-200 !text-red-500 hover:!bg-red-50 hover:!border-red-300"
+            >
+              Đăng xuất
+            </PillButton>
+          )}
         </div>
       </div>
     </motion.div>

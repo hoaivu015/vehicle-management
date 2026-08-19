@@ -25,25 +25,24 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   const uploadId = useId();
   
   return (
-    <div className={cn("space-y-3 w-full", className)}>
-      <div className="flex items-center justify-between px-2">
-        <label className="text-[10px] font-black uppercase tracking-widest text-kraft-ink/40">Hình ảnh</label>
-        {imageUrl && (
+    <div className={cn("space-y-2 w-full flex flex-col", className)}>
+      {imageUrl && (
+        <div className="flex items-center justify-end px-1">
           <motion.button 
             whileTap={{ scale: 0.95 }}
             type="button" 
             onClick={onRemove}
-            className="text-[10px] font-black text-expense uppercase tracking-widest hover:opacity-80 transition-all"
+            className="text-[10px] font-black text-expense uppercase tracking-widest hover:opacity-80 transition-all px-3 py-1 bg-expense/10 rounded-full"
           >
             Gỡ bỏ
           </motion.button>
-        )}
-      </div>
+        </div>
+      )}
 
       <motion.div 
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className="relative group w-full aspect-[4/3] max-w-[320px] mx-auto"
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
+        className="relative group w-full aspect-[16/9] rounded-[20px] overflow-hidden"
       >
         <input
           type="file"
@@ -56,32 +55,34 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         <label
           htmlFor={uploadId}
           className={cn(
-            "flex flex-col items-center justify-center w-full h-full rounded-t2 border-2 border-dashed transition-all cursor-pointer overflow-hidden relative",
-            isUploading ? "border-kraft-accent/20 bg-kraft-accent/5" : "border-hairline-soft hover:border-kraft-accent/40 hover:bg-kraft-accent/5",
+            "flex flex-col items-center justify-center w-full h-full rounded-[20px] border-2 border-dashed transition-all cursor-pointer overflow-hidden relative",
+            isUploading ? "border-kraft-accent/30 bg-kraft-accent/5" : "border-hairline-soft hover:border-kraft-accent/50 hover:bg-kraft-accent/[0.03] bg-white",
             imageUrl && "border-none shadow-kraft-deep"
           )}
         >
           {isUploading && (
-            <Skeleton className="w-full h-full rounded-3xl absolute inset-0 z-10" />
+            <Skeleton className="w-full h-full rounded-[20px] absolute inset-0 z-10" />
           )}
 
           {imageUrl ? (
             <>
-              <img src={optimizeCloudinaryUrl(imageUrl, { width: 400 })} alt="Preview" className="w-full h-full object-cover" />
+              <img src={optimizeCloudinaryUrl(imageUrl, { width: 600 })} alt="Preview" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
-                <Camera size={24} strokeWidth={2.5} />
-                <span className="text-[10px] font-black uppercase tracking-widest mt-2">Thay đổi ảnh</span>
+                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-1.5">
+                  <Camera size={18} strokeWidth={2.5} />
+                </div>
+                <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1 bg-white/20 backdrop-blur-md rounded-full">Thay đổi ảnh</span>
               </div>
             </>
           ) : (
             <>
-              <div className="w-16 h-16 rounded-3xl bg-kraft-accent/5 flex items-center justify-center mb-4 border border-kraft-accent/10">
-                <Camera size={28} strokeWidth={2.5} className="text-kraft-accent/40" />
+              <div className="w-11 h-11 rounded-full bg-kraft-accent/5 flex items-center justify-center mb-1.5 border border-kraft-accent/10 group-hover:scale-110 transition-transform">
+                <Camera size={20} strokeWidth={2.2} className="text-kraft-accent" />
               </div>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-kraft-ink/30 text-center px-6 leading-relaxed">
+              <span className="text-[10px] font-black uppercase tracking-wider text-kraft-ink/60 text-center px-4 leading-tight">
                 Tải ảnh xe lên
               </span>
-              <p className="text-[9px] font-bold text-kraft-ink/20 mt-2 uppercase tracking-widest">Hỗ trợ JPG, PNG, WEBP</p>
+              <p className="text-[8px] font-bold text-sub-label mt-0.5 uppercase tracking-widest">JPG, PNG, WEBP</p>
             </>
           )}
         </label>

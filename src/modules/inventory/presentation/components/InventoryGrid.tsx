@@ -52,9 +52,9 @@ export const InventoryGrid: React.FC<InventoryGridProps> = ({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 pt-g2 md:pt-g4">
+    <div className="flex-1 md:overflow-y-auto overflow-visible custom-scrollbar min-h-0 pt-g2 md:pt-g4">
       <div className={cn(
-        "grid grid-cols-1 md:grid-cols-2 gap-g2 md:gap-g4 pb-g6",
+        "grid grid-cols-1 md:grid-cols-2 gap-g2 md:gap-g4 pb-2 md:pb-g6",
         isCompact 
           ? "md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" 
           : "md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"

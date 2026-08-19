@@ -21,6 +21,8 @@ interface ModalProps {
   mobileHideTitle?: boolean;
   /** Thiết lập chiều cao di động: 'full' (h-[92vh]) hoặc 'auto' (tự động co giãn) */
   height?: 'auto' | 'full';
+  /** Tùy chọn chèn các nút hành động (Ghim, Sửa, v.v.) vào bên phải Header trước nút Đóng */
+  headerActions?: React.ReactNode;
 }
 
 const maxWidthClasses = {
@@ -44,6 +46,7 @@ interface ModalHeaderProps {
   showCloseButton?: boolean;
   className?: string;
   mobileHideTitle?: boolean;
+  headerActions?: React.ReactNode;
 }
 
 /**
@@ -57,30 +60,39 @@ export const ModalHeader = ({
   showCloseButton = true,
   className,
   mobileHideTitle = false,
+  headerActions,
 }: ModalHeaderProps) => (
-  <div className={cn("px-4 py-3 md:px-g4 md:py-g3 border-b border-hairline-soft flex justify-between items-center md:items-start bg-white sticky top-0 z-10 shrink-0", className)}>
-    <div className={cn("space-y-1", mobileHideTitle && "hidden md:block")}>
-      <div className="flex items-center gap-g1">
-        {Icon && <Icon size={24} className="text-kraft-accent" />}
-        <div className="text-xl md:text-2xl font-black text-kraft-ink uppercase tracking-tight">
+  <div className={cn(
+    "px-4 py-3 md:px-g4 md:py-g3 border-b border-hairline-soft flex justify-between items-center bg-white sticky top-0 z-10 shrink-0",
+    mobileHideTitle && "hidden md:flex",
+    className
+  )}>
+    <div className="space-y-1 min-w-0 flex-1 pr-3">
+      <div className="flex items-center gap-g1 min-w-0">
+        {Icon && <Icon size={24} className="text-kraft-accent shrink-0" />}
+        <div className="text-xl md:text-2xl font-black text-kraft-ink uppercase tracking-tight truncate">
           {title}
         </div>
       </div>
       {subtitle && (
-        <p className="text-sm text-sub-label font-medium leading-relaxed">
+        <div className="text-sm text-sub-label font-medium leading-relaxed truncate">
           {subtitle}
-        </p>
+        </div>
       )}
     </div>
-    {(onClose && showCloseButton) && (
-      <motion.button
-        whileTap={{ scale: 0.95 }}
-        onClick={onClose}
-        className="w-11 h-11 flex items-center justify-center hover:bg-black/5 rounded-full transition-all ml-auto"
-      >
-        <X size={20} className="text-sub-label" />
-      </motion.button>
-    )}
+    <div className="flex items-center gap-2 shrink-0 ml-auto">
+      {headerActions}
+      {(onClose && showCloseButton) && (
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={onClose}
+          className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center hover:bg-black/5 rounded-full transition-all text-sub-label hover:text-kraft-ink ml-auto"
+          aria-label="Đóng"
+        >
+          <X size={20} />
+        </motion.button>
+      )}
+    </div>
   </div>
 );
 
@@ -100,6 +112,7 @@ export const BaseModal = ({
   showCloseButton = true,
   mobileHideTitle = false,
   height = 'full',
+  headerActions,
 }: ModalProps) => {
   const isMobile = useIsMobile(768);
   const dragControls = useDragControls();
@@ -180,6 +193,7 @@ export const BaseModal = ({
                 onClose={onClose} 
                 showCloseButton={showCloseButton}
                 mobileHideTitle={mobileHideTitle}
+                headerActions={headerActions}
               />
             )}
 

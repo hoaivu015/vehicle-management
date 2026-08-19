@@ -138,7 +138,7 @@ const DependencyContext = createContext<Dependencies | null>(null);
 
 export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const dependencies = useMemo<Dependencies>(() => {
-    // 1. Khởi tạo Infrastructure
+    // 1. Repositories (Lightweight singletons)
     const vehicleRepo = new SupabaseVehicleRepository();
     const staffRepo = new SupabaseStaffRepository();
     const expenseRepo = new SupabaseExpenseRepository();
@@ -149,15 +149,8 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const authRepo = new SupabaseAuthRepository();
     const vehicleCodeGenerator = new SupabaseVehicleCodeGenerator();
 
-    // 5. Khởi tạo Finance Use Cases
-    const finance = {
-      getMonthly: new GetMonthlyFinance(expenseRepo, vehicleRepo, staffRepo),
-      getOverview: new GetFinancialOverview(expenseRepo, vehicleRepo, staffRepo),
-      recordExpense: new RecordExpense(staffRepo, vehicleRepo, expenseRepo),
-    };
-
-    // 2. Khởi tạo Inventory Use Cases
-    const inventory = {
+    // 2. Use Cases Collections
+    const inventory: Dependencies['inventory'] = {
       getList: new GetInventoryList(vehicleRepo),
       updateStatus: new UpdateVehicleStatus(vehicleRepo),
       deleteVehicle: new DeleteVehicle(vehicleRepo, storageRepo),
@@ -171,8 +164,7 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       service: new VehicleService(vehicleRepo, vehicleStaffRepo),
     };
 
-    // 3. Khởi tạo Staff Use Cases
-    const staff = {
+    const staff: Dependencies['staff'] = {
       getList: new GetStaffList(staffRepo, vehicleRepo),
       add: new AddStaff(staffRepo),
       update: new UpdateStaff(staffRepo),
@@ -183,18 +175,20 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       reimburseExpenses: new ReimburseStaffExpenses(staffRepo),
     };
 
-    // 4. Khởi tạo Payroll Use Cases
-    const payroll = {
+    const payroll: Dependencies['payroll'] = {
       processSalary: new ProcessSalaryPayment(staffRepo, expenseRepo, vehicleRepo),
       cancelSalary: new CancelSalaryPayment(staffRepo, expenseRepo, vehicleRepo),
     };
 
-    // 6. Presenter Factories
+    const finance: Dependencies['finance'] = {
+      getMonthly: new GetMonthlyFinance(expenseRepo, vehicleRepo, staffRepo),
+      getOverview: new GetFinancialOverview(expenseRepo, vehicleRepo, staffRepo),
+      recordExpense: new RecordExpense(staffRepo, vehicleRepo, expenseRepo),
+    };
+
+    // 3. Presenter Factories
     const createInventoryPresenter = () => {
-      const listPresenter = new InventoryListPresenter(
-        inventory.getList,
-        staffRepo
-      );
+      const listPresenter = new InventoryListPresenter(inventory.getList, staffRepo);
       const actionPresenter = new VehicleActionPresenter(
         inventory.updateStatus,
         inventory.deleteVehicle,
@@ -218,11 +212,7 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     const createStaffPresenter = () => {
       const listPresenter = new StaffListPresenter(staff.getList, vehicleRepo);
-      const actionPresenter = new StaffActionPresenter(
-        staff.add,
-        staff.update,
-        staff.delete
-      );
+      const actionPresenter = new StaffActionPresenter(staff.add, staff.update, staff.delete);
       const expensePresenter = new StaffExpensePresenter(
         finance.recordExpense,
         staff.toggleReimbursement,
@@ -230,10 +220,7 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         staff.updateExpense,
         staff.reimburseExpenses
       );
-      const payrollPresenter = new PayrollPresenter(
-        payroll.processSalary,
-        payroll.cancelSalary
-      );
+      const payrollPresenter = new PayrollPresenter(payroll.processSalary, payroll.cancelSalary);
 
       return new StaffPresenter(
         listPresenter,
@@ -244,15 +231,17 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       );
     };
 
-    const createFinancePresenter = () => new FinancePresenter(
-      finance.getMonthly,
-      finance.getOverview,
-      expenseRepo,
-      vehicleRepo,
-      staffRepo,
-      finance.recordExpense,
-      notificationService
-    );
+    const createFinancePresenter = () => {
+      return new FinancePresenter(
+        finance.getMonthly,
+        finance.getOverview,
+        expenseRepo,
+        vehicleRepo,
+        staffRepo,
+        finance.recordExpense,
+        notificationService
+      );
+    };
 
     const createUserManagementPresenter = () => new UserManagementPresenter(userRepo);
 
@@ -267,6 +256,8 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       storageRepo,
       vehicleStaffRepo,
       userRepo,
+      permissionRepo,
+      authRepo,
       inventory,
       staff,
       payroll,
@@ -277,8 +268,6 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       createUserManagementPresenter,
       createPersonalPresenter,
       createPermissionsPresenter,
-      permissionRepo,
-      authRepo
     };
   }, []);
 

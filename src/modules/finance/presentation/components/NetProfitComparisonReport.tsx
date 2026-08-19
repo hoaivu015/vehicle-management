@@ -38,8 +38,8 @@ export const NetProfitComparisonReport: React.FC<NetProfitComparisonReportProps>
 
     return (
       <motion.div 
-        initial={{ opacity: 0, y: 15, filter: 'blur(2px)' }}
-        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 120, damping: 18, delay }}
         className="relative group p-6 rounded-[2.5rem] glass-purity-surface hover:bg-white/60 transition-all duration-500 overflow-hidden"
       >

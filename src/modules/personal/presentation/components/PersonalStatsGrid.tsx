@@ -45,7 +45,7 @@ export const PersonalStatsGrid: React.FC<PersonalStatsGridProps> = ({
         icon={TrendingUp} 
         label={`Tài sản góp vốn`} 
         value={formatCurrency(coinvestProfitShare)} 
-        color="purple" 
+        color="blue" 
       />
       <StatCard 
         delay={0.5}

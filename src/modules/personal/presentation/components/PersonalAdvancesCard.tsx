@@ -4,6 +4,8 @@ import { motion } from 'motion/react';
 import { cn } from '@/src/shared/utils/cn';
 import { formatCurrency } from '@/src/shared/utils/currency';
 import { StaffExpense } from '@/src/shared/domain/types';
+import { haptics } from '@/src/shared/utils/haptics';
+import { formatDate } from '@/src/shared/utils/date';
 
 interface PersonalAdvancesCardProps {
   expenses: StaffExpense[];
@@ -37,59 +39,79 @@ export const PersonalAdvancesCard: React.FC<PersonalAdvancesCardProps> = ({
     reimbursedInSelectedMonth.reduce((sum, e) => sum + e.amount, 0),
   [reimbursedInSelectedMonth]);
 
+  const handleAdd = () => {
+    haptics.light();
+    onAddClick();
+  };
 
+  const handleEdit = (exp: StaffExpense) => {
+    haptics.light();
+    onEditClick(exp);
+  };
+
+  const handleDelete = (id: string) => {
+    haptics.heavy();
+    if (window.confirm('Bạn có chắc chắn muốn xóa khoản chi phí này?')) {
+      onDeleteClick(id);
+    }
+  };
 
   const renderExpenseCard = (expense: StaffExpense) => (
-    <div key={expense.id} className="group relative glass-surface-soft border border-hairline-soft rounded-xl py-3 px-5 hover:border-kraft-accent/30 transition-all duration-300 shadow-sm hover:shadow-kraft-deep">
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center gap-3">
+    <div 
+      key={expense.id} 
+      className="group relative bg-white/70 backdrop-blur-sm border border-hairline-soft rounded-xl p-4 hover:border-kraft-accent/30 transition-all duration-300 shadow-sm hover:shadow-kraft-deep"
+    >
+      <div className="flex justify-between items-start mb-2.5">
+        <div className="flex items-center gap-3 min-w-0">
           <div className={cn(
-            "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border",
-            expense.type === 'vehicle' ? "bg-brand/10 text-brand border-brand/20" : "bg-kraft-accent/10 text-kraft-accent border-kraft-accent/20"
+            "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border",
+            expense.type === 'vehicle' ? "bg-blue-50 text-blue-600 border-blue-100" : "bg-kraft-accent/10 text-kraft-accent border-kraft-accent/20"
           )}>
-            {expense.type === 'vehicle' ? <Car size={18} /> : <Settings size={18} />}
+            {expense.type === 'vehicle' ? <Car size={16} /> : <Settings size={16} />}
           </div>
-          <div>
-            <p className="font-black text-xs text-kraft-ink tracking-tight uppercase leading-tight">{expense.note}</p>
-            <p className="text-[10px] font-bold text-sub-label uppercase mt-1">
-              {expense.date} {expense.vehicle_code ? `• #${expense.vehicle_code}` : ''}
+          <div className="min-w-0">
+            <p className="font-black text-xs text-kraft-ink tracking-tight uppercase leading-snug truncate">
+              {expense.note}
+            </p>
+            <p className="text-[10px] font-bold text-sub-label opacity-60 uppercase mt-0.5">
+              {formatDate(expense.date)} {expense.vehicle_code ? `• #${expense.vehicle_code}` : ''}
             </p>
           </div>
         </div>
-        <p className="font-black text-sm text-kraft-ink tracking-tighter shrink-0 whitespace-nowrap">
+        <p className="font-black text-xs sm:text-sm text-kraft-ink tracking-tight shrink-0 whitespace-nowrap pl-2">
           {formatCurrency(expense.amount)}
         </p>
       </div>
 
-      <div className="flex items-center justify-between mt-2">
-        <div className={cn(
-          "inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border font-black text-[10px] uppercase tracking-widest whitespace-nowrap",
+      <div className="flex items-center justify-between pt-1">
+        <span className={cn(
+          "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border font-black text-[9px] uppercase tracking-widest whitespace-nowrap shadow-sm",
           expense.is_reimbursed 
             ? "bg-income/10 border-income/20 text-income" 
             : "bg-expense-light/40 border-expense/20 text-expense"
         )}>
           {expense.is_reimbursed ? <CheckCircle size={10} /> : <Clock size={10} />}
-          {expense.is_reimbursed ? 'Đã chi lại' : 'Chờ hoàn'}
-        </div>
+          {expense.is_reimbursed ? 'Đã hoàn ứng' : 'Chờ duyệt chi'}
+        </span>
 
-        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 opacity-80 sm:opacity-0 group-hover:opacity-100 transition-opacity">
           {!expense.is_reimbursed && (
             <motion.button 
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onEditClick(expense)}
-              className="w-10 h-10 flex items-center justify-center text-sub-label hover:text-kraft-accent hover:bg-kraft-accent/10 rounded-xl transition-all"
+              whileTap={{ scale: 0.9 }}
+              onClick={() => handleEdit(expense)}
+              className="w-8 h-8 flex items-center justify-center text-sub-label hover:text-kraft-accent hover:bg-kraft-accent/10 rounded-lg transition-colors"
+              title="Chỉnh sửa"
             >
-              <Edit2 size={16} />
+              <Edit2 size={14} />
             </motion.button>
           )}
           <motion.button 
-            whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              if (confirm('Xóa khoản chi này?')) onDeleteClick(expense.id);
-            }}
-            className="w-10 h-10 flex items-center justify-center text-sub-label hover:text-expense hover:bg-expense-light rounded-xl transition-all"
+            whileTap={{ scale: 0.9 }}
+            onClick={() => handleDelete(expense.id)}
+            className="w-8 h-8 flex items-center justify-center text-sub-label hover:text-expense hover:bg-expense-light rounded-lg transition-colors"
+            title="Xóa khoản chi"
           >
-            <Trash2 size={16} />
+            <Trash2 size={14} />
           </motion.button>
         </div>
       </div>
@@ -98,80 +120,91 @@ export const PersonalAdvancesCard: React.FC<PersonalAdvancesCardProps> = ({
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 30, x: 20, rotate: 1, filter: 'blur(6px)' }}
-      animate={{ opacity: 1, y: 0, x: 0, rotate: 0, filter: 'blur(0px)' }}
-      transition={{ type: 'spring' as const, stiffness: 120, damping: 18, delay: 0.35 }}
+      initial={{ opacity: 0, y: 20, x: 10 }}
+      animate={{ opacity: 1, y: 0, x: 0 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18, delay: 0.35 }}
       style={{ willChange: 'transform, opacity' }}
-      className="liquid-card border-white/60 !p-0 shadow-[var(--shadow-kraft-deep)] overflow-hidden rounded-t1 flex flex-col h-full"
+      className="liquid-card border-hairline-soft !p-0 shadow-kraft-deep overflow-hidden rounded-t2 flex flex-col justify-between h-full"
     >
-      <div className="p-4 md:p-8 border-b border-hairline-soft bg-kraft-accent/5 flex items-center justify-between">
-        <div className="flex flex-col gap-1 min-w-0">
-          <h3 className="text-lg md:text-xl font-black uppercase flex items-center gap-3 md:gap-4 text-kraft-accent font-heading tracking-tighter">
-            <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl bg-kraft-accent/10 flex items-center justify-center shrink-0">
-              <DollarSign size={18} className="md:w-5 md:h-5" strokeWidth={2.5} />
-            </div>
-            Chi phí & Hoàn ứng
-          </h3>
-          <div className="flex flex-wrap items-center gap-x-4 md:gap-x-6 gap-y-1 ml-12 md:ml-16">
-            <div className="flex items-center gap-1.5 md:gap-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-sub-label whitespace-nowrap">Chờ hoàn:</span>
-              <span className="text-xs font-black text-kraft-accent tracking-tighter whitespace-nowrap">{formatCurrency(totalUnreimbursedAmount)}</span>
-            </div>
-            <div className="flex items-center gap-1.5 md:gap-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-sub-label whitespace-nowrap">Đã chi ({selectedMonth}):</span>
-              <span className="text-xs font-black text-income tracking-tighter whitespace-nowrap">{formatCurrency(totalReimbursedInMonth)}</span>
+      {/* Header */}
+      <div className="p-5 sm:p-6 border-b border-hairline-soft bg-kraft-accent/5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-kraft-accent/10 flex items-center justify-center shrink-0 border border-kraft-accent/20">
+            <DollarSign size={20} strokeWidth={2.5} className="text-kraft-accent" />
+          </div>
+          <div>
+            <h3 className="text-base sm:text-lg font-black uppercase text-kraft-accent font-heading tracking-tight">
+              Chi phí & Hoàn ứng
+            </h3>
+            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-sub-label mt-0.5">
+              <span>Chờ hoàn: <b className={totalUnreimbursedAmount > 0 ? "text-expense font-black" : "text-sub-label"}>{formatCurrency(totalUnreimbursedAmount)}</b></span>
             </div>
           </div>
         </div>
+
         <motion.button 
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={onAddClick}
-          className="w-10 h-10 md:w-11 md:h-11 bg-kraft-accent text-white rounded-xl hover:opacity-80 transition-all shadow-kraft-deep flex items-center justify-center shrink-0"
-          title="Thêm khoản chi"
+          onClick={handleAdd}
+          className="w-10 h-10 bg-kraft-accent text-white rounded-xl hover:brightness-110 transition-all shadow-kraft-deep flex items-center justify-center shrink-0"
+          title="Ghi thêm khoản chi"
         >
-          <Plus size={18} className="md:w-5 md:h-5" strokeWidth={3} />
+          <Plus size={18} strokeWidth={3} />
         </motion.button>
       </div>
       
-      <div className="p-4 md:p-8 space-y-6 md:space-y-8 flex-1 overflow-y-auto custom-scrollbar max-h-[600px]">
+      {/* Expense list */}
+      <div className="p-5 sm:p-6 space-y-6 flex-1 overflow-y-auto custom-scrollbar max-h-[420px]">
         {unreimbursed.length > 0 && (
-          <div className="space-y-3 md:space-y-4">
-            <div className="flex items-center gap-2 px-1 md:px-2">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
               <Clock size={14} className="text-expense shrink-0" />
-              <h4 className="text-[10px] font-black uppercase tracking-widest text-expense whitespace-nowrap">Chờ hoàn tiền</h4>
-              <div className="h-px flex-1 bg-expense/10 ml-2" />
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-expense">
+                Chờ hoàn tiền ({unreimbursed.length})
+              </h4>
+              <div className="h-px flex-1 bg-expense/10" />
             </div>
-            <div className="space-y-3 md:space-y-4">
+            <div className="space-y-3">
               {unreimbursed.map(renderExpenseCard)}
             </div>
           </div>
         )}
 
         {reimbursedInSelectedMonth.length > 0 && (
-          <div className="space-y-3 md:space-y-4">
-            <div className="flex items-center justify-between px-1 md:px-2 flex-wrap gap-2">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <CheckCircle size={14} className="text-income shrink-0" />
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-income whitespace-nowrap">Đã chi tháng {selectedMonth.split('-')[1]}/{selectedMonth.split('-')[0]}</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-income">
+                  Đã chi tháng {selectedMonth.split('-')[1]} ({reimbursedInSelectedMonth.length})
+                </h4>
               </div>
-              <span className="text-[10px] font-black text-kraft-ink/40 uppercase tracking-widest whitespace-nowrap">
-                Tổng tháng: <span className="text-emerald-600 whitespace-nowrap">{formatCurrency(totalReimbursedInMonth)}</span>
+              <span className="text-[10px] font-black text-income">
+                {formatCurrency(totalReimbursedInMonth)}
               </span>
             </div>
-            <div className="space-y-3 md:space-y-4">
+            <div className="space-y-3">
               {reimbursedInSelectedMonth.map(renderExpenseCard)}
             </div>
           </div>
         )}
 
         {expenses.length === 0 && (
-          <div className="text-center py-24">
-            <div className="w-16 h-16 bg-kraft-accent/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-kraft-accent/10 opacity-30">
-              <DollarSign size={24} className="text-kraft-accent" />
+          <div className="text-center py-16">
+            <div className="w-12 h-12 bg-kraft-accent/5 rounded-full flex items-center justify-center mx-auto mb-3 border border-kraft-accent/10 opacity-40">
+              <DollarSign size={20} className="text-kraft-accent" />
             </div>
-            <p className="text-sub-label !opacity-30 italic">Chưa có khoản chi phí nào</p>
+            <p className="text-sub-label text-xs opacity-50 italic">Chưa có khoản chi phí nào</p>
           </div>
         )}
+      </div>
+
+      {/* Footer */}
+      <div className="p-4 sm:p-5 border-t border-hairline-soft bg-black/[0.01] flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-sub-label">
+        <span>Tổng chi phí đã ghi nhận</span>
+        <span className="text-xs font-black text-kraft-ink">
+          {formatCurrency(totalUnreimbursedAmount + totalReimbursedInMonth)}
+        </span>
       </div>
     </motion.div>
   );

@@ -2,6 +2,11 @@ import { useState, useMemo, useEffect } from 'react';
 import { useDependencies } from '@/src/shared/ioc/DependencyContext';
 import { useActionResponse } from '@/src/shared/presentation/useActionResponse';
 import { BaseView } from '@/src/shared/presentation/BasePresenter';
+import { Vehicle, Staff, StaffExpense } from '@/src/shared/domain/types';
+import { VehicleStatus } from '@/src/shared/domain/constants';
+import { AddStaffExpenseInput, UpdateStaffExpenseInput } from '@/src/modules/staff/domain/StaffValidation';
+import { UpdateVehicleInput } from '@/src/modules/inventory/domain/VehicleSchema';
+import { StaffWithSalary } from '@/src/modules/staff/application/GetStaffList';
 
 export interface PersonalViewInterface {
   updateVehicles(vehicles: Vehicle[]): void;
@@ -10,7 +15,7 @@ export interface PersonalViewInterface {
 }
 
 export interface StaffView extends BaseView {
-  showStaffList(staff: import('@/src/modules/staff/application/GetStaffList').StaffWithSalary[]): void;
+  showStaffList(staff: StaffWithSalary[]): void;
   onStaffAdded(): void;
   onStaffUpdated(): void;
   onStaffDeleted(): void;
@@ -25,18 +30,16 @@ export interface InventoryView extends BaseView {
   setStaffList(staff: Staff[]): void;
 }
 
-
-import { Vehicle, Staff, StaffExpense } from '@/src/shared/domain/types';
-import { AddStaffExpenseInput, UpdateStaffExpenseInput } from '@/src/modules/staff/domain/StaffValidation';
-import { UpdateVehicleInput } from '@/src/modules/inventory/domain/VehicleSchema';
-
-export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, data: Partial<Staff> & { password?: string }) => void) => {
+export const usePersonalState = (
+  user: Staff, 
+  onUpdateUser?: (email: string, data: Partial<Staff> & { password?: string }) => void
+) => {
   const { createPersonalPresenter, createStaffPresenter, createInventoryPresenter } = useDependencies();
   const [cars, setCars] = useState<Vehicle[]>([]);
   const [allVehicles, setAllVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
-  const [staffData, setStaffData] = useState<import('@/src/modules/staff/application/GetStaffList').StaffWithSalary | null>(null);
+  const [staffData, setStaffData] = useState<StaffWithSalary | null>(null);
   
   // Expense Modal
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
@@ -46,7 +49,7 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [isVehicleDetailOpen, setIsVehicleDetailOpen] = useState(false);
   
-  // Profile/Password Modals
+  // Profile / Password Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [newPassword, setNewPassword] = useState('');
@@ -68,7 +71,8 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
   }, [createStaffPresenter, createInventoryPresenter]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !user.code) return;
+
     const view: PersonalViewInterface = { 
       updateVehicles: setCars, 
       setAllVehicles: setAllVehicles,
@@ -77,8 +81,8 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
     presenter.attach(view);
 
     const staffView: StaffView = {
-      showStaffList: (list: import('@/src/modules/staff/application/GetStaffList').StaffWithSalary[]) => {
-        const current = list.find(s => s.code === user.code);
+      showStaffList: (list: StaffWithSalary[]) => {
+        const current = list.find(s => s.code.toLowerCase() === user.code.toLowerCase());
         if (current) setStaffData(current);
       },
       showLoading: () => setLoading(true),
@@ -93,11 +97,11 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
     staffPresenter.loadStaff(selectedMonth);
 
     const inventoryView: InventoryView = {
-      showAvailableCars: (cars) => setCars(cars),
+      showAvailableCars: (availableCars) => setCars(availableCars),
       showSoldCars: () => {},
       showLoading: () => setLoading(true),
       hideLoading: () => setLoading(false),
-      showError: () => {}, // Handled by useActionResponse
+      showError: () => {},
       onStatusUpdated: () => {
         staffPresenter.loadStaff(selectedMonth); 
       },
@@ -116,14 +120,10 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
     };
   }, [presenter, staffPresenter, inventoryPresenter, user, selectedMonth]);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSelectedVehicle(current => {
-      if (!current) return current;
-      const updated = allVehicles.find(c => c.id === current.id);
-      return updated || current;
-    });
-  }, [allVehicles]);
+  const activeSelectedVehicle = useMemo(() => {
+    if (!selectedVehicle) return null;
+    return allVehicles.find(c => c.id === selectedVehicle.id) || selectedVehicle;
+  }, [allVehicles, selectedVehicle]);
 
   const handleChangePassword = () => {
     if (!newPassword || newPassword.length < 6) {
@@ -140,20 +140,20 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
   };
 
   const handleUpdateProfile = () => {
-    if (!editFormData.name) {
-      throw new Error("Vui lòng nhập tên.");
+    if (!editFormData.name.trim()) {
+      throw new Error("Vui lòng nhập họ và tên.");
     }
 
     if (onUpdateUser) {
       executeAction(async () => {
         await onUpdateUser(user.email, editFormData);
         setIsEditModalOpen(false);
-      }, { successMessage: 'Cập nhật trang cá nhân thành công!' });
+      }, { successMessage: 'Cập nhật hồ sơ cá nhân thành công!' });
     }
   };
 
-  const handleUpdateStatus = (id: number, status: string, extra: Record<string, unknown>) =>
-    executeAction(() => inventoryPresenter.updateVehicleStatus({ id, nextStatus: status as import('@/src/shared/domain/constants').VehicleStatus, user: user.code, ...extra }, user.role), { 
+  const handleUpdateStatus = (id: number, status: VehicleStatus, extra: Record<string, unknown>) =>
+    executeAction(() => inventoryPresenter.updateVehicleStatus({ id, nextStatus: status, user: user.code, ...extra }, user.role), { 
       successMessage: 'Cập nhật trạng thái thành công!' 
     });
 
@@ -169,7 +169,7 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
 
   const handleAddCost = (id: number, name: string, amount: number) =>
     executeAction(() => inventoryPresenter.addVehicleCost(id, name, amount, user.id, user.role), { 
-      successMessage: 'Đã thêm chi phí!' 
+      successMessage: 'Đã thêm chi phí xe!' 
     });
 
   const handleDeleteCost = (id: number, idx: number) =>
@@ -185,8 +185,21 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
       successMessage: 'Đã lưu phiếu chi!' 
     });
 
-  const handleAddSalePayment = (id: number, amount: number, note: string, receiver: string, status: string, seller: string, bName?: string, sPrice?: number, comm?: number, bBonus?: number) =>
-    executeAction(() => inventoryPresenter.addSalePayment(id, amount, note, receiver, status as import('@/src/shared/domain/constants').VehicleStatus, seller, bName || '', sPrice || 0, comm || 0, bBonus || 0, user.role), { 
+  const handleAddSalePayment = (
+    id: number, 
+    amount: number, 
+    note: string, 
+    receiver: string, 
+    status: VehicleStatus, 
+    seller: string, 
+    bName?: string, 
+    sPrice?: number, 
+    comm?: number, 
+    bBonus?: number
+  ) =>
+    executeAction(() => inventoryPresenter.addSalePayment(
+      id, amount, note, receiver, status, seller, bName || '', sPrice || 0, comm || 0, bBonus || 0, user.role
+    ), { 
       successMessage: 'Ghi nhận giao dịch thành công!' 
     });
 
@@ -202,19 +215,19 @@ export const usePersonalState = (user: Staff, onUpdateUser?: (email: string, dat
 
   const handleUpdateExpense = (expenseId: string, data: UpdateStaffExpenseInput) =>
     executeAction(() => staffPresenter.updateExpense(String(staffData?.id || user.id), expenseId, data), {
-      successMessage: 'Cập nhật thành công!'
+      successMessage: 'Cập nhật chi phí thành công!'
     });
 
   const handleDeleteExpense = (expenseId: string) =>
     executeAction(() => staffPresenter.deleteExpense(String(staffData?.id || user.id), expenseId), {
-      successMessage: 'Đã xóa ghi chú!'
+      successMessage: 'Đã xóa ghi chú chi phí!'
     });
 
   return {
     cars, allVehicles, loading, selectedMonth, setSelectedMonth, staffData, 
     isExpenseModalOpen, setIsExpenseModalOpen,
     editingExpense, setEditingExpense,
-    selectedVehicle, setSelectedVehicle,
+    selectedVehicle: activeSelectedVehicle, setSelectedVehicle,
     isVehicleDetailOpen, setIsVehicleDetailOpen,
     isModalOpen, setIsModalOpen, 
     isEditModalOpen, setIsEditModalOpen,
