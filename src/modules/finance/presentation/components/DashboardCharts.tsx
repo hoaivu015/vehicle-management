@@ -116,7 +116,7 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({
               </p>
             </div>
             <div className="p-4 md:p-6 rounded-3xl glass-purity-surface text-center">
-              <p className="text-[10px] md:text-xs text-sub-label mb-1 md:mb-2 uppercase font-black tracking-wider">Tỷ suất lãi gộp (Margin)</p>
+              <p className="text-[10px] md:text-xs text-sub-label mb-1 md:mb-2 uppercase font-black tracking-wider">Biên lợi nhuận gộp (Gross Margin)</p>
               <p className="text-lg md:text-2xl font-black text-emerald-600">
                 {overview?.profitMarginPercent || 0}%
               </p>

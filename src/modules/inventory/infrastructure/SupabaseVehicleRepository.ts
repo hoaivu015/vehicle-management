@@ -48,6 +48,9 @@ export class SupabaseVehicleRepository implements VehicleRepository {
     if (!current) throw new EntityNotFoundError('Vehicle', id);
 
     const merged = { ...current, ...item };
+    if (item.cost_history !== undefined) {
+      merged.total_cost = (item.cost_history || []).reduce((sum, c) => sum + (c.amount || 0), 0);
+    }
     const entity = new VehicleEntity(merged);
     const financials = entity.financials;
 

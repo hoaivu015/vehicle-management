@@ -47,6 +47,7 @@ export class DeleteVehicleCost {
 
     // 2. Remove from vehicle and append an immutable Audit Log into history
     const updatedCostHistory = costHistory.filter((_, i) => i !== request.costIndex);
+    const updatedTotalCost = updatedCostHistory.reduce((sum, c) => sum + (c.amount || 0), 0);
     const updatedHistoryLogs = [
       ...(vehicle.history || []),
       {
@@ -59,6 +60,7 @@ export class DeleteVehicleCost {
 
     return await this.vehicleRepository.update(vehicle.id.toString(), {
       cost_history: updatedCostHistory,
+      total_cost: updatedTotalCost,
       history: updatedHistoryLogs
     });
   }

@@ -238,7 +238,7 @@ export const PersonalMobileView: React.FC<PersonalMobileViewProps> = ({
           
           <div className="grid grid-cols-2 gap-4 mt-6 pt-5 border-t border-white/10">
             <div>
-              <div className="text-[9px] uppercase font-black opacity-40 tracking-wider">Lương cứng</div>
+              <div className="text-[9px] uppercase font-black opacity-40 tracking-wider">Lương cơ bản</div>
               <div className="font-bold text-sm">{formatCurrency(user.base_salary || 0)}</div>
             </div>
             <div>

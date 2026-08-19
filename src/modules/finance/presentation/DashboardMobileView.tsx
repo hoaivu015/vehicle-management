@@ -159,7 +159,7 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
               <div className="flex items-center justify-between">
                 <SecondaryLabel className="text-white/70">Lợi nhuận ròng cuối</SecondaryLabel>
                 <span className="text-[10px] font-bold text-white/80 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/10">
-                  Chạm để xem xe bán
+                  Xem chi tiết xe đã bán
                 </span>
               </div>
 
@@ -169,7 +169,7 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
 
               <div className="flex items-center gap-2 mt-4 text-xs font-bold bg-white/10 w-fit px-3.5 py-1.5 rounded-full backdrop-blur-md border border-white/10">
                 <TrendingUp size={14} className="text-emerald-300" />
-                <span>Lãi gộp: {formatCurrency(overview?.grossProfit || 0)}</span>
+                <span>Lợi nhuận gộp: {formatCurrency(overview?.grossProfit || 0)}</span>
               </div>
             </div>
 
@@ -213,7 +213,7 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
                 <span className="text-base font-black text-kraft-ink mt-0.5 block">{overview?.averageDSI || 0} ngày</span>
               </div>
               <div className="text-center p-2">
-                <span className="text-[9px] font-black uppercase tracking-wider text-sub-label block">Tỷ suất lãi gộp</span>
+                <span className="text-[9px] font-black uppercase tracking-wider text-sub-label block">Biên lợi nhuận gộp</span>
                 <span className="text-base font-black text-income mt-0.5 block">{overview?.profitMarginPercent || 0}%</span>
               </div>
             </div>

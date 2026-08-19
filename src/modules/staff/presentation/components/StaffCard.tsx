@@ -377,7 +377,7 @@ export const StaffCard = React.memo<StaffCardProps>(({
               {/* Chi tiết cơ cấu thu nhập SSoT */}
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase">Lương cứng</span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Lương cơ bản</span>
                   <span className="text-xs font-black text-slate-800 whitespace-nowrap">
                     {formatCurrency(member.base_salary || 0)}
                   </span>

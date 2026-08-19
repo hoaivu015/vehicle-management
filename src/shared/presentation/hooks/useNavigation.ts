@@ -21,7 +21,7 @@ export const useNavigation = (
   hasPermission: (permission: string) => boolean
 ) => {
   const navItems: NavItem[] = useMemo(() => [
-    { id: 'dashboard', label: 'BÁO CÁO', icon: BarChart3, onClick: () => setActiveTab('dashboard'), visible: hasPermission('VIEW_DASHBOARD') },
+    { id: 'dashboard', label: 'Báo cáo', icon: BarChart3, onClick: () => setActiveTab('dashboard'), visible: hasPermission('VIEW_DASHBOARD') },
     { id: 'inventory', label: 'Kho xe', icon: Car, onClick: onInventoryClick, visible: hasPermission('VIEW_INVENTORY') },
     { id: 'staff', label: 'Nhân sự', icon: Users, onClick: () => setActiveTab('staff'), visible: hasPermission('VIEW_STAFF'), hideOnMobile: currentUser?.role !== UserRole.ACCOUNTANT && currentUser?.role !== UserRole.ADMIN },
     { id: 'cashflow', label: 'Dòng tiền', icon: CircleDollarSign, onClick: () => setActiveTab('cashflow'), visible: hasPermission('VIEW_CASHFLOW') },

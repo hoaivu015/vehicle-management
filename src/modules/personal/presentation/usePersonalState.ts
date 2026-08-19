@@ -107,6 +107,7 @@ export const usePersonalState = (
       },
       onVehicleUpdated: (v) => {
         setSelectedVehicle(v);
+        setCars(prev => prev.map(c => c.id === v.id ? v : c));
         staffPresenter.loadStaff(selectedMonth);
       },
       setStaffList: () => {} 
@@ -167,8 +168,8 @@ export const usePersonalState = (
       successMessage: 'Cập nhật thông tin thành công!' 
     });
 
-  const handleAddCost = (id: number, name: string, amount: number) =>
-    executeAction(() => inventoryPresenter.addVehicleCost(id, name, amount, user.id, user.role), { 
+  const handleAddCost = (id: number, name: string, amount: number, staffId?: string) =>
+    executeAction(() => inventoryPresenter.addVehicleCost(id, name, amount, staffId, user.role), { 
       successMessage: 'Đã thêm chi phí xe!' 
     });
 

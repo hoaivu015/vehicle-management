@@ -43,7 +43,7 @@ export const PayableDebtsList: React.FC<PayableDebtsListProps> = ({
                 </div>
                 <div className="min-w-0">
                   <span className="text-[10px] font-black uppercase tracking-wider text-red-800/60 leading-none block whitespace-nowrap">
-                    Tổng nợ tiền xe
+                    Tổng công nợ phải trả
                   </span>
                   <h3 className="text-xl sm:text-2xl font-black tracking-tight text-red-600 mt-1 leading-none whitespace-nowrap">
                     {formatCurrency(total)}
@@ -60,7 +60,7 @@ export const PayableDebtsList: React.FC<PayableDebtsListProps> = ({
               {debts.length === 0 ? (
                 <EmptyState
                   icon={CheckCircle2}
-                  title="ĐÃ TRẢ HẾT NỢ"
+                  title="ĐÃ THANH TOÁN HẾT CÔNG NỢ"
                   description="Tất cả các xe nhập về đã được thanh toán đầy đủ cho chủ cũ."
                   className="py-16"
                 />

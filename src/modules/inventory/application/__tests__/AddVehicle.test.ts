@@ -77,7 +77,7 @@ describe('AddVehicle Use Case', () => {
     expect(result.code).toBe(mockGeneratedCode);
   });
 
-  it('nên quăng lỗi nếu số tiền góp vốn lớn hơn giá mua', async () => {
+  it('nên quăng lỗi nếu số tiền góp vốn lớn hơn giá nhập', async () => {
     const invalidRequest = {
       ...validRequest,
       is_coinvested: true,
@@ -85,7 +85,7 @@ describe('AddVehicle Use Case', () => {
       coinvest_amount: 900000000 // > 800,000,000
     };
 
-    await expect(useCase.execute(invalidRequest as unknown as import('../AddVehicle').AddVehicleRequest)).rejects.toThrow('Số tiền góp vốn không được lớn hơn giá mua xe.');
+    await expect(useCase.execute(invalidRequest as unknown as import('../AddVehicle').AddVehicleRequest)).rejects.toThrow('Số tiền góp vốn không được lớn hơn giá nhập xe.');
   });
 
   it('nên sử dụng các giá trị mặc định từ schema nếu thiếu', async () => {

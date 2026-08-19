@@ -66,9 +66,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           'Ngày Bán': v.sale_date || '',
           'Người Bán': v.seller || '',
           'Khách Mua': v.buyer_name || '',
-          'Giá Mua': fin.purchasePrice,
-          'Chi Phí Spa': fin.totalCost,
-          'Giá Bán': fin.salePrice,
+          'Giá Nhập': fin.purchasePrice,
+          'Chi Phí Làm Đẹp': fin.totalCost,
+          'Giá Chốt Bán': fin.salePrice,
           'Hoa Hồng Bán': fin.sellingCommission,
           'Lợi Nhuận Gộp': fin.grossProfit,
           'Showroom Hưởng': fin.showroomProfitShare
@@ -86,18 +86,18 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           'Biển Số': v.license_plate || '',
           'Trạng Thái': VEHICLE_STATUS_LABELS[v.status as VehicleStatus] || v.status,
           'Ngày Nhập': v.purchase_date || '',
-          'Giá Mua': fin.purchasePrice,
-          'Chi Phí Spa Đã Chi': fin.totalCost,
-          'Tổng Vốn Đọng': fin.totalInvestment,
-          'Đã Trả Chủ Cũ': v.purchase_paid_amount || 0,
-          'Còn Nợ Mua': Math.max(0, fin.purchasePrice - (v.purchase_paid_amount || 0))
+          'Giá Nhập': fin.purchasePrice,
+          'Chi Phí Làm Đẹp Đã Chi': fin.totalCost,
+          'Tổng Giá Trị Tồn Kho': fin.totalInvestment,
+          'Đã Thanh Toán Tiền Nhập': v.purchase_paid_amount || 0,
+          'Công Nợ Phải Trả': Math.max(0, fin.purchasePrice - (v.purchase_paid_amount || 0))
         };
       });
 
     // Export multi-sheet Excel
     exportToExcel({
       '1_Tong_Quan': overviewSheet,
-      '2_Xe_Da_Ban': soldVehicles.length > 0 ? soldVehicles : [{ 'Thông báo': 'Chưa có xe bán trong tháng' }],
+      '2_Xe_Da_Ban': soldVehicles.length > 0 ? soldVehicles : [{ 'Thông báo': 'Chưa có xe đã bán trong tháng' }],
       '3_Xe_Ton_Kho': inventoryVehicles.length > 0 ? inventoryVehicles : [{ 'Thông báo': 'Kho trống' }]
     }, `Bao_Cao_Dieu_Hanh_${filterMonth}`);
   };

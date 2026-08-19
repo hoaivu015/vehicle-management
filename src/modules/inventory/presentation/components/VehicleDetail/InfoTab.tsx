@@ -140,7 +140,7 @@ export const InfoTab: React.FC<InfoTabProps> = ({
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                            <label className="text-[11px] font-black uppercase tracking-widest text-sub-label leading-none block">
-                              Lương mua xe (Hoa hồng nhập)
+                              Hoa hồng nhập xe (Lương thu mua)
                            </label>
                            <SmartAmountInput
                               value={editForm.buying_commission || 0}
@@ -149,7 +149,7 @@ export const InfoTab: React.FC<InfoTabProps> = ({
                         </div>
                         <div className="space-y-1.5">
                            <label className="text-[11px] font-black uppercase tracking-widest text-sub-label leading-none block">
-                              Thưởng nóng mua xe
+                              Thưởng nóng nhập xe
                            </label>
                            <div className="flex items-center gap-3">
                               <div className="flex-1">
@@ -258,7 +258,7 @@ export const InfoTab: React.FC<InfoTabProps> = ({
                         </p>
                      </div>
 
-                      {/* Hero Metric Pill: Lưu kho (Mở bán & Tổng sở hữu) */}
+                      {/* Hero Metric Pill: Lưu kho (Mở bán & Tổng lưu kho) */}
                       <div className="flex items-center gap-2 flex-wrap">
                          <div className={cn(
                             "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-bold whitespace-nowrap shadow-2xs",
@@ -274,7 +274,7 @@ export const InfoTab: React.FC<InfoTabProps> = ({
 
                          {holdingDays !== activeDays && holdingDays > 0 && (
                             <div className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-200/80 bg-slate-100/60 text-slate-600 text-xs font-medium whitespace-nowrap">
-                               <span>Tổng sở hữu: <strong className="font-bold text-slate-800">{holdingDays}</strong> ngày</span>
+                               <span>Tổng lưu kho: <strong className="font-bold text-slate-800">{holdingDays}</strong> ngày</span>
                             </div>
                          )}
                       </div>

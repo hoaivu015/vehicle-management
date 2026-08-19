@@ -27,7 +27,7 @@ export const VehicleProfile: React.FC<VehicleProfileProps> = ({
       
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
         <BaseInput 
-          label="Năm SX"
+          label="Năm sản xuất"
           type="number"
           value={formData.year}
           onChange={(e) => setFormData(prev => ({ ...prev, year: e.target.value }))}

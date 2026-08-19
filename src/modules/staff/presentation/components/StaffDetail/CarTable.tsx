@@ -30,9 +30,9 @@ export const CarTable: React.FC<CarTableProps> = ({ cars, onUpdateVehicle, userR
 
   const getLabel = (type: EarningType) => {
     switch (type) {
-      case 'sales': return "Bán";
-      case 'buying': return "Nhập";
-      case 'collaboration': return "Hợp tác";
+      case 'sales': return "Bán xe";
+      case 'buying': return "Nhập xe";
+      case 'collaboration': return "Góp vốn";
     }
   };
 

@@ -250,7 +250,7 @@ export const SmartFinancialEntryDock: React.FC<SmartFinancialEntryDockProps> = (
             ref={nameInputRef}
             label="Nội dung chứng từ / Khoản chi"
             required
-            placeholder="VD: Tiền điện Showroom, Spa xe Camry..."
+            placeholder="VD: Tiền điện Showroom, Làm đẹp hoàn thiện xe Camry..."
             value={name}
             onChange={e => {
               setName(e.target.value);

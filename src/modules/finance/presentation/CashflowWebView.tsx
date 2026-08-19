@@ -328,10 +328,10 @@ const BreakdownCard: React.FC<BreakdownCardProps> = ({ data, total }) => (
     </div>
 
     <div className="space-y-5">
-      <BreakdownRow label="Mua xe vào kho" value={data?.purchaseOutflow || 0} total={total} color="bg-blue-500" />
-      <BreakdownRow label="Chi phí Spa & Sửa xe" value={data?.carCosts || 0} total={total} color="bg-amber-500" />
+      <BreakdownRow label="Tiền nhập xe vào kho" value={data?.purchaseOutflow || 0} total={total} color="bg-blue-500" />
+      <BreakdownRow label="Chi phí làm đẹp & hoàn thiện xe" value={data?.carCosts || 0} total={total} color="bg-amber-500" />
       <BreakdownRow label="Vận hành Showroom" value={data?.operatingExpenses || 0} total={total} color="bg-rose-500" />
-      <BreakdownRow label="Vốn & LN Đối tác" value={data?.partnerPayouts || 0} total={total} color="bg-cyan-500" />
+      <BreakdownRow label="Vốn & Lợi nhuận đối tác" value={data?.partnerPayouts || 0} total={total} color="bg-cyan-500" />
       <BreakdownRow label="Lương nhân sự" value={data?.salaries || 0} total={total} color="bg-emerald-500" />
     </div>
   </section>

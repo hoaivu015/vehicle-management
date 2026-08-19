@@ -238,14 +238,14 @@ export class GetFinancialOverview {
       },
       {
         id: 'car_costs',
-        name: 'Làm đẹp & Spa xe',
+        name: 'Làm đẹp & Hoàn thiện xe',
         amount: monthlyCarCosts,
         percent: totalOutflowExpenses > 0 ? Math.round((monthlyCarCosts / totalOutflowExpenses) * 100) : 0,
         color: '#0099FF'
       },
       {
         id: 'base_salaries',
-        name: 'Lương cứng nhân sự',
+        name: 'Lương cơ bản nhân sự',
         amount: monthlyBaseSalaries,
         percent: totalOutflowExpenses > 0 ? Math.round((monthlyBaseSalaries / totalOutflowExpenses) * 100) : 0,
         color: '#1877F2'

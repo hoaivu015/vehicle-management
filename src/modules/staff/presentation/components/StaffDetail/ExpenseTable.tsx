@@ -221,7 +221,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
 
         {unreimbursed.length > 0 && (
           <div className="space-y-3">
-             <p className="text-[9px] font-black text-warning uppercase tracking-widest ml-2 opacity-60">Chờ hoàn tiền ({unreimbursed.length})</p>
+             <p className="text-[9px] font-black text-warning uppercase tracking-widest ml-2 opacity-60">Chờ hoàn ứng ({unreimbursed.length})</p>
              {unreimbursed.map(expense => (
                <div key={expense.id} onClick={() => onUpdateExpense(memberId, expense.id, expense)} className="p-4 glass-purity-surface rounded-t2 border border-white/60 space-y-3 relative border-l-4 border-l-warning shadow-kraft-deep active-press transition-all duration-200 scroll-reveal-item">
                   <div className="flex justify-between items-start">
@@ -250,7 +250,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                       className="px-3 py-1.5 rounded-full bg-warning/10 text-warning border border-warning/10 text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm active-press"
                     >
                       <Clock size={11} className="animate-pulse" />
-                      <span>Hoàn tiền</span>
+                      <span>Hoàn ứng</span>
                     </motion.button>
                   </div>
                </div>
@@ -331,7 +331,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                   <td colSpan={3} className="py-3 px-6">
                     <div className="flex items-center gap-2">
                       <Clock size={12} className="text-warning" />
-                      <span className="text-[9px] font-black uppercase tracking-widest text-warning">Chờ hoàn tiền</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-warning">Chờ hoàn ứng</span>
                     </div>
                   </td>
                 </tr>

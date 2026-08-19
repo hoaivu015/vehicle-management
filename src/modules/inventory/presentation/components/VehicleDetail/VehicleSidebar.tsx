@@ -102,7 +102,7 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
                {canSeeFullInfo ? (
                   <div className="flex items-center gap-2 mt-1 pt-1.5 border-t border-hairline-soft text-[10px] font-bold text-kraft-ink/80 leading-none min-w-0">
                      <div className="flex items-center gap-1 shrink-0 whitespace-nowrap">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-sub-label leading-none">LN:</span>
+                        <span className="text-[10px] font-black uppercase tracking-wider text-sub-label leading-none">Lợi nhuận:</span>
                         <span className="text-income font-black whitespace-nowrap">{formatCurrency(financials.showroomProfitShare)}</span>
                      </div>
                      <div className="w-[1px] h-2.5 bg-black/10 shrink-0" />
@@ -193,7 +193,7 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
                   <div className="p-3 bg-income/5 rounded-xl border border-income/15 flex items-center justify-between relative overflow-hidden group hover:border-income/30 transition-all">
                      <div className="space-y-0.5 relative z-10">
                         <p className="text-[9px] font-black uppercase tracking-widest text-income/80 whitespace-nowrap">
-                           {vehicle.is_coinvested ? "LN dự kiến showroom" : "Lợi nhuận dự kiến"}
+                           {vehicle.is_coinvested ? "Lợi nhuận dự kiến Showroom" : "Lợi nhuận dự kiến"}
                         </p>
                         <p className="text-xl font-black text-income tracking-tight whitespace-nowrap">
                            {formatCurrency(financials.showroomProfitShare)}

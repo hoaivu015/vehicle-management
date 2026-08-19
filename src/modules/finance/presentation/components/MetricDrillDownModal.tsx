@@ -37,7 +37,7 @@ export const MetricDrillDownModal: React.FC<MetricDrillDownModalProps> = ({
       case 'gross_profit': {
         const list = vehicles.filter(v => v.status === VehicleStatus.SOLD && v.sale_date?.startsWith(filterMonth));
         return {
-          title: 'Chi Tiết Lợi Nhuận Gộp Theo Xe Bán',
+          title: 'Chi Tiết Lợi Nhuận Gộp Theo Xe Đã Bán',
           subtitle: `Danh sách các xe đã bán và đóng góp lợi nhuận trong tháng ${filterMonth}`,
           icon: DollarSign,
           filteredVehicles: list,

@@ -53,7 +53,7 @@ export const EconomicSection: React.FC<EconomicSectionProps> = ({
         </BaseSelect>
 
         <SmartAmountInput 
-          label="Hoa hồng nhập (Lương mua)" 
+          label="Hoa hồng nhập xe" 
           value={formData.buying_commission} 
           onChange={(v) => setFormData(prev => ({ ...prev, buying_commission: v ?? 0 }))} 
           variant="dense"

@@ -125,8 +125,8 @@ export const PersonalVehiclesSection: React.FC<PersonalVehiclesSectionProps> = (
 
   const tabs = [
     { id: 'ALL', label: 'Tất cả', count: unifiedItems.length },
-    { id: 'sale', label: 'Xe bán', count: soldCars.length, icon: Car },
-    { id: 'buy', label: 'Xe nhập', count: boughtCars.length, icon: ShoppingBag },
+    { id: 'sale', label: 'Xe đã bán', count: soldCars.length, icon: Car },
+    { id: 'buy', label: 'Xe đã nhập', count: boughtCars.length, icon: ShoppingBag },
     { id: 'coinvest', label: 'Góp vốn', count: coinvestedCars.length, icon: Share2 }
   ];
 
@@ -207,7 +207,7 @@ export const PersonalVehiclesSection: React.FC<PersonalVehiclesSectionProps> = (
                 <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-sub-label opacity-70">Loại hình</th>
                 <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-sub-label opacity-70">Ngày ghi nhận</th>
                 <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-sub-label opacity-70 text-right">Giá trị</th>
-                <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-sub-label opacity-70 text-right">Hoa hồng / LN</th>
+                <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-sub-label opacity-70 text-right">Hoa hồng / Lợi nhuận</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-hairline-soft">

@@ -71,7 +71,7 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
       value: formatCurrency(overview?.grossProfit || 0),
       numericValue: overview?.grossProfit || 0,
       icon: CircleDollarSign,
-      subValue: 'Bấm xem chi tiết xe bán',
+      subValue: 'Xem chi tiết danh sách xe đã bán',
       tooltip: formatCurrency(overview?.grossProfit || 0, { showFull: true }),
       onClick: () => openDrillDown('gross_profit')
     },
@@ -80,12 +80,12 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
       value: formatCurrency(overview?.netProfit || 0),
       numericValue: overview?.netProfit || 0,
       icon: TrendingUp,
-      subValue: 'Sau chia vốn & trừ CP vận hành',
+      subValue: 'Sau chia vốn & trừ chi phí vận hành',
       isNegative: (overview?.netProfit || 0) < 0,
       tooltip: formatCurrency(overview?.netProfit || 0, { showFull: true })
     },
     {
-      label: 'Lợi ròng cuối',
+      label: 'Lợi nhuận ròng cuối',
       value: formatCurrency(overview?.finalNetProfit || 0),
       numericValue: overview?.finalNetProfit || 0,
       icon: Coins,
@@ -105,7 +105,7 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
       label: 'Xe đã bán', 
       value: `${overview?.soldCount || 0} xe`, 
       icon: CheckCircle2, 
-      subValue: `Bấm xem danh sách xe bán`,
+      subValue: `Xem chi tiết danh sách xe đã bán`,
       onClick: () => openDrillDown('sold_vehicles')
     },
     { 

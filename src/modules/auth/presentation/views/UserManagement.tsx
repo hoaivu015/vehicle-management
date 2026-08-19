@@ -1,7 +1,7 @@
 import React from 'react';
 import { Shield, UserPlus, Mail, Trash2, Edit2, Check, X, Key, Copy } from 'lucide-react';
 import { motion } from 'motion/react';
-import { UserRole } from '@/src/shared/domain/constants';
+import { UserRole, USER_ROLE_LABELS } from '@/src/shared/domain/constants';
 import { useUserManagement } from '../hooks/useUserManagement';
 import { BaseModal } from '@/src/shared/design-system';
 
@@ -48,7 +48,9 @@ export const UserManagement = () => {
             <div className="space-y-2">
               <label className="text-liquid-label ml-2">Vai trò</label>
               <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })} className="liquid-input h-14 px-6 text-sm font-black uppercase tracking-widest">
-                {Object.values(UserRole).filter(r => r !== UserRole.ADMIN).map(role => <option key={role} value={role}>{role}</option>)}
+                {Object.values(UserRole).filter(r => r !== UserRole.ADMIN).map(role => (
+                  <option key={role} value={role}>{USER_ROLE_LABELS[role] || role}</option>
+                ))}
               </select>
             </div>
             <div className="flex gap-4 pt-6">
@@ -96,9 +98,11 @@ const UserCard = ({ user, isEditing, onEdit, onCancel, onUpdate, onDelete, formD
         <span className="text-liquid-label opacity-40">Quyền hạn</span>
         {isEditing ? (
           <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })} className="bg-white border rounded-xl px-3 py-1 text-[10px] font-black uppercase tracking-widest">
-            {Object.values(UserRole).filter(r => r !== UserRole.ADMIN).map(role => <option key={role} value={role}>{role}</option>)}
+            {Object.values(UserRole).filter(r => r !== UserRole.ADMIN).map(role => (
+              <option key={role} value={role}>{USER_ROLE_LABELS[role] || role}</option>
+            ))}
           </select>
-        ) : <span className="px-3 py-1 bg-kraft-accent text-white text-[10px] font-black rounded-lg uppercase tracking-widest">{user.role}</span>}
+        ) : <span className="px-3 py-1 bg-kraft-accent text-white text-[10px] font-black rounded-lg uppercase tracking-widest">{USER_ROLE_LABELS[user.role as UserRole] || user.role}</span>}
       </div>
       {isEditing ? (
         <div className="space-y-1"><label className="text-liquid-label ml-2">Mật khẩu mới</label><input type="text" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="liquid-input h-14 px-6 text-sm" placeholder="Nhập mật khẩu..." /></div>

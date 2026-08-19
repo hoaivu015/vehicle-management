@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "lint:arch": "depcruise src --config .dependency-cruiser.cjs",
     "audit:standards": "node scripts/audit_standards.js",
+    "audit:language": "node scripts/audit_language_terminology.js",
     "health-check": "./scripts/check-complexity.sh",
     "prepare": "husky"
   },

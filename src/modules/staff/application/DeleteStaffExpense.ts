@@ -19,8 +19,10 @@ export class DeleteStaffExpense {
       const vehicle = await this.vehicleRepository.getById(expenseToDelete.vehicleId.toString());
       if (vehicle && vehicle.cost_history) {
         const updatedCostHistory = vehicle.cost_history.filter(cost => cost.staff_expense_id !== expenseId);
+        const updatedTotalCost = updatedCostHistory.reduce((sum, c) => sum + (c.amount || 0), 0);
         await this.vehicleRepository.update(vehicle.id.toString(), {
-          cost_history: updatedCostHistory
+          cost_history: updatedCostHistory,
+          total_cost: updatedTotalCost
         });
       }
     }

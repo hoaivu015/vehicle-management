@@ -19,7 +19,7 @@ export interface PaymentFormState {
 export interface UseVehicleFinancialsProps {
   vehicle: Vehicle | null;
   userCode: string;
-  onAddCost: (id: number, name: string, amount: number) => Promise<void>;
+  onAddCost: (id: number, name: string, amount: number, staffId?: string) => Promise<void>;
   onDeleteCost: (id: number, index: number) => Promise<void>;
   onAddPurchasePayment: (id: number, amount: number, note: string, receiver: string) => Promise<void>;
   onAddSalePayment: (
@@ -121,10 +121,10 @@ export const useVehicleFinancials = ({
   const saleDebt = vehicle && financials && isSalePhase ? (financials.salePrice || 0) - (vehicle.received_amount || 0) : 0;
 
   // Wrapped actions leveraging the Unified Action Pattern
-  const handleAddCost = async (id: number, name: string, amount: number) => {
+  const handleAddCost = async (id: number, name: string, amount: number, staffId?: string) => {
     setIsSubmitting(true);
     try {
-      await onAddCost(id, name, amount);
+      await onAddCost(id, name, amount, staffId);
       haptics.success();
     } finally {
       setIsSubmitting(false);

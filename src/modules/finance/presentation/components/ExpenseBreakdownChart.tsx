@@ -48,7 +48,7 @@ export const ExpenseBreakdownChart: React.FC<ExpenseBreakdownChartProps> = ({
           </span>
         </div>
         <p className="text-[11px] font-bold text-sub-label mb-6">
-          Phân rã chi phí vận hành, spa dọn xe, lương cứng và hoa hồng phát sinh
+          Phân rã chi phí vận hành, làm đẹp hoàn thiện xe, lương cơ bản và hoa hồng phát sinh
         </p>
       </div>
 

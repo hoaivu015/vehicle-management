@@ -79,7 +79,7 @@ export const AccountPage: React.FC = () => {
       const data = await repository.getAccounts();
       setAccounts(data);
     } catch (error: unknown) {
-      notification.error('Không thể tải danh sách tài khoản');
+      notification.error('Không thể tải danh sách tài khoản do lỗi kết nối. Vui lòng kiểm tra lại mạng hoặc thử lại sau.');
       console.error(error);
     } finally {
       setLoading(false);

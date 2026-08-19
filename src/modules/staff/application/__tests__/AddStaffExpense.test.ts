@@ -81,4 +81,31 @@ describe('RecordExpense Use Case', () => {
       name: expect.stringContaining('Office')
     }));
   });
+
+  it('should record direct company vehicle cost when staffId is undefined (default showroom cost)', async () => {
+    mockVehicleRepo.getById.mockResolvedValue({ id: 1, code: 'V01', cost_history: [] });
+
+    await useCase.execute({
+      amount: 6000000,
+      name: 'Hoa hồng',
+      date: '2026-08-19',
+      type: 'vehicle',
+      vehicleId: 1,
+      category: 'Vận hành'
+    });
+
+    // 1. Verify vehicle updated with clean note (NO [NV ứng] prefix) and empty staff_id
+    expect(mockVehicleRepo.update).toHaveBeenCalledWith('1', expect.objectContaining({
+      cost_history: expect.arrayContaining([
+        expect.objectContaining({
+          amount: 6000000,
+          note: 'Hoa hồng',
+          staff_id: ''
+        })
+      ])
+    }));
+
+    // 2. Verify staff repository was NOT called (no staff advance created)
+    expect(mockStaffRepo.update).not.toHaveBeenCalled();
+  });
 });

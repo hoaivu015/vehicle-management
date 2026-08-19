@@ -23,7 +23,7 @@ interface VehicleDetailModalProps {
    onUpdateStatus: (id: number, nextStatus: VehicleStatus, extra?: Record<string, unknown>) => Promise<void>;
    onDeleteVehicle: (id: number) => Promise<void>;
    onUpdateVehicle: (id: number, data: Partial<Vehicle>) => Promise<void>;
-   onAddCost: (id: number, name: string, amount: number) => Promise<void>;
+   onAddCost: (id: number, name: string, amount: number, staffId?: string) => Promise<void>;
    onDeleteCost: (id: number, index: number) => Promise<void>;
    onPin: (id: number, isPinned: boolean) => Promise<void>;
    onAddPurchasePayment: (id: number, amount: number, note: string, receiver: string) => Promise<void>;
@@ -242,7 +242,10 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = (props) => 
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative bg-white">
                {/* Tab Navigation Header Bar */}
                <div className="px-3 sm:px-6 pt-2.5 sm:pt-4 pb-2.5 shrink-0 border-b border-hairline-soft bg-surface-soft/40 flex items-center">
-                  <nav className="w-full sm:w-auto grid grid-cols-3 sm:flex items-center gap-1 bg-black/[0.06] p-1 rounded-full border border-black/[0.06] relative shrink-0 shadow-inner">
+                  <nav className={cn(
+                    "w-full sm:w-auto grid sm:flex items-center gap-1 bg-black/[0.06] p-1 rounded-full border border-black/[0.06] relative shrink-0 shadow-inner",
+                    tabs.length === 3 ? "grid-cols-3" : "grid-cols-2"
+                  )}>
                      {tabs.map(tab => {
                         const isActive = activeTab === tab.id;
                         const Icon = tab.icon;

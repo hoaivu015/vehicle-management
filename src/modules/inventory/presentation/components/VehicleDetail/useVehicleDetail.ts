@@ -10,7 +10,7 @@ interface VehicleDetailActions {
   onUpdateStatus: (id: number, status: VehicleStatus, extra?: Record<string, unknown>) => Promise<void>;
   onDeleteVehicle: (id: number) => Promise<void>;
   onUpdateVehicle: (id: number, data: Partial<Vehicle>) => Promise<void>;
-  onAddCost: (id: number, name: string, amount: number) => Promise<void>;
+  onAddCost: (id: number, name: string, amount: number, staffId?: string) => Promise<void>;
   onDeleteCost: (id: number, costIndex: number) => Promise<void>;
   onPin: (id: number, isPinned: boolean) => Promise<void>;
   onAddPurchasePayment: (id: number, amount: number, note: string, receiver: string) => Promise<void>;
@@ -151,7 +151,7 @@ export const useVehicleDetail = (
       setEditForm(prev => ({ ...prev, image_url: publicUrl }));
       haptics.success();
     } catch (err: unknown) {
-      notification.error('Tải ảnh thất bại');
+      notification.error('Không thể tải ảnh xe lên hệ thống do lỗi tệp hoặc mạng. Vui lòng thử lại.');
       console.error('Image upload failed:', err);
     } finally {
       setIsUploadingImage(false);

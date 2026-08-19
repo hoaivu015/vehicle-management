@@ -24,7 +24,7 @@ interface FinancialsTabProps {
    userCode: string;
    staffList: Staff[];
    actions: {
-      onAddCost: (id: number, name: string, amount: number) => Promise<void>;
+      onAddCost: (id: number, name: string, amount: number, staffId?: string) => Promise<void>;
       onDeleteCost: (id: number, index: number) => Promise<void>;
       onAddPurchasePayment: (id: number, amount: number, note: string, receiver: string) => Promise<void>;
       onAddSalePayment: (
@@ -309,7 +309,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                         <span className="text-[10px] font-black uppercase tracking-wider">
                            {activeLedger === 'purchase'
                               ? (purchaseDebt > 0 ? `Còn nợ: ${formatFinance(purchaseDebt)}` : "Đã trả đủ tiền xe")
-                              : (saleDebt > 0 ? `Khách nợ: ${formatFinance(saleDebt)}` : "Đã thu đủ 100%")
+                              : (saleDebt > 0 ? `Công nợ còn lại: ${formatFinance(saleDebt)}` : "Đã thu đủ 100%")
                            }
                         </span>
                      </div>
@@ -337,7 +337,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                                     >
                                        <ActivityItem 
                                           date={formatDate(p.date)}
-                                          title={p.note || "Thanh toán tiền mua xe"}
+                                          title={p.note || "Thanh toán tiền nhập xe"}
                                           category={p.receiver ? `Người nhận: ${p.receiver}` : "Chi tiền mặt"}
                                           amount={formatCurrency(p.amount)}
                                           amountType="expense"
@@ -350,7 +350,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                                        <Receipt size={15} />
                                     </div>
                                     <p className="text-xs font-bold text-kraft-ink">Chưa có lịch sử chi tiền</p>
-                                    <p className="text-[10px] text-sub-label">Các đợt thanh toán mua xe sẽ xuất hiện tại đây.</p>
+                                    <p className="text-[10px] text-sub-label">Các đợt thanh toán nhập xe sẽ xuất hiện tại đây.</p>
                                  </div>
                               )
                            ) : (
@@ -432,7 +432,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                               title={c.note}
                               amount={formatCurrency(c.amount)}
                               amountType="expense"
-                              onDelete={isAdminOrAccountant ? () => handleDeleteCost(vehicle.id, idx) : undefined}
+                           onDelete={isAdminOrAccountant ? () => handleDeleteCost(vehicle.id, idx) : undefined}
                            />
                         </motion.div>
                      ))}
@@ -440,7 +440,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                      {(vehicle.cost_history || []).length === 0 && (
                         <div className="py-6 text-center flex flex-col items-center justify-center space-y-1.5 border border-dashed border-hairline-soft rounded-xl bg-surface-soft/30">
                            <Sparkles size={16} className="text-sub-label opacity-40" />
-                           <p className="text-xs font-bold text-sub-label">Chưa phát sinh chi phí spa cho xe này</p>
+                           <p className="text-xs font-bold text-sub-label">Chưa phát sinh chi phí làm đẹp cho xe này</p>
                         </div>
                      )}
                   </div>
@@ -450,8 +450,9 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                      onClose={() => setIsAddingCost(false)}
                      isSubmitting={isSubmitting}
                      vehicle={vehicle}
-                     onAdd={async (name, amount) => {
-                        await handleAddCost(vehicle.id, name, amount);
+                     staffList={staffList}
+                     onAdd={async (name, amount, staffId) => {
+                        await handleAddCost(vehicle.id, name, amount, staffId);
                      }}
                   />
                </div>
@@ -482,7 +483,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                         <div className="flex items-center gap-2 text-warning">
                            <ArrowDownCircle size={16} strokeWidth={2.5} />
                            <span className="text-[11px] font-black uppercase tracking-wider">
-                              Phiếu chi tiền mặt (Trả tiền mua xe)
+                              Phiếu chi tiền mặt (Thanh toán tiền nhập xe)
                            </span>
                         </div>
                         
@@ -494,7 +495,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                            />
                            <BaseInput 
                               label="Ghi chú chi tiền" 
-                              placeholder="Ghi chú chi trả tiền mua xe..." 
+                              placeholder="Ghi chú chi trả tiền nhập xe..." 
                               value={purchasePaymentForm.note} 
                               onChange={e => setPurchasePaymentForm({ ...purchasePaymentForm, note: e.target.value })} 
                            />

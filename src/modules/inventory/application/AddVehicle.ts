@@ -17,7 +17,7 @@ export class AddVehicle {
     const validatedRequest = CreateVehicleSchema.parse(request);
 
     if (validatedRequest.is_coinvested && (validatedRequest.coinvest_amount || 0) > validatedRequest.purchase_price) {
-      throw new Error('Số tiền góp vốn không được lớn hơn giá mua xe.');
+      throw new Error('Số tiền góp vốn không được lớn hơn giá nhập xe.');
     }
 
     let attempts = 0;

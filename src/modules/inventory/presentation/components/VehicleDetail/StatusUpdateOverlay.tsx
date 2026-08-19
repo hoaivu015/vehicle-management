@@ -70,8 +70,8 @@ const STATUS_METAS: Record<VehicleStatus, StatusMeta> = {
       colorClass: 'text-blue-600',
       bgClass: 'bg-blue-500/10',
       borderClass: 'border-blue-500/20 hover:border-blue-500/40',
-      description: 'Chuyển xe vào khu vực làm đẹp, spa dọn dẹp và kiểm tra kỹ thuật.',
-      actionLabel: 'Chuyển xe vào khu vực Spa'
+      description: 'Chuyển xe vào khu vực làm đẹp, hoàn thiện và kiểm tra kỹ thuật.',
+      actionLabel: 'Chuyển xe đi làm đẹp hoàn thiện'
    },
    [VehicleStatus.IN_STOCK]: {
       icon: Warehouse,
@@ -544,7 +544,7 @@ export const StatusUpdateOverlay: React.FC<StatusUpdateOverlayProps> = ({
                                  <div className="flex items-center gap-1.5 text-income">
                                     <TrendingUp size={14} strokeWidth={2.5} />
                                     <span className="text-[10px] font-black uppercase tracking-wider">
-                                       {transitionStatus === VehicleStatus.SOLD ? 'Thanh toán & Chốt bán' : 'Tiền cọc & Giá bán'}
+                                       {transitionStatus === VehicleStatus.SOLD ? 'Thanh toán & Chốt bán' : 'Tiền đặt cọc & Giá bán'}
                                     </span>
                                  </div>
 

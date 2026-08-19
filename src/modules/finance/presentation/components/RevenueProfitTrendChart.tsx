@@ -103,7 +103,7 @@ export const RevenueProfitTrendChart: React.FC<RevenueProfitTrendChartProps> = (
                     <div className="bg-kraft-ink/95 backdrop-blur-xl text-white p-4 rounded-2xl shadow-kraft-deep border border-white/10 text-xs space-y-2 min-w-[200px]">
                       <div className="flex items-center justify-between border-b border-white/10 pb-1.5 font-black">
                         <span className="text-white/60">Tháng {item.month}</span>
-                        <span className="text-kraft-accent">{item.soldCount} xe bán</span>
+                        <span className="text-kraft-accent">{item.soldCount} xe đã bán</span>
                       </div>
                       <div className="space-y-1">
                         <div className="flex justify-between">
@@ -111,11 +111,11 @@ export const RevenueProfitTrendChart: React.FC<RevenueProfitTrendChartProps> = (
                           <span className="font-black text-kraft-accent">{formatCurrency(item.revenue)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-white/60">Lãi gộp:</span>
+                          <span className="text-white/60">Lợi nhuận gộp:</span>
                           <span className="font-bold text-white/90">{formatCurrency(item.grossProfit)}</span>
                         </div>
                         <div className="flex justify-between pt-1 border-t border-white/10">
-                          <span className="text-income font-bold">Lãi ròng cuối:</span>
+                          <span className="text-income font-bold">Lợi nhuận ròng cuối:</span>
                           <span className="font-black text-income">{formatCurrency(item.finalNetProfit)}</span>
                         </div>
                       </div>

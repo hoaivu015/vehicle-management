@@ -61,6 +61,8 @@ export const useInventoryState = ({
     },
     onVehicleUpdated: (vehicle: Vehicle) => {
       setSelectedVehicle(vehicle);
+      setAvailableCars(prev => prev.map(c => c.id === vehicle.id ? vehicle : c));
+      setSoldCars(prev => prev.map(c => c.id === vehicle.id ? vehicle : c));
     },
     setStaffList: setStaffList,
   }), [presenter, notification]);
@@ -165,8 +167,8 @@ export const useInventoryState = ({
   const handleUpdateVehicle = (id: number, data: Partial<Vehicle>) => 
     executeAction(() => presenter.updateVehicle(id, data, userRole), { successMessage: 'Cập nhật thông tin thành công!' });
 
-  const handleAddCost = (id: number, name: string, amount: number) => 
-    executeAction(() => presenter.addVehicleCost(id, name, amount, currentUser?.id, userRole), { successMessage: 'Đã thêm chi phí thành công!' });
+  const handleAddCost = (id: number, name: string, amount: number, staffId?: string) => 
+    executeAction(() => presenter.addVehicleCost(id, name, amount, staffId, userRole), { successMessage: 'Đã thêm chi phí thành công!' });
 
   const handleDeleteCost = (id: number, costIndex: number) => 
     executeAction(() => presenter.deleteVehicleCost(id, costIndex, userRole), { successMessage: 'Đã xóa chi phí!' });

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { BaseModal as Modal, ModalBody, ModalFooter } from '@/src/shared/design-system/BaseModal';
-import { Plus, FileText, Car, Sparkles } from 'lucide-react';
+import { Plus, FileText, Car, Sparkles, Building2, User } from 'lucide-react';
 import { SmartAmountInput } from '@/src/shared/design-system/SmartAmountInput';
-import { BaseInput } from '@/src/shared/design-system/FormElements';
+import { BaseInput, BaseSelect } from '@/src/shared/design-system/FormElements';
 import { SectionHeader } from '@/src/shared/design-system/BaseCard';
-import { Vehicle, CostItem } from '@/src/shared/domain/types';
+import { Vehicle, CostItem, Staff } from '@/src/shared/domain/types';
 import { formatCurrency } from '@/src/shared/utils/currency';
 import { haptics } from '@/src/shared/utils/haptics';
 import { motion } from 'motion/react';
@@ -12,9 +12,10 @@ import { motion } from 'motion/react';
 interface AddCostOverlayProps {
    isOpen: boolean;
    onClose: () => void;
-   onAdd: (name: string, amount: number) => Promise<void>;
+   onAdd: (name: string, amount: number, staffId?: string) => Promise<void>;
    isSubmitting: boolean;
    vehicle?: Vehicle;
+   staffList?: Staff[];
    initialForm?: { name: string; amount: number };
 }
 
@@ -39,10 +40,13 @@ export const AddCostOverlay: React.FC<AddCostOverlayProps> = ({
    onAdd,
    isSubmitting,
    vehicle,
+   staffList = [],
    initialForm
 }) => {
    const [name, setName] = useState<string>(initialForm?.name || '');
    const [amount, setAmount] = useState<number>(initialForm?.amount || 0);
+   const [paymentSource, setPaymentSource] = useState<'company' | 'staff'>('company');
+   const [selectedStaffId, setSelectedStaffId] = useState<string>('');
    const [error, setError] = useState<string | null>(null);
 
    useEffect(() => {
@@ -50,6 +54,8 @@ export const AddCostOverlay: React.FC<AddCostOverlayProps> = ({
          // eslint-disable-next-line react-hooks/set-state-in-effect
          setName(initialForm?.name || '');
          setAmount(initialForm?.amount || 0);
+         setPaymentSource('company');
+         setSelectedStaffId('');
          setError(null);
       }
    }, [isOpen, initialForm]);
@@ -75,14 +81,20 @@ export const AddCostOverlay: React.FC<AddCostOverlayProps> = ({
          setError("Số tiền phải lớn hơn 0 ₫");
          return;
       }
+      if (paymentSource === 'staff' && !selectedStaffId) {
+         setError("Vui lòng chọn nhân viên ứng tiền");
+         return;
+      }
 
       setError(null);
-      await onAdd(name.trim(), amount);
+      await onAdd(name.trim(), amount, paymentSource === 'staff' ? selectedStaffId : undefined);
       onClose();
    };
 
    // Financial Simulation
-   const currentTotalCost = vehicle?.total_cost ?? (vehicle?.cost_history || []).reduce((sum: number, c: CostItem) => sum + (c.amount || 0), 0);
+   const currentTotalCost = Array.isArray(vehicle?.cost_history)
+      ? vehicle.cost_history.reduce((sum: number, c: CostItem) => sum + (c.amount || 0), 0)
+      : (vehicle?.total_cost || 0);
    const currentCOGS = (vehicle?.purchase_price || 0) + currentTotalCost;
    const newCOGS = currentCOGS + (amount || 0);
    const hasSalePrice = vehicle?.sale_price && vehicle.sale_price > 0;
@@ -95,13 +107,92 @@ export const AddCostOverlay: React.FC<AddCostOverlayProps> = ({
          onClose={onClose}
          maxWidth="lg"
          title="Ghi nhận chi phí xe"
-         subtitle={vehicle ? `Hạng mục làm đẹp, bảo dưỡng cho xe ${vehicle.name} (${vehicle.code})` : "Hạng mục Spa, dọn dẹp, sửa chữa cho xe"}
+         subtitle={vehicle ? `Hạng mục làm đẹp, bảo dưỡng cho xe ${vehicle.name} (${vehicle.code})` : "Hạng mục làm đẹp, bảo dưỡng cho xe"}
          icon={Plus}
          height="auto"
       >
          <form onSubmit={(e) => { e.preventDefault(); handleConfirm(); }} className="flex-1 flex flex-col overflow-hidden">
             <ModalBody className="flex-1">
                <div className="space-y-4 md:space-y-5 py-0.5">
+                  {/* Nguồn tiền chi trả: Quỹ Showroom (Mặc định) vs Nhân viên ứng */}
+                  <div className="space-y-2">
+                     <span className="text-[10px] font-black uppercase tracking-wider text-sub-label block px-1">
+                        Hình thức thanh toán
+                     </span>
+                     <div className="grid grid-cols-2 gap-2">
+                        <motion.button
+                           whileTap={{ scale: 0.97 }}
+                           type="button"
+                           onClick={() => {
+                              haptics.light();
+                              setPaymentSource('company');
+                              setSelectedStaffId('');
+                              if (error) setError(null);
+                           }}
+                           className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                              paymentSource === 'company'
+                                 ? 'bg-brand/10 border-brand/40 text-brand shadow-xs font-black'
+                                 : 'bg-surface-soft/60 border-hairline-soft text-sub-label hover:text-kraft-ink'
+                           }`}
+                        >
+                           <Building2 size={16} />
+                           <div className="text-left">
+                              <span className="text-[11px] block leading-tight">Quỹ Showroom chi</span>
+                              <span className="text-[9px] opacity-70 block font-normal">(Mặc định công ty chi)</span>
+                           </div>
+                        </motion.button>
+
+                        <motion.button
+                           whileTap={{ scale: 0.97 }}
+                           type="button"
+                           onClick={() => {
+                              haptics.light();
+                              setPaymentSource('staff');
+                              if (error) setError(null);
+                           }}
+                           className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                              paymentSource === 'staff'
+                                 ? 'bg-warning/10 border-warning/40 text-warning shadow-xs font-black'
+                                 : 'bg-surface-soft/60 border-hairline-soft text-sub-label hover:text-kraft-ink'
+                           }`}
+                        >
+                           <User size={16} />
+                           <div className="text-left">
+                              <span className="text-[11px] block leading-tight">Nhân viên ứng trước</span>
+                              <span className="text-[9px] opacity-70 block font-normal">(Hoàn ứng sau)</span>
+                           </div>
+                        </motion.button>
+                     </div>
+
+                     {paymentSource === 'staff' && (
+                        <motion.div
+                           initial={{ opacity: 0, height: 0 }}
+                           animate={{ opacity: 1, height: 'auto' }}
+                           className="pt-1"
+                        >
+                           <BaseSelect
+                              label="Nhân viên ứng tiền"
+                              required
+                              value={selectedStaffId}
+                              onChange={e => {
+                                 setSelectedStaffId(e.target.value);
+                                 if (error) setError(null);
+                              }}
+                              variant="dense"
+                              icon={User}
+                              error={error && paymentSource === 'staff' && !selectedStaffId ? error : undefined}
+                           >
+                              <option value="">-- Chọn nhân viên ứng tiền --</option>
+                              {staffList.map(s => (
+                                 <option key={s.id} value={s.id}>
+                                    {s.name} ({s.role})
+                                 </option>
+                              ))}
+                           </BaseSelect>
+                        </motion.div>
+                     )}
+                  </div>
+
                   {/* Quick Category Chips */}
                   <div className="space-y-2">
                      <div className="flex items-center gap-1.5 px-1">

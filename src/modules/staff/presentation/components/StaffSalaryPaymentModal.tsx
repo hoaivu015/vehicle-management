@@ -43,7 +43,7 @@ export const StaffSalaryPaymentModal: React.FC<StaffSalaryPaymentModalProps> = (
       isOpen={isOpen} 
       onClose={onClose} 
       maxWidth="xl" 
-      title="Chi lương"
+      title="Quyết toán lương"
       subtitle={`Thanh toán lương & hoàn ứng cho ${staff.name}`}
       icon={DollarSign}
     >
@@ -89,7 +89,7 @@ export const StaffSalaryPaymentModal: React.FC<StaffSalaryPaymentModalProps> = (
           onCancel={onClose} 
           onSubmit={handleSubmit}
           isSubmitting={isLoading}
-          submitLabel={isLoading ? 'Đang quyết toán...' : 'Chi lương'}
+          submitLabel={isLoading ? 'Đang thanh toán...' : 'Xác nhận chi trả'}
         />
       </form>
     </Modal>
