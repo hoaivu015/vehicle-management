@@ -1,5 +1,5 @@
 import React from 'react';
-import { DollarSign, Clock, CheckCircle, Plus, Car, Settings, Edit2, Trash2 } from 'lucide-react';
+import { DollarSign, Clock, CheckCircle2, Plus, Car, Settings, Edit2, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '@/src/shared/utils/cn';
 import { formatCurrency } from '@/src/shared/utils/currency';
@@ -90,7 +90,7 @@ export const PersonalAdvancesCard: React.FC<PersonalAdvancesCardProps> = ({
             ? "bg-income/10 border-income/20 text-income" 
             : "bg-expense-light/40 border-expense/20 text-expense"
         )}>
-          {expense.is_reimbursed ? <CheckCircle size={10} /> : <Clock size={10} />}
+          {expense.is_reimbursed ? <CheckCircle2 size={10} /> : <Clock size={10} />}
           {expense.is_reimbursed ? 'Đã hoàn ứng' : 'Chờ duyệt chi'}
         </span>
 
@@ -174,7 +174,7 @@ export const PersonalAdvancesCard: React.FC<PersonalAdvancesCardProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <CheckCircle size={14} className="text-income shrink-0" />
+                <CheckCircle2 size={14} className="text-income shrink-0" />
                 <h4 className="text-[10px] font-black uppercase tracking-widest text-income">
                   Đã chi tháng {selectedMonth.split('-')[1]} ({reimbursedInSelectedMonth.length})
                 </h4>

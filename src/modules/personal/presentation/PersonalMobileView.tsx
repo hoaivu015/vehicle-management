@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense } from 'react';
-import { Calendar, LogOut, Key, UserCircle, DollarSign, Clock, CheckCircle, Car, Settings, Edit2, Trash2, ShoppingBag, ArrowUpRight, Award, Share2, ReceiptText, ChevronRight } from 'lucide-react';
+import { Calendar, LogOut, Key, UserCircle, DollarSign, Clock, CheckCircle2, Car, Settings, Edit2, Trash2, ShoppingBag, ArrowUpRight, Award, Share2, ReceiptText, ChevronRight } from 'lucide-react';
 import { StaffSalaryService, SalaryDetails } from '@/src/modules/staff/domain/StaffSalaryService';
 import { UserRole, VehicleStatus } from '@/src/shared/domain/constants';
 import { useDependencies } from '@/src/shared/ioc/DependencyContext';
@@ -699,7 +699,7 @@ const UnifiedExpenseList: React.FC<UnifiedExpenseListProps> = ({
           "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-black text-[8px] uppercase tracking-widest",
           exp.is_reimbursed ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
         )}>
-          {exp.is_reimbursed ? <CheckCircle size={9} /> : <Clock size={9} />}
+          {exp.is_reimbursed ? <CheckCircle2 size={9} /> : <Clock size={9} />}
           {exp.is_reimbursed ? 'Đã hoàn ứng' : 'Chờ duyệt chi'}
         </span>
 
@@ -744,7 +744,7 @@ const UnifiedExpenseList: React.FC<UnifiedExpenseListProps> = ({
       {reimbursed.length > 0 && (
         <div className="space-y-2.5">
           <div className="flex items-center gap-2 px-1">
-            <CheckCircle size={11} className="text-emerald-500" />
+            <CheckCircle2 size={11} className="text-emerald-500" />
             <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">Đã chi tháng {selectedMonth.split('-')[1]} ({reimbursed.length})</span>
             <div className="h-px flex-1 bg-emerald-500/10" />
           </div>

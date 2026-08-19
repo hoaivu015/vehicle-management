@@ -32,6 +32,7 @@
   /* 🏷️ TẦNG 1: NỀN TẢNG & MẶT THẺ (60% Canvas & Surfaces) */
   --color-kraft-bg: #F0F2F6;                     /* Geneva Wash: Nền xám sương mù dịu mắt */
   --color-surface-pure: #FFFFFF;                 /* Pure Surface: Nền thẻ trắng tinh khiết */
+  --color-surface-soft: #F0F2F5;                 /* Surface Soft: Hộp phụ / Bộ lọc / Bảng thống kê */
   --color-kraft-folder: #E4E6EB;                 /* Meta Sub-container: Hộp phụ / Bộ lọc */
   --color-kraft-paper: #FFFFFF;
   --color-hairline: #E4E6EB;                     /* Hairline Divider: Viền siêu mảnh 0.5px */
@@ -45,6 +46,7 @@
   /* 🏷️ TẦNG 3: THƯƠNG HIỆU & HÀNH ĐỘNG (10% Brand & CTAs) */
   --color-kraft-accent: #1877F2;                 /* Meta Royal Blue: Nút Lưu / Thêm xe / Active */
   --color-kraft-blue: #1877F2;
+  --color-brand: #1877F2;                        /* Meta Royal Blue SSoT */
   --color-accent-soft: #E7F3FF;                  /* Soft Tint: Nền mờ thương hiệu */
   --color-brand-glow: #1877F2;
 
@@ -144,8 +146,6 @@
 @layer base {
   body {
     @apply bg-kraft-bg text-kraft-ink font-sans antialiased selection:bg-kraft-accent/10 selection:text-kraft-accent;
-    background-color: var(--color-surface-pure);
-    background-image: none; /* Stark White Canvas */
     line-height: var(--line-height-body, 1.6);
     letter-spacing: -0.014em; /* Tight body spacing like Optimistic VF */
   }
@@ -170,8 +170,8 @@
   /* Standard Apple Typography Scale */
   .text-apple-large-title { @apply text-[34px] leading-tight font-black tracking-tighter; }
   .text-apple-headline { @apply text-[17px] font-black tracking-tight; }
-  .text-apple-subheadline { @apply text-[15px] font-medium text-kraft-ink/60; }
-  .text-apple-footnote { @apply text-[11px] font-black uppercase tracking-widest text-kraft-ink/40; }
+  .text-apple-subheadline { @apply text-[15px] font-medium text-kraft-ink/75; }
+  .text-apple-footnote { @apply text-[11px] font-black uppercase tracking-widest text-sub-label; }
 }
 
 @layer components {
@@ -206,7 +206,7 @@
   }
 
   .folder-tab-inactive {
-    @apply text-kraft-ink/40 hover:bg-white/60 hover:text-kraft-ink/60 z-30 border border-white/40 bg-white/30;
+    @apply text-kraft-ink/65 hover:bg-white/80 hover:text-kraft-ink z-30 border border-white/60 bg-white/50 backdrop-blur-md;
     transform: translateY(4px) translateZ(0);
   }
 
@@ -315,14 +315,14 @@
   }
 
   .text-sub-label {
-    @apply text-[10px] font-black uppercase tracking-[0.2em] text-kraft-ink/60 transition-opacity duration-300;
+    @apply text-[10px] font-black uppercase tracking-[0.2em] text-sub-label transition-opacity duration-300;
   }
 
   /* ─────────────────────────────────────────────
      ENFORCEMENT UTILITIES (Root Cause Fix)
      ───────────────────────────────────────────── */
   .text-liquid-label {
-    @apply text-[10px] font-black uppercase tracking-[0.2em] text-kraft-ink/60 transition-opacity duration-300;
+    @apply text-[10px] font-black uppercase tracking-[0.2em] text-sub-label transition-opacity duration-300;
   }
 
   /* ─────────────────────────────────────────────
@@ -343,9 +343,12 @@
   .text-income { color: var(--color-income); }
   .text-expense { color: var(--color-expense); }
   .text-warning { color: var(--color-warning); }
+  .text-brand { color: var(--color-brand); }
   .bg-income { background-color: var(--color-income); @apply text-white; }
   .bg-expense { background-color: var(--color-expense); @apply text-white; }
+  .bg-brand { background-color: var(--color-brand); @apply text-white; }
   .bg-accent-soft { background-color: var(--color-accent-soft); }
+  .border-brand { border-color: var(--color-brand); }
 
   .glass-purity-surface {
     @apply bg-white border border-[#f3f4f6] rounded-[32px];
@@ -358,41 +361,73 @@
     color: white;
   }
 
-  .glass-badge-blue    { background: rgba(29, 78, 216, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: white; }
-  .glass-badge-purple  { 
-    background: rgba(126, 34, 206, 0.75); 
+  /* 🌟 LIQUID GLASS 2.0 SPECULAR BADGES (SSOT COLOR ALIGNED) */
+  .glass-badge-blue    { 
+    background: rgba(24, 119, 242, 0.85); 
     backdrop-filter: blur(12px); 
     -webkit-backdrop-filter: blur(12px); 
     color: white; 
-    box-shadow: 0 4px 12px rgba(126, 34, 206, 0.25);
-    transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: 96px;
-    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.35); 
+    box-shadow: 0 4px 12px rgba(24, 119, 242, 0.25);
   }
-  .glass-badge-purple:hover {
-    background: linear-gradient(135deg, oklch(75% 0.15 280), oklch(90% 0.05 300)); /* Tím ánh bạc */
-    box-shadow: 0 8px 20px rgba(126, 34, 206, 0.4);
-    min-width: 120px;
-  }
-  .glass-badge-emerald { background: rgba(16, 185, 129, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: white; }
-  .glass-badge-red     { background: rgba(239, 68, 68, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: white; }
-  .glass-badge-orange  { 
-    background: rgba(245, 158, 11, 0.75); 
+  .glass-badge-purple  { 
+    background: rgba(126, 34, 206, 0.85); 
     backdrop-filter: blur(12px); 
     -webkit-backdrop-filter: blur(12px); 
-    color: #0a0a0a; 
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    color: white; 
+    border: 1px solid rgba(255, 255, 255, 0.35); 
+    box-shadow: 0 4px 12px rgba(126, 34, 206, 0.25);
     transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: 96px;
-    justify-content: center;
   }
-  .glass-badge-orange:hover {
-    background: linear-gradient(135deg, oklch(80% 0.15 75), oklch(90% 0.05 100)); /* Cam ánh bạc sáng */
-    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
-    min-width: 120px;
+  .glass-badge-emerald { 
+    background: rgba(49, 162, 76, 0.88); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    color: white; 
+    border: 1px solid rgba(255, 255, 255, 0.35); 
+    box-shadow: 0 4px 12px rgba(49, 162, 76, 0.25);
   }
-  .glass-badge-sky     { background: rgba(3, 105, 161, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: white; }
-  .glass-badge-dark    { background: rgba(15, 15, 15, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: white; }
+  .glass-badge-red     { 
+    background: rgba(250, 56, 62, 0.88); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    color: white; 
+    border: 1px solid rgba(255, 255, 255, 0.35); 
+    box-shadow: 0 4px 12px rgba(250, 56, 62, 0.25);
+  }
+  .glass-badge-orange  { 
+    background: rgba(247, 177, 37, 0.92); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    color: #050505; 
+    border: 1px solid rgba(255, 255, 255, 0.45); 
+    box-shadow: 0 4px 12px rgba(247, 177, 37, 0.25);
+    transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .glass-badge-sky     { 
+    background: rgba(0, 153, 255, 0.85); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    color: white; 
+    border: 1px solid rgba(255, 255, 255, 0.35); 
+    box-shadow: 0 4px 12px rgba(0, 153, 255, 0.25);
+  }
+  .glass-badge-slate   { 
+    background: rgba(100, 116, 139, 0.85); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    color: white; 
+    border: 1px solid rgba(255, 255, 255, 0.35); 
+    box-shadow: 0 4px 12px rgba(100, 116, 139, 0.2);
+  }
+  .glass-badge-dark    { 
+    background: rgba(15, 23, 42, 0.85); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    color: white; 
+    border: 1px solid rgba(255, 255, 255, 0.25); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
 
   /* ─────────────────────────────────────────────
      4-LAYER CONTAINED TAB SYSTEM (RE-INTEGRATED)

@@ -2,7 +2,7 @@ import { Vehicle, Staff } from '@/src/shared/domain/types';
 import { FinanceService } from '@/src/modules/finance/domain/FinanceService';
 import { ExpenseRepository, Expense } from '@/src/modules/finance/domain/ExpenseRepository';
 import { VehicleStatus, INVENTORY_CONSTANTS } from '@/src/shared/domain/constants';
-import { isVehicleAging, calculateVehicleFinancials } from '@/src/shared/utils/vehicle_calculations';
+import { isVehicleAging, calculateVehicleFinancials, calculateActiveSellingDays } from '@/src/shared/utils/vehicle_calculations';
 import { VehicleRepository } from '@/src/modules/inventory/domain/VehicleRepository';
 import { StaffRepository } from '@/src/modules/staff/domain/StaffRepository';
 import { calcCompanyMonthlyNetProfit } from '@/src/shared/utils/financial_formulas';
@@ -135,7 +135,7 @@ export class GetFinancialOverview {
 
     // Aging logic
     const agingCount = inventoryVehicles.filter(v => 
-      isVehicleAging(v.purchase_date, INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS)
+      isVehicleAging(v, INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS)
     ).length;
 
     // Recent Activities from Status History AND Payment History
@@ -154,16 +154,16 @@ export class GetFinancialOverview {
     const paymentActivities = vehicles.flatMap(v => [
       ...(v.purchase_payment_history || []).map(p => ({
         type: 'purchase' as const,
-        user: p.receiver || 'Hệ thống',
-        action: 'đã thanh toán nhập xe',
+        user: p.receiver || 'Showroom',
+        action: `đã chi trả mua xe (${(p.amount / 1000000).toFixed(1)}M)`,
         target: v.name,
         date: p.date,
         vCode: v.code
       })),
       ...(v.sale_payment_history || []).map(p => ({
         type: 'sale' as const,
-        user: p.receiver || 'Hệ thống',
-        action: p.amount > 0 ? 'đã thu tiền khách' : 'đã hoàn trả tiền cọc',
+        user: p.receiver || 'Showroom',
+        action: `đã thu tiền bán xe (${(p.amount / 1000000).toFixed(1)}M)`,
         target: v.name,
         date: p.date,
         vCode: v.code
@@ -173,7 +173,7 @@ export class GetFinancialOverview {
     const recentActivities = [...statusActivities, ...paymentActivities]
       .filter(a => a.date)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 10);
+      .slice(0, 5);
 
     const weeklyCashflow = FinanceService.calculateWeeklyCashflow(vehicles, month, allOpExpenses);
 
@@ -291,9 +291,8 @@ export class GetFinancialOverview {
     const averageProfitPerCar = soldVehiclesInMonth.length > 0 ? Math.round(grossProfit / soldVehiclesInMonth.length) : 0;
     const averageDSI = inventoryVehicles.length > 0 
       ? Math.round(inventoryVehicles.reduce((acc, v) => {
-          if (!v.purchase_date) return acc;
-          const diffDays = Math.max(0, Math.floor((new Date().getTime() - new Date(v.purchase_date).getTime()) / (1000 * 60 * 60 * 24)));
-          return acc + diffDays;
+          const activeDays = v.days !== undefined ? v.days : calculateActiveSellingDays(v);
+          return acc + activeDays;
         }, 0) / inventoryVehicles.length)
       : 0;
     const profitMarginPercent = monthlyRevenue > 0 ? Math.round((grossProfit / monthlyRevenue) * 100) : 0;

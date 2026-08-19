@@ -39,9 +39,9 @@ export const DESIGN_TOKENS = {
   // 🎨 Color & Tonal Hierarchy (Industrial Color System SSoT)
   colors: {
     brand: {
-      surface: "bg-blue-50/80",
-      border: "border-blue-200/60",
-      text: "text-blue-700",
+      surface: "bg-accent-soft",
+      border: "border-brand/20",
+      text: "text-brand",
       primary: "bg-kraft-accent",
       hover: "hover:bg-blue-700",
       active: "active:bg-blue-800",

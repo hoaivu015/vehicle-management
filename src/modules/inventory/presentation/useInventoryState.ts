@@ -4,6 +4,7 @@ import { useActionResponse } from '@/src/shared/presentation/useActionResponse';
 import { InventoryView } from './InventoryPresenter';
 import { Vehicle } from '@/src/shared/domain/types';
 import { VehicleStatus, INVENTORY_CONSTANTS } from '@/src/shared/domain/constants';
+import { isVehicleAging } from '@/src/shared/utils/vehicle_calculations';
 import { useDependencies } from '@/src/shared/ioc/DependencyContext';
 import { AddVehicleRequest } from '@/src/modules/inventory/application/AddVehicle';
 
@@ -94,8 +95,7 @@ export const useInventoryState = ({
       let targetCar: Vehicle | undefined;
       
       if (initialFilter === 'AGING_25') {
-        const limit = new Date(); limit.setDate(limit.getDate() - INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS);
-        targetCar = availableCars.find(c => c.purchase_date && new Date(c.purchase_date) <= limit);
+        targetCar = availableCars.find(c => isVehicleAging(c, INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS));
       } else {
         targetCar = availableCars[0];
       }

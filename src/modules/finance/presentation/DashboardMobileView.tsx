@@ -180,27 +180,27 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
                 value={formatCurrency(overview?.availableCash || 0)}
                 numericValue={overview?.availableCash || 0}
                 icon={Wallet}
-                color="emerald"
+                color="income"
               />
               <StatCard 
                 label="Xe đã bán"
                 value={`${overview?.soldCount || 0} xe`}
                 icon={CheckCircle2}
-                color="blue"
+                color="brand"
                 onClick={() => openDrillDown('sold_vehicles')}
               />
               <StatCard 
                 label="Tồn kho"
                 value={`${overview?.inventoryCount || 0} xe`}
                 icon={Car}
-                color="orange"
+                color="warning"
                 onClick={() => openDrillDown('inventory_vehicles')}
               />
               <StatCard 
                 label="Tồn lâu"
                 value={`${overview?.agingCount || 0} xe`}
                 icon={AlertCircle}
-                color="red"
+                color="expense"
                 isWarning={(overview?.agingCount || 0) > 0}
                 onClick={() => openDrillDown('aging_vehicles')}
               />
@@ -214,7 +214,7 @@ export const DashboardMobileView: React.FC<DashboardMobileViewProps> = ({
               </div>
               <div className="text-center p-2">
                 <span className="text-[9px] font-black uppercase tracking-wider text-sub-label block">Tỷ suất lãi gộp</span>
-                <span className="text-base font-black text-emerald-600 mt-0.5 block">{overview?.profitMarginPercent || 0}%</span>
+                <span className="text-base font-black text-income mt-0.5 block">{overview?.profitMarginPercent || 0}%</span>
               </div>
             </div>
 
@@ -294,31 +294,31 @@ interface StatCardProps {
   onClick?: () => void;
 }
 
-const StatCard = ({ label, value, numericValue, isCurrency = true, icon: Icon, color = 'blue', isWarning, onClick }: StatCardProps) => (
+const StatCard = ({ label, value, numericValue, isCurrency = true, icon: Icon, color = 'brand', isWarning, onClick }: StatCardProps) => (
   <button 
     onClick={onClick}
     className={cn(
       "flex flex-col gap-3 p-5 rounded-[2rem] border transition-all active:scale-95 text-left backdrop-blur-md cursor-pointer",
       "bg-white/80 border-white/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] hover:bg-white",
-      isWarning && "bg-red-50/60 border-red-100/80"
+      isWarning && "bg-expense/10 border-expense/20"
     )}
   >
     <div className={cn(
       "w-10 h-10 rounded-xl flex items-center justify-center shadow-inner",
-      color === 'emerald' && "bg-emerald-100 text-emerald-600",
-      color === 'blue' && "bg-blue-100 text-blue-600",
-      color === 'orange' && "bg-orange-100 text-orange-600",
-      color === 'red' && "bg-red-100 text-red-600",
+      color === 'income' && "bg-income/10 text-income",
+      color === 'brand' && "bg-accent-soft text-brand",
+      color === 'warning' && "bg-warning/10 text-warning",
+      color === 'expense' && "bg-expense/10 text-expense",
     )}>
       <Icon size={20} strokeWidth={2.5} />
     </div>
     <div>
-      <div className="text-[10px] font-black uppercase tracking-wider text-kraft-ink/40 leading-none mb-1">
+      <div className="text-[10px] font-black uppercase tracking-wider text-sub-label leading-none mb-1">
         {label}
       </div>
       <div className={cn(
         "text-lg font-black tracking-tight text-kraft-ink",
-        isWarning && "text-red-600"
+        isWarning && "text-expense"
       )}>
         {numericValue !== undefined ? (
           <AnimatedNumber value={numericValue} isCurrency={isCurrency} />

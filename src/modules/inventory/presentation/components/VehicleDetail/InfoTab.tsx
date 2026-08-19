@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { 
-   Calendar, TrendingUp, Clock, User, Trash2, AlertCircle, 
+   Calendar, Tag, Clock, User, Trash2, AlertCircle, 
    ShieldAlert, Sparkles
 } from 'lucide-react';
 import { SmartAmountInput } from '@/src/shared/design-system/SmartAmountInput';
@@ -13,6 +13,11 @@ import { BaseInput, BaseSelect, BaseTextArea } from '@/src/shared/design-system/
 import { AlertBlock } from './VehicleDetailModalShared';
 import { PillButton, ExecutiveSection } from '@/src/shared/design-system/ExecutiveModules';
 import { cn } from '@/src/shared/utils/cn';
+import { 
+  calculateActiveSellingDays, 
+  calculateAgingDays, 
+  getInventoryAgingTier 
+} from '@/src/shared/utils/vehicle_calculations';
 
 interface InfoTabProps {
    vehicle: Vehicle;
@@ -39,11 +44,9 @@ export const InfoTab: React.FC<InfoTabProps> = ({
    showDeleteConfirm,
    setShowDeleteConfirm
 }) => {
-   const agingDays = vehicle.purchase_date 
-      ? Math.max(0, Math.floor((new Date().getTime() - new Date(vehicle.purchase_date).getTime()) / (1000 * 60 * 60 * 24)))
-      : (vehicle.days || 0);
-
-   const isLongAging = agingDays >= 45;
+   const activeDays = vehicle.days !== undefined ? vehicle.days : calculateActiveSellingDays(vehicle);
+   const holdingDays = vehicle.holding_days !== undefined ? vehicle.holding_days : calculateAgingDays(vehicle.purchase_date, vehicle.sale_date);
+   const agingTier = getInventoryAgingTier(activeDays);
 
    return (
       <motion.div
@@ -237,7 +240,7 @@ export const InfoTab: React.FC<InfoTabProps> = ({
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-hairline-soft pb-3">
                      <div className="flex items-center gap-2 text-kraft-ink">
                         <div className="w-7 h-7 rounded-lg bg-kraft-accent/10 flex items-center justify-center text-kraft-accent">
-                           <TrendingUp size={15} strokeWidth={2.5} />
+                           <Tag size={15} strokeWidth={2.5} />
                         </div>
                         <span className="text-[11px] font-black uppercase tracking-widest text-kraft-ink">
                            Giá chào bán (Target Niêm Yết)
@@ -255,17 +258,26 @@ export const InfoTab: React.FC<InfoTabProps> = ({
                         </p>
                      </div>
 
-                     {/* Hero Metric Pill: Lưu kho */}
-                     <div className="flex items-center gap-2 flex-wrap">
-                        <div className={cn(
-                           "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-bold whitespace-nowrap shadow-2xs",
-                           isLongAging ? "bg-warning/10 border-warning/20 text-warning" : "bg-surface-soft border-hairline-soft text-kraft-ink"
-                        )}>
-                           <Clock size={12} className={isLongAging ? "text-warning" : "text-sub-label"} />
-                           <span>Lưu kho: <strong className="font-black">{agingDays}</strong> ngày</span>
-                           {isLongAging && <ShieldAlert size={12} className="text-warning ml-0.5" />}
-                        </div>
-                     </div>
+                      {/* Hero Metric Pill: Lưu kho (Mở bán & Tổng sở hữu) */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                         <div className={cn(
+                            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-bold whitespace-nowrap shadow-2xs",
+                            agingTier.tier === 4 ? "bg-expense/10 border-expense/20 text-expense" :
+                            agingTier.tier === 3 ? "bg-warning/10 border-warning/20 text-warning" :
+                            agingTier.tier === 1 ? "bg-income/10 border-income/20 text-income" :
+                            "bg-surface-soft border-hairline-soft text-kraft-ink"
+                         )}>
+                            <Clock size={12} className={agingTier.colorClass} />
+                            <span>Mở bán: <strong className="font-black">{activeDays}</strong> ngày</span>
+                            {agingTier.isAging && <ShieldAlert size={12} className={cn("ml-0.5 shrink-0", agingTier.colorClass)} />}
+                         </div>
+
+                         {holdingDays !== activeDays && holdingDays > 0 && (
+                            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-200/80 bg-slate-100/60 text-slate-600 text-xs font-medium whitespace-nowrap">
+                               <span>Tổng sở hữu: <strong className="font-bold text-slate-800">{holdingDays}</strong> ngày</span>
+                            </div>
+                         )}
+                      </div>
                   </div>
                </div>
 

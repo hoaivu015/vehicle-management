@@ -69,6 +69,7 @@ export const VehicleSchema = z.object({
   
   profit: zNumber,
   days: zNumber,
+  holding_days: zNumber,
   is_pinned: zBoolean,
   
   partner_capital_repaid: zBoolean,
@@ -112,6 +113,7 @@ export const VehicleRowSchema = VehicleSchema.omit({
   seller_name: true,
   customer_name: true,
   images: true,
+  holding_days: true,
 }).extend({
   // Đảm bảo các trường date rỗng được gửi dưới dạng null thay vì "" để Postgres không báo lỗi
   purchase_date: z.string().nullish().transform(v => v || null),

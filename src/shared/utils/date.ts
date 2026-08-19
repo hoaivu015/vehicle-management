@@ -1,3 +1,5 @@
+import { diffCalendarDays } from './vehicle_calculations';
+
 /**
  * Date Utilities
  */
@@ -24,22 +26,9 @@ export const formatDate = (dateString: string | undefined | null): string => {
 
 /**
  * Calculates the number of days between a purchase date and today
- * or between purchase date and sale date if sold.
+ * or between purchase date and sale date if sold (SSoT).
  */
 export const calculateAging = (purchaseDate: string, saleDate?: string): number => {
-  if (!purchaseDate) return 0;
-  
-  const start = new Date(purchaseDate);
-  const end = saleDate ? new Date(saleDate) : new Date();
-  
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
-  
-  // Set both dates to midnight to get accurate day difference
-  start.setHours(0, 0, 0, 0);
-  end.setHours(0, 0, 0, 0);
-  
-  const diffTime = end.getTime() - start.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  
-  return Math.max(0, diffDays);
+  return diffCalendarDays(purchaseDate, saleDate);
 };
+

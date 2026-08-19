@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DollarSign, Plus, Car, Settings, CheckCircle, Clock, CheckSquare, Calendar } from 'lucide-react';
+import { DollarSign, Plus, Car, Settings, CheckCircle2, Clock, CheckSquare, Calendar } from 'lucide-react';
 import { EmptyState } from '@/src/shared/design-system/DataDisplay';
 import { cn } from '@/src/shared/utils/cn';
 import { formatCurrency } from '@/src/shared/utils/currency';
@@ -132,7 +132,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
               )}
               title={expense.is_reimbursed ? "Đổi thành Chờ hoàn tiền" : "Đổi thành Đã chi lại"}
             >
-              {expense.is_reimbursed ? <CheckCircle size={13} /> : <Clock size={13} />}
+              {expense.is_reimbursed ? <CheckCircle2 size={13} /> : <Clock size={13} />}
             </motion.button>
           )}
         </div>
@@ -157,7 +157,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                   <span className="text-xs font-black tracking-tighter tabular-nums">{formatCurrency(totalUnreimbursedAmount)}</span>
                </div>
                <div className="flex items-center gap-2 px-3 py-1.5 bg-income/5 border border-income/10 rounded-full text-income shadow-sm">
-                  <CheckCircle size={12} className="text-income" />
+                  <CheckCircle2 size={12} className="text-income" />
                   <span className="text-[9px] font-black uppercase tracking-widest opacity-60">Đã hoàn ({filterMonth.split('-')[1]}/{filterMonth.split('-')[0]}):</span>
                   <span className="text-xs font-black tracking-tighter tabular-nums">{formatCurrency(totalReimbursedAmount)}</span>
                </div>
@@ -196,7 +196,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                 onClick={handleReimburseSelected}
                 className="w-full lg:w-auto bg-income text-white px-6 h-11 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 animate-in zoom-in duration-300 shadow-md shadow-income/20 active-press"
               >
-                <CheckCircle size={12} />
+                <CheckCircle2 size={12} />
                 Thanh toán: {formatCurrency(selectedTotalAmount)}
               </motion.button>
             )}
@@ -280,7 +280,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                   
                   <div className="flex justify-between items-center">
                     <span className="text-[9px] font-black uppercase text-income flex items-center gap-1.5 tracking-widest">
-                       <CheckCircle size={11} />
+                       <CheckCircle2 size={11} />
                        Đã thanh toán
                     </span>
                     <span className="text-[9px] font-black text-sub-label opacity-20 tracking-widest">#{expense.type === 'vehicle' ? expense.vehicle_code : 'VH'}</span>
@@ -345,7 +345,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({
                   <td colSpan={3} className="py-3 px-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <CheckCircle size={12} className="text-income" />
+                        <CheckCircle2 size={12} className="text-income" />
                         <span className="text-[9px] font-black uppercase tracking-widest text-income">Đã chi tháng {filterMonth.split('-')[1]}/{filterMonth.split('-')[0]}</span>
                       </div>
                       <span className="text-[9px] font-black uppercase tracking-widest text-sub-label opacity-40">

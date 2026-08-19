@@ -11,24 +11,24 @@ interface ToastProps {
 export const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
   const styles = {
     success: {
-      container: "bg-emerald-50/80 border-emerald-200/50 text-emerald-800",
-      icon: "text-emerald-600",
-      closeBtn: "bg-emerald-100/50 text-emerald-600 hover:bg-emerald-200/50"
+      container: "bg-income/10 border-income/20 text-income shadow-income/10",
+      icon: "text-income",
+      closeBtn: "bg-income/15 text-income hover:bg-income/25"
     },
     error: {
-      container: "bg-red-50/80 border-red-200/50 text-red-800",
-      icon: "text-red-600",
-      closeBtn: "bg-red-100/50 text-red-600 hover:bg-red-200/50"
+      container: "bg-expense/10 border-expense/20 text-expense shadow-expense/10",
+      icon: "text-expense",
+      closeBtn: "bg-expense/15 text-expense hover:bg-expense/25"
     },
     warning: {
-      container: "bg-amber-50/80 border-amber-200/50 text-amber-800",
-      icon: "text-amber-600",
-      closeBtn: "bg-amber-100/50 text-amber-600 hover:bg-amber-200/50"
+      container: "bg-warning/10 border-warning/20 text-warning shadow-warning/10",
+      icon: "text-warning",
+      closeBtn: "bg-warning/15 text-warning hover:bg-warning/25"
     },
     info: {
-      container: "bg-blue-50/80 border-blue-200/50 text-blue-800",
-      icon: "text-blue-600",
-      closeBtn: "bg-blue-100/50 text-blue-600 hover:bg-blue-200/50"
+      container: "bg-accent-soft border-brand/20 text-kraft-ink shadow-brand/10",
+      icon: "text-brand",
+      closeBtn: "bg-brand/15 text-brand hover:bg-brand/25"
     }
   };
 

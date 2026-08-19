@@ -106,7 +106,7 @@ export class InventoryListPresenter extends BasePresenter<InventoryListView> {
       );
     }
     if (this.currentFilter === 'AGING_25') {
-      filtered = filtered.filter(car => isVehicleAging(car.purchase_date, INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS));
+      filtered = filtered.filter(car => isVehicleAging(car, INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS));
     }
     this.view.showAvailableCars(this.sortVehicles(filtered));
   }

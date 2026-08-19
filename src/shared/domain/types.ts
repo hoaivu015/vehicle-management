@@ -83,6 +83,7 @@ export interface Vehicle {
   profit?: number;
   total_cost?: number;
   days?: number;
+  holding_days?: number;
   is_pinned: boolean;
   is_coinvested: boolean;
   coinvestor_code?: string;

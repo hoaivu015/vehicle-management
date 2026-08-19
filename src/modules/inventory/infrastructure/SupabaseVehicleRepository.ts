@@ -14,7 +14,7 @@ export class SupabaseVehicleRepository implements VehicleRepository {
     this.tableName, 
     VehicleSchema,
     {
-      toDomain: (dto) => dto as Vehicle,
+      toDomain: (dto) => new VehicleEntity(dto).toRaw(),
       toDTO: (domain) => {
         // Chỉ lấy các trường có trong DB thực tế
         const result = VehicleRowSchema.partial().safeParse(domain);
@@ -54,7 +54,8 @@ export class SupabaseVehicleRepository implements VehicleRepository {
     return this.baseRepo.update(id, {
       ...item,
       total_cost: financials.totalCost,
-      profit: financials.netProfit
+      profit: financials.netProfit,
+      days: entity.activeDays
     });
   }
 
@@ -66,13 +67,13 @@ export class SupabaseVehicleRepository implements VehicleRepository {
     const { data, error } = await supabase.from(this.tableName).select('*').eq('code', code).maybeSingle();
     if (error) throw error;
     if (!data) return null;
-    return VehicleSchema.parse(data);
+    return new VehicleEntity(data).toRaw();
   }
 
   async getAvailableVehicles(): Promise<Vehicle[]> {
     const { data, error } = await supabase.from(this.tableName).select('*').neq('status', VehicleStatus.SOLD).order('id', { ascending: false });
     if (error) throw error;
-    return (data || []).map(v => VehicleSchema.parse(v));
+    return (data || []).map(v => new VehicleEntity(v).toRaw());
   }
 
   async getSoldVehiclesByMonth(monthStr: string): Promise<Vehicle[]> {
@@ -81,7 +82,7 @@ export class SupabaseVehicleRepository implements VehicleRepository {
     const end = date.toISOString().split('T')[0];
     const { data, error } = await supabase.from(this.tableName).select('*').eq('status', VehicleStatus.SOLD).gte('sale_date', start).lt('sale_date', end).order('sale_date', { ascending: false });
     if (error) throw error;
-    return (data || []).map(v => VehicleSchema.parse(v));
+    return (data || []).map(v => new VehicleEntity(v).toRaw());
   }
 
   async updateStatus(id: number, status: VehicleStatus, history: VehicleHistoryEntry, updates?: Partial<Vehicle>): Promise<void> {
@@ -180,14 +181,14 @@ export class SupabaseVehicleRepository implements VehicleRepository {
   async getVehiclesByStaff(staffCode: string): Promise<Vehicle[]> {
     const { data, error } = await supabase.from(this.tableName).select('*').or(`seller.eq."${staffCode}",coinvestor_code.eq."${staffCode}",buyer.eq."${staffCode}"`).order('id', { ascending: false });
     if (error) throw error;
-    return (data || []).map(v => VehicleSchema.parse(v));
+    return (data || []).map(v => new VehicleEntity(v).toRaw());
   }
 
   async getVehiclesByCodes(codes: string[]): Promise<Vehicle[]> {
     if (codes.length === 0) return [];
     const { data, error } = await supabase.from(this.tableName).select('*').or(`seller.in.(${codes.map(c => `"${c}"`).join(',')}),buyer.in.(${codes.map(c => `"${c}"`).join(',')}),coinvestor_code.in.(${codes.map(c => `"${c}"`).join(',')})`).order('id', { ascending: false });
     if (error) throw error;
-    return (data || []).map(v => VehicleSchema.parse(v));
+    return (data || []).map(v => new VehicleEntity(v).toRaw());
   }
 }
 

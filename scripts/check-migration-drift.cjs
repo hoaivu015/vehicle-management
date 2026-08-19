@@ -75,7 +75,7 @@ try {
   const missingInDb = [];
   for (const field of vehicleFields) {
     // Một số trường đặc thù có thể được Map hoặc Computed
-    if (!dbVehicleFields.has(field) && !['expected_profit', 'days', 'battery_type', 'show_on_landing'].includes(field)) {
+    if (!dbVehicleFields.has(field) && !['expected_profit', 'days', 'holding_days', 'battery_type', 'show_on_landing'].includes(field)) {
       missingInDb.push(field);
     }
   }

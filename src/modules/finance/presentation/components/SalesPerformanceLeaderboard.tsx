@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Trophy, Award, Medal, UserCheck, Flame } from 'lucide-react';
+import { Trophy, Award, Medal, UserCheck } from 'lucide-react';
 import { SalesLeaderboardItem } from '@/src/modules/finance/application/GetFinancialOverview';
 import { formatCurrency } from '@/src/shared/utils/currency';
 import { cn } from '@/src/shared/utils/cn';
@@ -56,7 +56,7 @@ export const SalesPerformanceLeaderboard: React.FC<SalesPerformanceLeaderboardPr
         <div>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
-              <Flame size={18} />
+              <Trophy size={18} />
             </div>
             <h3 className="text-base md:text-lg font-black uppercase tracking-tight text-kraft-ink">
               Bảng Xếp Hạng Đội Ngũ Kinh Doanh

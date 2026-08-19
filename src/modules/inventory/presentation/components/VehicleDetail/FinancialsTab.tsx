@@ -152,7 +152,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                   <div className={cn(
                      "p-3.5 sm:p-4 rounded-xl border flex items-center justify-between transition-all",
                      financials.grossProfit > 0 
-                        ? "bg-emerald-500/10 border-emerald-500/25 text-emerald-700"
+                        ? "bg-income/10 border-income/25 text-income"
                         : financials.grossProfit < 0
                         ? "bg-expense/10 border-expense/25 text-expense"
                         : "bg-warning/10 border-warning/25 text-warning"
@@ -164,7 +164,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                         {financials.salePrice > 0 && (
                            <span className={cn(
                               "text-[9px] font-black px-1.5 py-0.5 rounded-full",
-                              financials.grossProfit > 0 ? "bg-emerald-500/20 text-emerald-800" : "bg-black/10 text-kraft-ink"
+                              financials.grossProfit > 0 ? "bg-income/20 text-income" : "bg-black/10 text-kraft-ink"
                            )}>
                               {profitMargin > 0 ? `+${profitMargin.toFixed(1)}%` : `${profitMargin.toFixed(1)}%`}
                            </span>

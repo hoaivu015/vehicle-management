@@ -1,5 +1,5 @@
 import React from 'react';
-import { Car, Calendar, Layers, Clock } from 'lucide-react';
+import { Car, Calendar, Layers, Gauge } from 'lucide-react';
 import { BaseInput } from '@/src/shared/design-system/FormElements';
 import { SmartAmountInput } from '@/src/shared/design-system/SmartAmountInput';
 import { AddVehicleRequest } from '@/src/modules/inventory/application/AddVehicle';
@@ -47,7 +47,7 @@ export const VehicleProfile: React.FC<VehicleProfileProps> = ({
           value={formData.odo || 0}
           onChange={(v) => setFormData(prev => ({ ...prev, odo: v }))}
           suffix=" km"
-          icon={Clock}
+          icon={Gauge}
           showTextPreview={false}
           placeholder="VD: 5k, 12k..."
           variant="dense"

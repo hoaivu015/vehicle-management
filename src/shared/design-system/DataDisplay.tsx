@@ -48,22 +48,22 @@ interface FinancialBoxProps {
 
 export const FinancialBox = ({ label, value, color, isEstimated }: FinancialBoxProps) => {
   const styles = {
-    income: "text-income bg-kraft-bg border-hairline-soft",
-    warning: "text-warning bg-kraft-bg border-hairline-soft",
-    neutral: "text-kraft-ink bg-kraft-bg border-hairline-soft",
+    income: "text-income bg-white border-hairline-soft",
+    warning: "text-warning bg-white border-hairline-soft",
+    neutral: "text-kraft-ink bg-white border-hairline-soft",
   };
   
   return (
     <div className={cn(
-      "p-g4 rounded-t2 border flex flex-col items-start text-left gap-g1 relative overflow-hidden transition-all shadow-kraft", 
+      "p-g4 rounded-t2 border flex flex-col items-start text-left gap-g1 relative overflow-hidden transition-all shadow-xs", 
       styles[color]
     )}>
       {isEstimated && (
         <div className="absolute top-g1 right-g1 p-g1">
-          <div className="w-2 h-2 rounded-full bg-current opacity-20" />
+          <div className="w-2 h-2 rounded-full bg-current opacity-30" />
         </div>
       )}
-      <span className="text-[11px] font-black uppercase tracking-widest text-kraft-ink/40 leading-none">{label}</span>
+      <span className="text-[11px] font-black uppercase tracking-widest text-sub-label leading-none">{label}</span>
       <span className="text-2xl font-black tracking-tighter leading-none">{formatCurrency(value)}</span>
     </div>
   );
@@ -79,15 +79,15 @@ export const FinancialBadge: React.FC<{
   className?: string;
 }> = ({ label, value, type, className }) => {
   const typeClasses = {
-    income: "text-income bg-income/10",
-    expense: "text-expense bg-expense/10",
-    warning: "text-warning bg-warning/10",
-    neutral: "text-kraft-ink/60 bg-kraft-folder"
+    income: "text-income bg-income/10 border-income/20",
+    expense: "text-expense bg-expense/10 border-expense/20",
+    warning: "text-warning bg-warning/10 border-warning/20",
+    neutral: "text-sub-label bg-surface-soft border-hairline-soft"
   };
 
   return (
-    <div className={cn("flex justify-between items-center p-g2 rounded-full border border-hairline-soft", typeClasses[type], className)}>
-      <span className="text-[10px] font-black uppercase tracking-widest opacity-60 leading-none">{label}</span>
+    <div className={cn("flex justify-between items-center p-g2 rounded-full border", typeClasses[type], className)}>
+      <span className="text-[10px] font-black uppercase tracking-widest opacity-80 leading-none">{label}</span>
       <span className="text-sm font-black tracking-tighter leading-none">{value}</span>
     </div>
   );
@@ -103,11 +103,11 @@ export const StatusBadge: React.FC<{ label: string; badgeClass: string; icon?: R
   className 
 }) => (
   <div className={cn(
-    "px-g1.5 py-0.5 md:px-g2 md:py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20 backdrop-blur-md flex items-center gap-g1",
+    "px-g1.5 py-0.5 md:px-g2 md:py-1 rounded-full text-[10px] font-black uppercase tracking-widest border backdrop-blur-md flex items-center gap-g1 shadow-xs",
     badgeClass,
     className
   )}>
-    {Icon ? <Icon size={10} strokeWidth={3} /> : <div className="w-1.5 h-1.5 rounded-full bg-white opacity-40" />}
+    {Icon ? <Icon size={10} strokeWidth={3} /> : <div className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />}
     {label}
   </div>
 );
@@ -134,35 +134,35 @@ export const AlertBlock: React.FC<AlertBlockProps> = ({
   const variants = {
     danger: {
       bg: "bg-expense/10",
-      border: "border-expense/10",
+      border: "border-expense/20",
       iconBg: "bg-expense",
       iconColor: "text-white",
       titleColor: "text-expense",
-      descColor: "text-expense/60"
+      descColor: "text-expense/80"
     },
     warning: {
       bg: "bg-warning/10",
-      border: "border-warning/10",
+      border: "border-warning/20",
       iconBg: "bg-warning",
       iconColor: "text-kraft-ink",
       titleColor: "text-warning",
-      descColor: "text-warning/60"
+      descColor: "text-warning/80"
     },
     info: {
-      bg: "bg-kraft-accent/10",
-      border: "border-kraft-accent/10",
+      bg: "bg-accent-soft",
+      border: "border-brand/20",
       iconBg: "bg-kraft-accent",
       iconColor: "text-white",
       titleColor: "text-kraft-ink",
-      descColor: "text-kraft-ink/40"
+      descColor: "text-kraft-ink/75"
     },
     success: {
       bg: "bg-income/10",
-      border: "border-income/10",
+      border: "border-income/20",
       iconBg: "bg-income",
       iconColor: "text-white",
       titleColor: "text-income",
-      descColor: "text-income/60"
+      descColor: "text-income/80"
     }
   };
 

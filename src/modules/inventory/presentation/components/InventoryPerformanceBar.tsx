@@ -3,6 +3,8 @@ import { Package, DollarSign, AlertCircle } from 'lucide-react';
 import { Vehicle } from '@/src/shared/domain/types';
 import { formatCurrency } from '@/src/shared/utils/currency';
 import { MetricCard } from '@/src/shared/design-system/DataDisplay';
+import { isVehicleAging } from '@/src/shared/utils/vehicle_calculations';
+import { INVENTORY_CONSTANTS } from '@/src/shared/domain/constants';
 
 interface InventoryPerformanceBarProps {
   vehicles: Vehicle[];
@@ -12,14 +14,7 @@ export const InventoryPerformanceBar: React.FC<InventoryPerformanceBarProps> = (
   const totalInStock = vehicles.length;
   const totalValue = vehicles.reduce((sum, v) => sum + (v.purchase_price || 0) + (v.total_cost || 0), 0);
   
-  const twentyFiveDaysAgo = new Date();
-  twentyFiveDaysAgo.setDate(twentyFiveDaysAgo.getDate() - 25);
-  
-  const agingCount = vehicles.filter(v => {
-    if (!v.purchase_date) return false;
-    const purchaseDate = new Date(v.purchase_date);
-    return purchaseDate <= twentyFiveDaysAgo;
-  }).length;
+  const agingCount = vehicles.filter(v => isVehicleAging(v, INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS)).length;
 
   const stats = [
     { label: 'Tổng xe tồn', value: totalInStock, icon: Package, color: 'text-kraft-accent' },

@@ -8,7 +8,7 @@ import {
   Car,
   AlertCircle,
   Coins,
-  Edit3,
+  Edit2,
 } from 'lucide-react';
 import { formatCurrency } from '@/src/shared/utils/currency';
 import { INVENTORY_CONSTANTS } from '@/src/shared/domain/constants';
@@ -128,7 +128,7 @@ export const DashboardWebView: React.FC<DashboardWebViewProps> = ({
       icon: AlertCircle,
       subValue: 'Bấm xem xe cần xử lý giá',
       isWarning: (overview?.agingCount || 0) > 0,
-      actionIcon: Edit3,
+      actionIcon: Edit2,
       onClick: () => openDrillDown('aging_vehicles'),
       onActionClick: (e: React.MouseEvent) => {
         e.stopPropagation();

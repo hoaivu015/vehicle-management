@@ -1,13 +1,13 @@
 import React from 'react';
-import { Calendar, TrendingUp, Award, Clock, ArrowRight, Pin } from 'lucide-react';
+import { Calendar, Gauge, Award, Clock, ArrowRight, Pin } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Vehicle } from '../../../../shared/domain/types';
-import { VehicleStatus, VEHICLE_STATUS_CONFIG, INVENTORY_CONSTANTS } from '../../../../shared/domain/constants';
+import { VehicleStatus, VEHICLE_STATUS_CONFIG } from '../../../../shared/domain/constants';
 import { cn } from '@/src/shared/utils/cn';
 import { formatCurrency } from '@/src/shared/utils/currency';
 import { BaseCard, CardImageSection, CardContentSection, PriceBadge, CardFooter } from '@/src/shared/design-system/BaseCard';
 import { StatusBadge } from '@/src/shared/design-system/DataDisplay';
-import { calculateVehicleFinancials } from '../../../../shared/utils/vehicle_calculations';
+import { calculateVehicleFinancials, getInventoryAgingTier } from '../../../../shared/utils/vehicle_calculations';
 import { optimizeCloudinaryUrl } from '@/src/shared/utils/cloudinary';
 import { haptics } from '@/src/shared/utils/haptics';
 
@@ -32,7 +32,8 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
   financials,
   canSeeFullInfo
 }) => {
-  const isAging = (car.days || 0) > INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS;
+  const agingTier = getInventoryAgingTier(car.days || 0);
+  const isAging = agingTier.isAging;
   const isCompressed = (car.days || 0) > 30;
   const isLarge = variant === 'large';
   const statusConfig = VEHICLE_STATUS_CONFIG[car.status as VehicleStatus];
@@ -101,8 +102,8 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
                 {car.name}
               </h3>
               {car.is_coinvested && (
-                <span className="shrink-0 px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full text-[8.5px] font-bold uppercase tracking-wider whitespace-nowrap flex items-center gap-0.5 border border-amber-200/60 shadow-2xs">
-                  <Award size={8.5} strokeWidth={2.5} />
+                <span className="shrink-0 px-2 py-0.5 bg-surface-soft text-kraft-ink rounded-full text-[8.5px] font-bold uppercase tracking-wider whitespace-nowrap flex items-center gap-0.5 border border-hairline-soft shadow-2xs">
+                  <Award size={8.5} strokeWidth={2.5} className="text-warning" />
                   Góp vốn
                 </span>
               )}
@@ -116,13 +117,14 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
               </div>
               <span className="text-[10px] text-slate-400">•</span>
               <div className="flex items-center gap-0.5 text-[10px] font-bold whitespace-nowrap">
-                <TrendingUp size={9} />
+                <Gauge size={9} />
                 <span>{((car.odo || 0) / 1000).toFixed(0)}K km</span>
               </div>
               <span className="text-[10px] text-slate-400">•</span>
               <span className={cn(
                 "text-[9.5px] font-bold uppercase tracking-wider flex items-center gap-0.5 whitespace-nowrap",
-                isAging ? "text-coral font-black" : "text-slate-500"
+                agingTier.colorClass,
+                isAging && "font-black"
               )}>
                 <Clock size={9} className="shrink-0" />
                 {car.days || 0}d
@@ -145,7 +147,7 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight whitespace-nowrap">
                   Lãi dự kiến
                 </span>
-                <span className="text-xs sm:text-sm font-black text-emerald-600 whitespace-nowrap">
+                <span className="text-xs sm:text-sm font-black text-income whitespace-nowrap">
                   +{formatCurrency(financials.showroomProfitShare).replace('₫', '')}
                 </span>
               </div>
@@ -262,10 +264,11 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
               isCompact ? "pt-2 md:pt-2.5 mt-2" : "pt-2.5 md:pt-3 mt-2.5"
             )}>
               <div className="flex items-center gap-1.5">
-                <Clock size={12} className={cn("shrink-0", isAging ? "text-coral" : "text-slate-400")} />
+                <Clock size={12} className={cn("shrink-0", agingTier.colorClass)} />
                 <span className={cn(
                   "text-[11px] font-semibold tracking-tight whitespace-nowrap",
-                  isAging ? "text-coral font-black" : "text-slate-500",
+                  agingTier.colorClass,
+                  isAging && "font-black",
                   isCompact && "text-[10px]"
                 )}>
                   {car.days || 0} ngày lưu kho
@@ -274,7 +277,7 @@ export const CarCard: React.FC<CarCardProps> = React.memo(({
 
               <div className="text-right">
                 {canSeeFullInfo ? (
-                  <p className="text-sm md:text-[15px] font-black text-emerald-600 tracking-tight leading-none whitespace-nowrap">
+                  <p className="text-sm md:text-[15px] font-black text-income tracking-tight leading-none whitespace-nowrap">
                     +{formatCurrency(financials.showroomProfitShare).replace('₫', '')}
                   </p>
                 ) : (

@@ -4,8 +4,8 @@ import { X, Search, Car, ArrowRight, DollarSign, Wallet, CheckCircle2, AlertCirc
 import { Vehicle } from '@/src/shared/domain/types';
 import { formatCurrency } from '@/src/shared/utils/currency';
 import { formatDate } from '@/src/shared/utils/date';
-import { VEHICLE_STATUS_LABELS, VehicleStatus } from '@/src/shared/domain/constants';
-import { calculateVehicleFinancials } from '@/src/shared/utils/vehicle_calculations';
+import { VEHICLE_STATUS_LABELS, VehicleStatus, INVENTORY_CONSTANTS } from '@/src/shared/domain/constants';
+import { calculateVehicleFinancials, isVehicleAging } from '@/src/shared/utils/vehicle_calculations';
 import { cn } from '@/src/shared/utils/cn';
 
 export type DrillDownType = 'gross_profit' | 'sold_vehicles' | 'inventory_vehicles' | 'aging_vehicles' | 'cash_balance' | null;
@@ -66,12 +66,11 @@ export const MetricDrillDownModal: React.FC<MetricDrillDownModalProps> = ({
       }
       case 'aging_vehicles': {
         const list = vehicles.filter(v => {
-          if (v.status === VehicleStatus.SOLD || !v.purchase_date) return false;
-          const diffDays = Math.floor((new Date().getTime() - new Date(v.purchase_date).getTime()) / (1000 * 60 * 60 * 24));
-          return diffDays > 25;
+          if (v.status === VehicleStatus.SOLD) return false;
+          return isVehicleAging(v, INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS);
         });
         return {
-          title: 'Danh Sách Xe Tồn Kho Lâu (> 25 Ngày)',
+          title: `Danh Sách Xe Tồn Kho Lâu (> ${INVENTORY_CONSTANTS.AGING_THRESHOLD_DAYS} Ngày)`,
           subtitle: 'Các xe cần ưu tiên điều chỉnh giá bán hoặc đẩy mạnh marketing',
           icon: AlertCircle,
           filteredVehicles: list,

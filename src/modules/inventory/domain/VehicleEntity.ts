@@ -1,6 +1,11 @@
 import { VehicleStatus } from '../../../shared/domain/constants';
 import { VehicleStateMachine } from './VehicleStateMachine';
-import { calculateVehicleFinancials, VehicleFinancials } from '../../../shared/utils/vehicle_calculations';
+import { 
+  calculateVehicleFinancials, 
+  VehicleFinancials,
+  calculateAgingDays,
+  calculateActiveSellingDays
+} from '../../../shared/utils/vehicle_calculations';
 import { VehicleDTO, VehicleSchema } from './VehicleSchema';
 import { Vehicle } from '../../../shared/domain/types';
 
@@ -21,11 +26,25 @@ export class VehicleEntity {
   get purchasePrice(): number { return this.data.purchase_price; }
   get salePrice(): number | null | undefined { return this.data.sale_price; }
 
+  /**
+   * 1. CHỈ SỐ TÀI CHÍNH: Tổng ngày nắm giữ (Financial Holding Days)
+   */
+  get holdingDays(): number {
+    return calculateAgingDays(this.purchaseDate, this.saleDate);
+  }
+
+  /**
+   * 2. CHỈ SỐ VẬN HÀNH & KPI: Số ngày mở bán thực tế (Active Selling Days)
+   */
+  get activeDays(): number {
+    return calculateActiveSellingDays(this.data);
+  }
+
+  /**
+   * Số ngày lưu kho dùng cho vận hành (tương thích ngược)
+   */
   get agingDays(): number {
-    const start = new Date(this.purchaseDate);
-    const end = this.saleDate ? new Date(this.saleDate) : new Date();
-    const diffTime = Math.abs(end.getTime() - start.getTime());
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return this.activeDays;
   }
 
   /**
@@ -51,7 +70,8 @@ export class VehicleEntity {
       ...this.data,
       profit: fin.netProfit,
       total_cost: fin.totalCost,
-      days: this.agingDays
+      days: this.activeDays,
+      holding_days: this.holdingDays
     } as Vehicle;
   }
 
@@ -62,3 +82,4 @@ export class VehicleEntity {
     return this.data;
   }
 }
+
