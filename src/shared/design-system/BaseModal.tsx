@@ -19,7 +19,7 @@ interface ModalProps {
   showCloseButton?: boolean;
   /** Ẩn title/subtitle trên mobile (dùng khi popup có hero image riêng) */
   mobileHideTitle?: boolean;
-  /** Thiết lập chiều cao di động: 'full' (h-[92vh]) hoặc 'auto' (tự động co giãn) */
+  /** Thiết lập chiều cao di động: 'full' (h-[88dvh]) hoặc 'auto' (tự động co giãn) */
   height?: 'auto' | 'full';
   /** Tùy chọn chèn các nút hành động (Ghim, Sửa, v.v.) vào bên phải Header trước nút Đóng */
   headerActions?: React.ReactNode;
@@ -170,7 +170,7 @@ export const BaseModal = ({
               "relative w-full overflow-hidden flex flex-col bg-white border border-hairline-soft shadow-kraft-deep",
               "rounded-t-t1 md:rounded-t2",
               maxWidthClasses[maxWidth],
-              height === 'auto' ? "h-auto max-h-[92vh] md:h-auto md:max-h-[85vh]" : "h-[92vh] md:h-auto md:max-h-[85vh]",
+              height === 'auto' ? "h-auto max-h-[88dvh] md:h-auto md:max-h-[85vh]" : "h-[88dvh] md:h-auto md:max-h-[85vh]",
               className
             )}
             role="dialog"
@@ -179,7 +179,7 @@ export const BaseModal = ({
             {/* Grab/Drag zone for Mobile Sheet - Generous hit area for easy drag triggers */}
             <div 
               onPointerDown={(e) => dragControls.start(e)}
-              className="w-full h-6 flex items-center justify-center md:hidden shrink-0 cursor-grab active:cursor-grabbing touch-none select-none"
+              className="w-full h-7 pt-1.5 flex items-center justify-center md:hidden shrink-0 cursor-grab active:cursor-grabbing touch-none select-none"
             >
               <div className="w-12 h-1 bg-black/10 rounded-full" />
             </div>

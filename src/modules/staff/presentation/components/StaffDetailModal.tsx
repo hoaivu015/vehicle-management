@@ -84,7 +84,7 @@ export const StaffDetailModal: React.FC<StaffDetailModalProps> = ({
         onClose={onClose} 
         maxWidth="6xl" 
         showCloseButton={false}
-        className="h-[92vh] lg:h-[85vh]"
+        className="h-[88dvh] lg:h-[85vh]"
       >
         <div className="relative w-full h-full flex flex-col lg:flex-row overflow-hidden pointer-events-auto">
           <div className="absolute top-[var(--safe-area-top)] right-4 md:top-8 md:right-8 z-[110] flex gap-3 pt-2 md:pt-0">

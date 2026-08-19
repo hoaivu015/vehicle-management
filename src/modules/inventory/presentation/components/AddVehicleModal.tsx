@@ -20,7 +20,7 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({ isOpen, onClos
       maxWidth="6xl" 
       title="Thêm xe mới"
       subtitle="Hệ thống quản lý phương tiện"
-      className="h-[92vh] lg:h-auto max-h-[92vh] md:max-h-[860px]"
+      className="h-[88dvh] lg:h-auto max-h-[88dvh] md:max-h-[860px]"
     >
       <AddVehicleForm 
         isOpen={isOpen}

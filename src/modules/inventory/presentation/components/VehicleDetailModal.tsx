@@ -218,7 +218,7 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = (props) => 
          subtitle={modalSubtitle}
          headerActions={headerActions}
          mobileHideTitle={true}
-         className="h-[92vh] lg:h-[86vh]"
+         className="h-[88dvh] lg:h-[86vh]"
       >
          <div className="relative w-full h-full flex flex-col lg:flex-row overflow-hidden pointer-events-auto">
             <VehicleSidebar 

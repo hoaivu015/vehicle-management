@@ -112,7 +112,7 @@ export const MetricDrillDownModal: React.FC<MetricDrillDownModalProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          className="relative w-full max-w-4xl max-h-[85vh] bg-white rounded-[2.5rem] shadow-2xl border border-white/80 overflow-hidden flex flex-col z-10"
+          className="relative w-full max-w-4xl max-h-[85dvh] md:max-h-[85vh] bg-white rounded-[2.5rem] shadow-2xl border border-white/80 overflow-hidden flex flex-col z-10"
         >
           {/* Header */}
           <div className="p-6 sm:p-8 border-b border-hairline-soft flex items-start justify-between gap-4 bg-surface-soft/40">
