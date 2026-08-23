@@ -126,6 +126,8 @@ export interface Database {
           customer_name: string | null
           buying_bonus: number | null
           buying_bonus_paid: boolean | null
+          buying_commission_paid: boolean | null
+          coinvest_date: string | null
         }
         Insert: {
           id?: number
@@ -169,6 +171,8 @@ export interface Database {
           customer_name?: string | null
           buying_bonus?: number | null
           buying_bonus_paid?: boolean | null
+          buying_commission_paid?: boolean | null
+          coinvest_date?: string | null
         }
         Update: {
           id?: number
@@ -212,6 +216,8 @@ export interface Database {
           customer_name?: string | null
           buying_bonus?: number | null
           buying_bonus_paid?: boolean | null
+          buying_commission_paid?: boolean | null
+          coinvest_date?: string | null
         }
       }
       operating_expenses: {
