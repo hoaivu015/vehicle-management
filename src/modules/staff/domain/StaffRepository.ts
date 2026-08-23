@@ -12,4 +12,6 @@ export interface StaffRepository extends Repository<Staff> {
   addSalaryPayout(payout: { employee_id: number; month: string; amount: number; target_expense_ids?: string[]; note?: string }): Promise<void>;
   deleteSalaryPayout(employee_id: number, month: string): Promise<void>;
   registerUser(user: { name: string; email: string; password?: string; role: string; linkedfrom: string }): Promise<void>;
+  subscribe?(callback: (staff: Staff[]) => void): () => void;
+  subscribeToEmail?(email: string, callback: (staff: Staff) => void): () => void;
 }

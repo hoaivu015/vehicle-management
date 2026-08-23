@@ -10,4 +10,9 @@ export interface PermissionRepository {
    * Cập nhật danh sách quyền cho vai trò cụ thể
    */
   upsertPermissions(permissions: Omit<RolePermission, 'id' | 'updated_at'>[]): Promise<void>;
+
+  /**
+   * Đăng ký lắng nghe cập nhật phân quyền theo thời gian thực
+   */
+  subscribe?(callback: (permissions: RolePermission[]) => void): () => void;
 }

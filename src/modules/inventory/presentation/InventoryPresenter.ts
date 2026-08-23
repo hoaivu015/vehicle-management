@@ -69,7 +69,7 @@ export class InventoryPresenter extends BasePresenter<InventoryView> implements 
 
   async subscribeToChanges(): Promise<void> {
     if (this.subscription) return;
-    this.subscription = supabase.channel('inventory_changes')
+    this.subscription = supabase.channel(`inventory_changes_${Math.random().toString(36).slice(2)}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => this.debouncedRefreshCurrentView())
       .subscribe();
   }

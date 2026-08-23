@@ -16,4 +16,26 @@ export class SupabasePermissionRepository implements PermissionRepository {
     );
     if (error) throw error;
   }
+
+  subscribe(callback: (permissions: RolePermission[]) => void): () => void {
+    const channel = supabase
+      .channel(`permissions_realtime_${Math.random().toString(36).slice(2)}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'role_permissions' },
+        async () => {
+          try {
+            const perms = await this.getAllPermissions();
+            callback(perms);
+          } catch (err) {
+            console.error('Error fetching permissions in realtime sync:', err);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }
 }

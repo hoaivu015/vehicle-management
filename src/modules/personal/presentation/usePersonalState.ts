@@ -95,6 +95,7 @@ export const usePersonalState = (
     };
     staffPresenter.attachView(staffView);
     staffPresenter.loadStaff(selectedMonth);
+    staffPresenter.subscribeToChanges(selectedMonth);
 
     const inventoryView: InventoryView = {
       showAvailableCars: (availableCars) => setCars(availableCars),
@@ -113,6 +114,8 @@ export const usePersonalState = (
       setStaffList: () => {} 
     };
     inventoryPresenter.attachView(inventoryView);
+    inventoryPresenter.loadPersonal(user.code, selectedMonth);
+    inventoryPresenter.subscribeToChanges();
 
     return () => {
       presenter.detach();

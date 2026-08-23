@@ -127,5 +127,52 @@ export class SupabaseStaffRepository implements StaffRepository {
     
     if (error) throw error;
   }
+
+  subscribe(callback: (staff: Staff[]) => void): () => void {
+    const channel = supabase
+      .channel(`staff_realtime_${Math.random().toString(36).slice(2)}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: this.tableName }, async () => {
+        try {
+          const list = await this.getAll();
+          callback(list);
+        } catch (err) {
+          console.error('Error in SupabaseStaffRepository subscribe:', err);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }
+
+  subscribeToEmail(email: string, callback: (staff: Staff) => void): () => void {
+    const targetEmail = email.toLowerCase();
+    const channel = supabase
+      .channel(`staff_user_realtime_${Math.random().toString(36).slice(2)}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: this.tableName }, async (payload) => {
+        try {
+          const newDoc = payload.new as { email?: string } | undefined;
+          const oldDoc = payload.old as { email?: string } | undefined;
+          if (
+            (newDoc?.email && newDoc.email.toLowerCase() === targetEmail) ||
+            (oldDoc?.email && oldDoc.email.toLowerCase() === targetEmail) ||
+            !newDoc?.email
+          ) {
+            const staff = await this.getByEmail(targetEmail);
+            if (staff) {
+              callback(staff);
+            }
+          }
+        } catch (err) {
+          console.error('Error in SupabaseStaffRepository subscribeToEmail:', err);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }
 }
 

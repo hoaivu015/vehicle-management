@@ -50,14 +50,14 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
       this.debounceTimer = null;
     }
     if (this.subscription) {
-      this.subscription.unsubscribe();
+      supabase.removeChannel(this.subscription);
       this.subscription = null;
     }
   }
 
   async subscribeToChanges(): Promise<void> {
     if (this.subscription) return;
-    this.subscription = supabase.channel('finance_realtime')
+    this.subscription = supabase.channel(`finance_realtime_${Math.random().toString(36).slice(2)}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'operating_expenses' }, () => this.debouncedLoadFinanceData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'company_settings' }, () => this.debouncedLoadFinanceData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => this.debouncedLoadFinanceData())

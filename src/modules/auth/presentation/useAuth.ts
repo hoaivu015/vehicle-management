@@ -155,6 +155,42 @@ export const useAuth = () => {
     return () => unsubscribe();
   }, [fetchProfile, authRepo]);
 
+  // Realtime synchronization for global permissions matrix
+  useEffect(() => {
+    if (!permissionRepo.subscribe) return;
+    const unsubPerms = permissionRepo.subscribe((perms) => {
+      if (perms && perms.length > 0) {
+        PermissionService.setDynamicPermissions(perms);
+        try {
+          localStorage.setItem(CACHE_KEY_PERMS, JSON.stringify(perms));
+        } catch {
+          // Ignore quota/storage errors
+        }
+      }
+    });
+    return () => {
+      unsubPerms();
+    };
+  }, [permissionRepo]);
+
+  // Realtime synchronization for current user profile / role changes
+  useEffect(() => {
+    if (!currentUser?.email || !staffRepo.subscribeToEmail) return;
+    const unsubProfile = staffRepo.subscribeToEmail(currentUser.email, (updatedProfile) => {
+      if (updatedProfile) {
+        setCurrentUser(updatedProfile);
+        try {
+          localStorage.setItem(CACHE_KEY_USER, JSON.stringify(updatedProfile));
+        } catch {
+          // Ignore quota/storage errors
+        }
+      }
+    });
+    return () => {
+      unsubProfile();
+    };
+  }, [currentUser?.email, staffRepo]);
+
   const hasPermission = useCallback((permission: Permission | string) => {
     return PermissionService.hasPermission(currentUser?.role, permission as Permission);
   }, [currentUser]);

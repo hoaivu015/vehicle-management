@@ -85,6 +85,7 @@ export const useInventoryState = ({
     };
 
     loadData();
+    presenter.subscribeToChanges();
     return () => {
       presenter.detachView();
       setHasHandledAction(false);

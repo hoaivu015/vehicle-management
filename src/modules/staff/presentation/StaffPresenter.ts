@@ -49,18 +49,28 @@ export class StaffPresenter extends BasePresenter<StaffView> implements IUnified
     this.actionPresenter.detachView();
     this.expensePresenter.detachView();
     this.payrollPresenter.detachView();
-    if (this.debounceTimer) clearTimeout(this.debounceTimer);
-    if (this.subscription) supabase.removeChannel(this.subscription);
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+    if (this.subscription) {
+      supabase.removeChannel(this.subscription);
+      this.subscription = null;
+    }
   }
 
   async subscribeToChanges(monthStr: string): Promise<void> {
     if (this.subscription) return;
     this.currentMonth = monthStr;
-    this.subscription = supabase.channel('staff_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'employees' }, () => {
-        if (this.debounceTimer) clearTimeout(this.debounceTimer);
-        this.debounceTimer = setTimeout(() => this.loadStaff(this.currentMonth), 300);
-      })
+    const triggerDebouncedReload = () => {
+      if (this.debounceTimer) clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => this.loadStaff(this.currentMonth), 300);
+    };
+
+    this.subscription = supabase.channel(`staff_changes_${Math.random().toString(36).slice(2)}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'employees' }, triggerDebouncedReload)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, triggerDebouncedReload)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'operating_expenses' }, triggerDebouncedReload)
       .subscribe();
   }
 
