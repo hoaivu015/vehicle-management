@@ -88,6 +88,7 @@ export interface Vehicle {
   is_coinvested: boolean;
   coinvestor_code?: string;
   coinvest_amount?: number;
+  coinvest_date?: string;
   
   cost_history: CostItem[] | null;
   purchase_paid_amount?: number;
@@ -106,6 +107,7 @@ export interface Vehicle {
   buying_commission?: number;
   buying_bonus?: number;
   buying_bonus_paid?: boolean;
+  buying_commission_paid?: boolean;
 
   partner_capital_repaid?: boolean;
   partner_profit_shared?: boolean;

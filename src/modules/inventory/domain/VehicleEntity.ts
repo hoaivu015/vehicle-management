@@ -5,7 +5,7 @@ import {
   VehicleFinancials,
   calculateAgingDays,
   calculateActiveSellingDays
-} from '../../../shared/utils/vehicle_calculations';
+} from './services/VehicleFinancialService';
 import { VehicleDTO, VehicleSchema } from './VehicleSchema';
 import { Vehicle } from '../../../shared/domain/types';
 

@@ -65,7 +65,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           'Biển Số': v.license_plate || '',
           'Ngày Bán': v.sale_date || '',
           'Người Bán': v.seller || '',
-          'Khách Mua': v.buyer_name || '',
+          'Khách Mua': v.customer_name || 'Khách vãng lai',
           'Giá Nhập': fin.purchasePrice,
           'Chi Phí Làm Đẹp': fin.totalCost,
           'Giá Chốt Bán': fin.salePrice,

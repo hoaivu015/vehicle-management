@@ -204,9 +204,9 @@ export const usePersonalState = (
       successMessage: 'Ghi nhận giao dịch thành công!' 
     });
 
-  const handleCancelSale = (id: number, code: string) =>
-    executeAction(() => inventoryPresenter.cancelSale(id, code, user.role), { 
-      successMessage: 'Đã hủy giao dịch bán!' 
+  const handleCancelSale = (id: number, code: string, cancelType?: 'REFUND' | 'FORFEIT') =>
+    executeAction(() => inventoryPresenter.cancelSale(id, code, cancelType, user.role), { 
+      successMessage: cancelType === 'FORFEIT' ? 'Đã hủy giao dịch và tịch thu tiền cọc!' : 'Đã hủy giao dịch bán!' 
     });
 
   const handleAddStaffExpense = (data: AddStaffExpenseInput) => 

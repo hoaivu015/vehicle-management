@@ -11,6 +11,7 @@ import { RecordExpense } from '@/src/modules/finance/application/RecordExpense';
 import { UnifiedExpenseCommand } from '@/src/shared/domain/schemas';
 import { IUnifiedExpensePresenter } from '@/src/shared/presentation/interfaces/IUnifiedExpensePresenter';
 import { supabase } from '@/src/shared/infrastructure/supabase';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface FinanceView extends BaseView {
   setMonthlyFinance(data: MonthlyFinanceData): void;
@@ -22,7 +23,7 @@ export interface FinanceView extends BaseView {
 
 export class FinancePresenter extends BasePresenter<FinanceView> implements IUnifiedExpensePresenter {
   private currentMonth: string = new Date().toISOString().slice(0, 7);
-  private subscription: { unsubscribe: () => void } | null = null;
+  private subscription: RealtimeChannel | null = null;
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
@@ -38,12 +39,8 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
   }
 
   private debouncedLoadFinanceData(): void {
-    if (this.debounceTimer) {
-      clearTimeout(this.debounceTimer);
-    }
-    this.debounceTimer = setTimeout(() => {
-      this.loadFinanceData();
-    }, 300);
+    if (this.debounceTimer) clearTimeout(this.debounceTimer);
+    this.debounceTimer = setTimeout(() => this.loadFinanceData(), 300);
   }
 
   detachView(): void {
@@ -60,17 +57,15 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
 
   async subscribeToChanges(): Promise<void> {
     if (this.subscription) return;
-
     this.subscription = supabase.channel('finance_realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'operating_expenses' }, () => this.debouncedLoadFinanceData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'company_settings' }, () => this.debouncedLoadFinanceData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => this.debouncedLoadFinanceData())
-      .subscribe() as unknown as { unsubscribe: () => void };
+      .subscribe();
   }
 
   async loadFinanceData(): Promise<void> {
     await this.perform(async () => {
-      // 1 single parallel batch for all required raw datasets
       const [settings, vehicles, staff, allOpExpenses] = await Promise.all([
         this.expenseRepo.getCompanySettings(),
         this.vehicleRepository.getAll(),
@@ -78,7 +73,6 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
         this.expenseRepo.getAll()
       ]);
       
-      // Calculate monthly finance and overview in memory with 0 duplicate DB requests
       const [monthlyData, overviewData] = await Promise.all([
         this.getMonthlyFinance.execute(this.currentMonth, { allOpExpenses, vehicles, staff, settings }),
         this.getFinancialOverview.execute(this.currentMonth, { settings, vehicles, staff, allOpExpenses })
@@ -89,9 +83,7 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
         this.view.setFinancialOverview(overviewData);
         this.view.setTotalCapital(overviewData.totalCapital);
         this.view.setVehicles(vehicles);
-        
-        const filteredStaff = staff.filter(s => !PermissionService.isAdmin(s.role));
-        this.view.setStaff(filteredStaff);
+        this.view.setStaff(staff.filter(s => !PermissionService.isAdmin(s.role)));
       }
     }, undefined, 'Lỗi tải dữ liệu tài chính');
   }
@@ -104,10 +96,7 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
   async addExpense(expense: Omit<Expense, 'id'>): Promise<void> {
     await this.perform(
       () => this.expenseRepo.add(expense),
-      () => {
-        this.notification.success('Đã thêm chi phí vận hành');
-        this.loadFinanceData();
-      },
+      () => { this.notification.success('Đã thêm chi phí vận hành'); this.loadFinanceData(); },
       'Lỗi khi thêm chi phí'
     );
   }
@@ -115,10 +104,7 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
   async updateExpense(id: string | number, expense: Partial<Expense>): Promise<void> {
     await this.perform(
       () => this.expenseRepo.update(id, expense),
-      () => {
-        this.notification.success('Đã cập nhật chi phí');
-        this.loadFinanceData();
-      },
+      () => { this.notification.success('Đã cập nhật chi phí'); this.loadFinanceData(); },
       'Lỗi khi cập nhật chi phí'
     );
   }
@@ -127,24 +113,15 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
     if (!confirm('Bạn có chắc chắn muốn xóa chi phí này?')) return;
     await this.perform(
       () => this.expenseRepo.delete(id),
-      () => {
-        this.notification.success('Đã xóa chi phí');
-        this.loadFinanceData();
-      },
+      () => { this.notification.success('Đã xóa chi phí'); this.loadFinanceData(); },
       'Lỗi khi xóa chi phí'
     );
   }
 
-  /**
-   * recordShowroomExpense - Orchestrated entry point for any expense.
-   */
   async recordShowroomExpense(data: UnifiedExpenseCommand): Promise<void> {
     await this.perform(
       () => this.recordExpenseUseCase.execute(data),
-      () => {
-        this.notification.success('Ghi nhận chi thành công');
-        this.loadFinanceData();
-      },
+      () => { this.notification.success('Ghi nhận chi thành công'); this.loadFinanceData(); },
       'Lỗi ghi nhận chi'
     );
   }
@@ -156,10 +133,7 @@ export class FinancePresenter extends BasePresenter<FinanceView> implements IUni
   async updateCapital(amount: number): Promise<void> {
     await this.perform(
       () => this.expenseRepo.updateCapital(amount),
-      () => {
-        this.notification.success('Đã cập nhật nguồn vốn');
-        this.loadFinanceData();
-      },
+      () => { this.notification.success('Đã cập nhật nguồn vốn'); this.loadFinanceData(); },
       'Lỗi khi cập nhật vốn'
     );
   }

@@ -53,9 +53,9 @@ describe('StaffSalaryService', () => {
     expect(salary.salesCommission).toBe(1400000);
     
     // Co-investment for Car 2:
-    // Net profit = 600 - (500 + 10) = 90M
-    // Total capital = 510M. NV01 coinvest 100M (~19.6%)
-    // Partner share = 90M * (100/510) = 17,647,058.8...
+    // Net profit = 600 - (500 + 10) = 90M (chi phí sửa chữa tính vào giá bán)
+    // Ratio on total investment = 100M / 510M = 19.6078%
+    // Partner share = Math.round(90M * (100 / 510)) = 17,647,059
     expect(salary.coinvestProfitShare).toBe(17647059);
     expect(salary.totalSalary).toBe(10000000 + 1400000 + 17647059);
   });
@@ -107,5 +107,29 @@ describe('StaffSalaryService', () => {
     expect(salary.boughtCount).toBe(1);
     expect(salary.buyingCommission).toBe(3000000);
     expect(salary.buyingBonus).toBe(1000000);
+  });
+
+  it('không trừ âm vào lương nhân viên khi xe góp vốn bán cắt lỗ (chống double-deduction)', () => {
+    const coinvestStaff = createMockStaff({ code: 'COINVEST01', base_salary: 10000000 });
+    const lossCar = [
+      createMockVehicle({
+        status: VehicleStatus.SOLD,
+        purchase_price: 400000000,
+        total_cost: 20000000,
+        sale_price: 360000000, // Lỗ 60M
+        purchase_date: '2026-04-01',
+        sale_date: '2026-04-20',
+        is_coinvested: true,
+        coinvestor_code: 'COINVEST01',
+        coinvest_amount: 200000000, // 50%
+        partner_profit_shared: false,
+      })
+    ];
+
+    const salary = StaffSalaryService.calculateMonthlySalary(coinvestStaff, lossCar, '2026-04');
+    // Lãi góp vốn trên lương không được là số âm (lỗ đã trừ vào vốn hoàn lại)
+    expect(salary.coinvestProfitShare).toBe(0);
+    // Lương nhân sự vẫn nhận đủ lương cứng 10,000,000đ
+    expect(salary.totalSalary).toBe(10000000);
   });
 });

@@ -39,7 +39,8 @@ interface FinancialsTabProps {
         commission?: number, 
         buyingBonus?: number
       ) => Promise<void>;
-      onCancelSale: (id: number, userCode: string) => Promise<void>;
+      onCancelSale: (id: number, userCode: string, cancelType?: 'REFUND' | 'FORFEIT') => Promise<void>;
+      onUpdateVehicle?: (id: number, data: Partial<Vehicle>) => Promise<void>;
    };
 }
 
@@ -128,7 +129,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                   {/* 2 Core Metric Cards: Doanh thu & Tổng giá vốn */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                      {/* Doanh thu */}
-                     <div className="p-3 bg-income/5 rounded-xl border border-income/15 flex flex-col justify-between gap-1">
+                     <div className="p-3 bg-income/5 rounded-xl border border-income/15 flex flex-col justify-between gap-1 shadow-2xs">
                         <span className="text-[9px] font-black uppercase tracking-widest text-income/80 whitespace-nowrap">
                            Doanh thu bán xe
                         </span>
@@ -138,7 +139,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                      </div>
 
                      {/* Tổng Giá Vốn */}
-                     <div className="p-3 bg-expense/5 rounded-xl border border-expense/15 flex flex-col justify-between gap-1">
+                     <div className="p-3 bg-expense/5 rounded-xl border border-expense/15 flex flex-col justify-between gap-1 shadow-2xs">
                         <span className="text-[9px] font-black uppercase tracking-widest text-expense/80 whitespace-nowrap">
                            Tổng giá vốn
                         </span>
@@ -150,7 +151,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
 
                   {/* Lợi nhuận gộp Hero Card */}
                   <div className={cn(
-                     "p-3.5 sm:p-4 rounded-xl border flex items-center justify-between transition-all",
+                     "p-3.5 sm:p-4 rounded-xl border flex items-center justify-between transition-all shadow-2xs",
                      financials.grossProfit > 0 
                         ? "bg-income/10 border-income/25 text-income"
                         : financials.grossProfit < 0
@@ -163,7 +164,7 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                         </span>
                         {financials.salePrice > 0 && (
                            <span className={cn(
-                              "text-[9px] font-black px-1.5 py-0.5 rounded-full",
+                              "text-[9px] font-black px-2 py-0.5 rounded-full shadow-2xs",
                               financials.grossProfit > 0 ? "bg-income/20 text-income" : "bg-black/10 text-kraft-ink"
                            )}>
                               {profitMargin > 0 ? `+${profitMargin.toFixed(1)}%` : `${profitMargin.toFixed(1)}%`}
@@ -178,16 +179,19 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
 
                {/* Nhân sự & Hoa hồng Section */}
                <div className="pt-3 border-t border-hairline-soft space-y-2">
-                  <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center justify-between px-0.5">
                      <div className="flex items-center gap-1.5 text-sub-label">
-                        <Users size={12} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">
+                        <div className="w-5 h-5 rounded-md bg-black/[0.04] flex items-center justify-center text-sub-label">
+                           <Users size={12} strokeWidth={2.5} />
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-wider text-kraft-ink">
                            Nhân sự & Hoa hồng
                         </span>
                      </div>
                      {!hasCommission && (
-                        <span className="text-[10px] font-bold text-sub-label bg-surface-soft px-2 py-0.5 rounded-full border border-hairline-soft">
-                           0 đ • Chưa phát sinh
+                        <span className="text-[9.5px] font-bold text-sub-label bg-surface-soft px-2.5 py-0.5 rounded-full border border-hairline-soft inline-flex items-center gap-1">
+                           <span className="w-1.5 h-1.5 rounded-full bg-sub-label/40" />
+                           <span>0 đ • Chưa phát sinh</span>
                         </span>
                      )}
                   </div>
@@ -218,32 +222,148 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                   )}
                </div>
 
-               {/* Cơ cấu góp vốn (Nếu có) */}
-               {financials.isCoinvested && (
-                  <div className="pt-3 border-t border-hairline-soft space-y-2">
-                     <div className="flex items-center gap-1.5 text-sub-label px-1">
-                        <Layers size={12} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">
-                           Cơ cấu phân chia lợi nhuận
-                        </span>
-                     </div>
+               {/* Cơ cấu góp vốn & Quản lý quỹ đầu tư (Nếu có) */}
+               {financials.isCoinvested && (() => {
+                  const coinvestRatio = (vehicle.purchase_price && vehicle.purchase_price > 0 && financials.coinvestAmount > 0)
+                     ? Math.min(100, Math.round((financials.coinvestAmount / vehicle.purchase_price) * 1000) / 10)
+                     : 0;
 
-                     <div className="grid grid-cols-2 gap-2">
-                        <div className="p-2.5 bg-income/5 rounded-xl border border-income/15 flex flex-col justify-between">
-                           <span className="text-[9px] font-black uppercase tracking-wider text-income/80">Showroom</span>
-                           <span className="text-xs sm:text-sm font-black text-income whitespace-nowrap">
-                              {formatCurrency(financials.showroomProfitShare)}
+                  return (
+                     <div className="pt-3 border-t border-hairline-soft space-y-2.5">
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-sub-label px-0.5">
+                           <div className="flex items-center gap-1.5 shrink-0">
+                              <div className="w-5 h-5 rounded-md bg-blue-50 flex items-center justify-center text-blue-600">
+                                 <Layers size={12} strokeWidth={2.5} />
+                              </div>
+                              <span className="text-[10px] font-black uppercase tracking-wider text-kraft-ink">
+                                 Cơ cấu góp vốn
+                              </span>
+                           </div>
+                           <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/80 whitespace-nowrap shadow-2xs">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                              <span>#{vehicle.coinvestor_code || 'ĐT'}</span>
+                              <span className="text-blue-400">•</span>
+                              <span>{coinvestRatio > 0 ? `${coinvestRatio.toFixed(1)}% giá nhập` : 'Góp vốn'}</span>
                            </span>
                         </div>
-                        <div className="p-2.5 bg-surface-soft rounded-xl border border-hairline-soft flex flex-col justify-between">
-                           <span className="text-[9px] font-black uppercase tracking-wider text-sub-label">Đối tác ({vehicle.coinvestor_code || 'ĐT'})</span>
-                           <span className="text-xs sm:text-sm font-black text-kraft-ink whitespace-nowrap">
-                              {formatCurrency(financials.partnerProfitShare)}
-                           </span>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                           {/* Vốn gốc đối tác góp */}
+                           <div className="p-3 bg-surface-soft/90 rounded-xl border border-hairline-soft flex flex-col justify-between gap-2.5 shadow-2xs overflow-hidden">
+                              <div className="flex items-center justify-between gap-1.5 flex-wrap">
+                                 <span className="text-[9.5px] font-bold text-sub-label uppercase tracking-wider">
+                                    Vốn góp ban đầu
+                                 </span>
+                                 <span className={cn(
+                                    "text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full border whitespace-nowrap inline-flex items-center gap-1",
+                                    vehicle.partner_capital_repaid
+                                       ? "text-income bg-income/10 border-income/20"
+                                       : "text-blue-700 bg-blue-50 border-blue-200/80"
+                                 )}>
+                                    <span className={cn("w-1.5 h-1.5 rounded-full", vehicle.partner_capital_repaid ? "bg-income" : "bg-blue-600 animate-pulse")} />
+                                    <span>{vehicle.partner_capital_repaid ? 'Đã hoàn vốn' : 'Đang giữ'}</span>
+                                 </span>
+                              </div>
+                              <div className="flex flex-wrap items-baseline justify-between gap-2 pt-0.5">
+                                 <div className="min-w-0">
+                                    <span className="text-sm sm:text-base font-black text-kraft-ink tracking-tight whitespace-nowrap">
+                                       {formatCurrency(financials.coinvestAmount)}
+                                    </span>
+                                    {vehicle.status === VehicleStatus.SOLD && financials.partnerProfitShare < 0 && (
+                                       <span className="text-[9.5px] font-bold text-expense block mt-0.5">
+                                          Thực nhận: {formatCurrency(financials.refundablePartnerCapital)} (Lỗ {formatCurrency(Math.abs(financials.partnerProfitShare))})
+                                       </span>
+                                    )}
+                                 </div>
+                                 {isAdminOrAccountant && actions.onUpdateVehicle && (
+                                    vehicle.partner_capital_repaid ? (
+                                       <button
+                                          type="button"
+                                          onClick={async () => {
+                                             haptics.medium();
+                                             await actions.onUpdateVehicle?.(vehicle.id, { partner_capital_repaid: false });
+                                          }}
+                                          className="text-[9.5px] font-bold text-sub-label hover:text-expense underline transition-colors whitespace-nowrap cursor-pointer"
+                                       >
+                                          Hủy hoàn vốn
+                                       </button>
+                                    ) : (
+                                       <button
+                                          type="button"
+                                          onClick={async () => {
+                                             haptics.success();
+                                             await actions.onUpdateVehicle?.(vehicle.id, { partner_capital_repaid: true });
+                                          }}
+                                          className="px-2.5 py-1 bg-[#1877F2] hover:bg-[#166fe5] text-white rounded-lg text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs active:scale-95 whitespace-nowrap cursor-pointer"
+                                       >
+                                          Hoàn vốn {financials.partnerProfitShare < 0 ? `(${formatCurrency(financials.refundablePartnerCapital)})` : ''}
+                                       </button>
+                                    )
+                                 )}
+                              </div>
+                           </div>
+
+                           {/* Lợi nhuận được chia */}
+                           <div className="p-3 bg-surface-soft/90 rounded-xl border border-hairline-soft flex flex-col justify-between gap-2.5 shadow-2xs overflow-hidden">
+                              <div className="flex items-center justify-between gap-1.5 flex-wrap">
+                                 <span className="text-[9.5px] font-bold text-sub-label uppercase tracking-wider">
+                                    Lợi nhuận đối tác
+                                 </span>
+                                 {vehicle.status === VehicleStatus.SOLD ? (
+                                    <span className={cn(
+                                       "text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full border whitespace-nowrap inline-flex items-center gap-1",
+                                       vehicle.partner_profit_shared
+                                          ? "text-income bg-income/10 border-income/20"
+                                          : "text-amber-700 bg-amber-50 border-amber-200/80"
+                                    )}>
+                                       <span className={cn("w-1.5 h-1.5 rounded-full", vehicle.partner_profit_shared ? "bg-income" : "bg-amber-500 animate-pulse")} />
+                                       <span>{vehicle.partner_profit_shared ? 'Đã chi lương' : 'Chờ chi'}</span>
+                                    </span>
+                                 ) : (
+                                    <span className="text-[8.5px] font-bold text-sub-label bg-black/[0.04] px-2 py-0.5 rounded-full border border-hairline-soft whitespace-nowrap inline-flex items-center gap-1">
+                                       <span className="w-1.5 h-1.5 rounded-full bg-sub-label/40" />
+                                       <span>Tạm tính</span>
+                                    </span>
+                                 )}
+                              </div>
+                              <div className="flex flex-wrap items-baseline justify-between gap-2 pt-0.5">
+                                 <span className={cn(
+                                    "text-sm sm:text-base font-black tracking-tight whitespace-nowrap",
+                                    financials.partnerProfitShare > 0 ? "text-income" : financials.partnerProfitShare < 0 ? "text-expense" : "text-kraft-ink"
+                                 )}>
+                                    {financials.partnerProfitShare > 0 ? `+${formatCurrency(financials.partnerProfitShare)}` : formatCurrency(financials.partnerProfitShare)}
+                                 </span>
+                                 {isAdminOrAccountant && actions.onUpdateVehicle && vehicle.status === VehicleStatus.SOLD && financials.partnerProfitShare > 0 && (
+                                    vehicle.partner_profit_shared ? (
+                                       <button
+                                          type="button"
+                                          onClick={async () => {
+                                             haptics.medium();
+                                             await actions.onUpdateVehicle?.(vehicle.id, { partner_profit_shared: false });
+                                          }}
+                                          className="text-[9.5px] font-bold text-sub-label hover:text-expense underline transition-colors whitespace-nowrap cursor-pointer"
+                                       >
+                                          Hủy chi
+                                       </button>
+                                    ) : (
+                                       <button
+                                          type="button"
+                                          onClick={async () => {
+                                             haptics.success();
+                                             await actions.onUpdateVehicle?.(vehicle.id, { partner_profit_shared: true });
+                                          }}
+                                          className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-[9.5px] font-black uppercase tracking-wider transition-all shadow-xs active:scale-95 whitespace-nowrap cursor-pointer"
+                                       >
+                                          Chi lãi
+                                       </button>
+                                    )
+                                 )}
+                              </div>
+                           </div>
                         </div>
                      </div>
-                  </div>
-               )}
+                  );
+               })()}
             </div>
 
             {/* 1.2 CỘT PHẢI: SỔ CÁI DÒNG TIỀN & QUẢN LÝ CHI PHÍ SPA (STACKED BENTO) */}
@@ -620,20 +740,42 @@ export const FinancialsTab: React.FC<FinancialsTabProps> = ({
                                     <motion.div 
                                        initial={{ opacity: 0, scale: 0.95 }} 
                                        animate={{ opacity: 1, scale: 1 }}
-                                       className="flex gap-2"
+                                       className="space-y-2"
                                     >
-                                       <button 
-                                          onClick={() => setShowCancelSaleConfirm(false)} 
-                                          className="flex-1 h-10 bg-white border border-hairline-soft rounded-full text-xs font-black uppercase tracking-widest hover:bg-surface-soft transition-all cursor-pointer"
-                                       >
-                                          Quay lại
-                                       </button>
-                                       <button 
-                                          onClick={() => handleCancelSale(vehicle.id, userCode)} 
-                                          className="flex-1 h-10 bg-expense text-white rounded-full text-xs font-black uppercase tracking-widest shadow-md shadow-expense/20 hover:bg-expense/90 transition-all cursor-pointer"
-                                       >
-                                          Xác nhận Hủy
-                                       </button>
+                                       <p className="text-[11px] font-bold text-center text-kraft-ink">
+                                          Chọn phương thức xử lý cọc khi hủy giao dịch:
+                                       </p>
+                                       <div className="flex flex-col sm:flex-row gap-2">
+                                          <button 
+                                             onClick={() => setShowCancelSaleConfirm(false)} 
+                                             className="flex-1 h-10 bg-white border border-hairline-soft rounded-full text-xs font-black uppercase tracking-widest hover:bg-surface-soft transition-all cursor-pointer"
+                                          >
+                                             Quay lại
+                                          </button>
+                                          {vehicle.received_amount && vehicle.received_amount > 0 ? (
+                                             <>
+                                                <button 
+                                                   onClick={() => handleCancelSale(vehicle.id, userCode, 'REFUND')} 
+                                                   className="flex-1 h-10 bg-amber-500 text-white rounded-full text-[11px] font-black uppercase tracking-widest shadow-md shadow-amber-500/20 hover:bg-amber-600 transition-all cursor-pointer whitespace-nowrap"
+                                                >
+                                                   Hoàn cọc ({formatCurrency(vehicle.received_amount)})
+                                                </button>
+                                                <button 
+                                                   onClick={() => handleCancelSale(vehicle.id, userCode, 'FORFEIT')} 
+                                                   className="flex-1 h-10 bg-expense text-white rounded-full text-[11px] font-black uppercase tracking-widest shadow-md shadow-expense/20 hover:bg-expense/90 transition-all cursor-pointer whitespace-nowrap"
+                                                >
+                                                   Tịch thu cọc
+                                                </button>
+                                             </>
+                                          ) : (
+                                             <button 
+                                                onClick={() => handleCancelSale(vehicle.id, userCode, 'REFUND')} 
+                                                className="flex-1 h-10 bg-expense text-white rounded-full text-xs font-black uppercase tracking-widest shadow-md shadow-expense/20 hover:bg-expense/90 transition-all cursor-pointer"
+                                             >
+                                                Xác nhận Hủy
+                                             </button>
+                                          )}
+                                       </div>
                                     </motion.div>
                                  )}
                               </AnimatePresence>

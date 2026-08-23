@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { FinancePresenter, FinanceView } from './FinancePresenter';
+import { FinancePresenter, FinanceView } from '@/src/modules/finance/presentation/FinancePresenter';
 import { FinancialOverviewData } from '@/src/modules/finance/application/GetFinancialOverview';
 import { MonthlyFinanceData } from '@/src/modules/finance/application/GetMonthlyFinance';
 import { Vehicle, Staff } from '@/src/shared/domain/types';
-import { VehicleStatus } from '@/src/shared/domain/constants';
+import { calcVehicleReceivableDebt, calcVehiclePayableDebt } from '@/src/shared/utils/vehicle_calculations';
 
 export const useDashboardState = (presenter: FinancePresenter) => {
   const [loading, setLoading] = useState(true);
@@ -34,17 +34,11 @@ export const useDashboardState = (presenter: FinancePresenter) => {
     };
   }, [presenter, view]);
 
-  // Derived state: Receivable Debts (Nợ phải thu - Khách nợ)
+  // Derived state: Receivable Debts (Nợ phải thu - Khách nợ) theo SSoT
   const receivableDebts = useMemo(() => {
     return vehicles
       .map(v => {
-        const isSalePhase = [
-          VehicleStatus.DEPOSIT_SALE,
-          VehicleStatus.BANK_DEPOSIT,
-          VehicleStatus.BANK_CONFIRMED,
-          VehicleStatus.SOLD
-        ].includes(v.status);
-        const saleDebt = isSalePhase ? (v.sale_price || 0) - (v.received_amount || 0) : 0;
+        const saleDebt = calcVehicleReceivableDebt(v);
         return { vehicle: v, saleDebt };
       })
       .filter(item => item.saleDebt > 0);
@@ -54,11 +48,11 @@ export const useDashboardState = (presenter: FinancePresenter) => {
     return receivableDebts.reduce((sum, item) => sum + item.saleDebt, 0);
   }, [receivableDebts]);
 
-  // Derived state: Payable Debts (Nợ phải trả - Showroom nợ chủ cũ/NPP)
+  // Derived state: Payable Debts (Nợ phải trả - Showroom nợ chủ cũ/NPP) theo SSoT
   const payableDebts = useMemo(() => {
     return vehicles
       .map(v => {
-        const purchaseDebt = v.purchase_price - (v.purchase_paid_amount || 0);
+        const purchaseDebt = calcVehiclePayableDebt(v);
         return { vehicle: v, purchaseDebt };
       })
       .filter(item => item.purchaseDebt > 0);

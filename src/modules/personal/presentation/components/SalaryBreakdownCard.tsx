@@ -10,11 +10,13 @@ import { SalaryDetails } from '@/src/modules/staff/domain/StaffSalaryService';
 interface SalaryBreakdownCardProps {
   salaryDetails: SalaryDetails;
   selectedMonth: string;
+  totalHeldCapital?: number;
 }
 
 export const SalaryBreakdownCard: React.FC<SalaryBreakdownCardProps> = ({
   salaryDetails,
-  selectedMonth
+  selectedMonth,
+  totalHeldCapital = 0
 }) => {
   const monthNum = selectedMonth.split('-')[1];
 
@@ -67,6 +69,7 @@ export const SalaryBreakdownCard: React.FC<SalaryBreakdownCardProps> = ({
             label="Chia sẻ lợi nhuận góp vốn" 
             value={formatCurrency(salaryDetails.coinvestProfitShare)} 
             icon={Target}
+            detail={totalHeldCapital > 0 ? `(Vốn đang gửi: ${formatCurrency(totalHeldCapital)})` : undefined}
           />
         </div>
 

@@ -1,37 +1,45 @@
 import { VehicleStatus } from '@/src/shared/domain/constants';
 import { StaffSalaryService, SalaryDetails as StaffSalaryDetails } from '@/src/modules/staff/domain/StaffSalaryService';
-import { Vehicle, Staff, PaymentItem } from '@/src/shared/domain/types';
+import { FinanceService } from '@/src/modules/finance/domain/FinanceService';
+import { Vehicle, Staff } from '@/src/shared/domain/types';
+import { calculateVehicleFinancials } from './vehicle_calculations';
 
 export type { StaffSalaryDetails };
+
+export const INVENTORY_ACTIVE_STATUSES = [
+  VehicleStatus.SPA,
+  VehicleStatus.IN_STOCK,
+  VehicleStatus.DEPOSIT_SALE,
+  VehicleStatus.BANK_DEPOSIT,
+  VehicleStatus.BANK_CONFIRMED
+];
 
 /**
  * Calculates the total stock value of cars currently in inventory.
  */
 export const calculateStockValue = (cars: Vehicle[]) => {
-  return cars.reduce((acc, car) => acc + (car && car.status !== VehicleStatus.SOLD ? (car.purchase_price || 0) : 0), 0);
-};
-
-/**
- * Calculates the monthly revenue from REAL cash received (sale_payment_history).
- */
-export const calculateMonthlyRevenue = (cars: Vehicle[], month: string) => {
   return cars.reduce((acc, car) => {
-    if (!car || !car.sale_payment_history) return acc;
-    const monthPayments = (car.sale_payment_history as unknown as PaymentItem[])
-      .filter((p) => p.date?.startsWith(month))
-      .reduce((sum: number, p) => sum + (p.amount || 0), 0);
-    return acc + monthPayments;
+    if (car && INVENTORY_ACTIVE_STATUSES.includes(car.status as VehicleStatus)) {
+      return acc + (car.purchase_price || 0);
+    }
+    return acc;
   }, 0);
 };
 
 /**
- * Calculates the total profit from sold cars in a given month.
- * Note: Still uses the 'profit' field which should be auto-updated in DB.
+ * Calculates the monthly revenue from REAL cash received (sale_payment_history).
+ * @deprecated Use FinanceService.calculateMonthlyRevenue instead.
+ */
+export const calculateMonthlyRevenue = (cars: Vehicle[], month: string) => {
+  return FinanceService.calculateMonthlyRevenue(cars, month);
+};
+
+/**
+ * Calculates the total profit from sold cars in a given month using SSoT financial calculations.
+ * @deprecated Use FinanceService.calculateMonthlySalesProfit instead.
  */
 export const calculateTotalProfit = (cars: Vehicle[], month: string) => {
-  return cars
-    .filter(c => c && c.status === VehicleStatus.SOLD && c.sale_date?.startsWith(month))
-    .reduce((acc, car) => acc + (car.profit || 0), 0);
+  return FinanceService.calculateMonthlySalesProfit(cars, month);
 };
 
 /**
@@ -51,8 +59,11 @@ export const calculateTotalSalaries = (staff: Staff[], cars: Vehicle[], month: s
  */
 export const calculateCurrentCarInvestment = (cars: Vehicle[]) => {
   return cars
-    .filter(c => c && [VehicleStatus.IN_STOCK, VehicleStatus.DEPOSIT_SALE, VehicleStatus.BANK_DEPOSIT, VehicleStatus.BANK_CONFIRMED].includes(c.status as VehicleStatus))
-    .reduce((acc, c) => acc + ((c.purchase_price || 0) + (c.total_cost || 0)), 0);
+    .filter(c => c && INVENTORY_ACTIVE_STATUSES.includes(c.status as VehicleStatus))
+    .reduce((acc, c) => {
+      const fin = calculateVehicleFinancials(c);
+      return acc + (fin.purchasePrice + fin.totalCost);
+    }, 0);
 };
 
 /**

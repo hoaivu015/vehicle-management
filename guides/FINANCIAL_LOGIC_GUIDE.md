@@ -107,13 +107,17 @@ export const calculateAgingDays = (purchaseDate: string | null | undefined): num
 
 ## Phần II: Chia sẻ Lợi nhuận Đối tác
 
-### 2.1 Nguyên tắc
+### 2.1 Nguyên tắc (Mô hình Quản lý Vốn Tập trung - Centralized Treasury)
 
-Showroom và Đối tác góp vốn đầu tư chung cho một chiếc xe dựa trên cơ chế đồng đầu tư (`is_coinvested = true`).
+Showroom và Đối tác/Nhân viên góp vốn đầu tư chung cho một chiếc xe dựa trên cơ chế đồng đầu tư (`is_coinvested = true`).
 
+*   **Đầu mối Dòng tiền (Centralized Cashflow)**: Công ty đứng ra nhận tiền góp vốn của Cá nhân (`+coinvest_amount` ghi nhận dòng tiền thu vào quỹ Showroom) và chi trả 100% tiền mua xe cho chủ cũ (`-purchase_price` trong `purchase_payment_history`).
 *   **Tổng Vốn Đầu Tư Cần Thiết**: `Giá nhập + Phí Spa/Dọn` (`totalInvestment`).
 *   **Vốn Góp Của Showroom**: `Tổng Vốn - Vốn Đối Tác Góp` (`totalInvestment - coinvestAmount`).
-*   **Chia sẻ Lợi nhuận**: Dựa trên **tỷ lệ góp vốn thực tế** nhân với **Lợi nhuận Ròng** (Lợi nhuận sau khi đã trừ hết hoa hồng mua, bán và thưởng).
+*   **Chia sẻ Lợi nhuận**: Dựa trên **tỷ lệ góp vốn thực tế** nhân với **Lợi nhuận Ròng** (Lợi nhuận sau khi đã trừ hết hoa hồng mua, bán và thưởng). Lợi nhuận của nhân viên được tự động gom vào **Bảng lương tháng** để chi trả 1 lần.
+*   **Xử lý Vốn gốc khi bán xe**:
+    *   *Hoàn trả (`partner_capital_repaid = true`)*: Xuất phiếu chi danh mục `Đối tác` $\rightarrow$ Trừ tiền mặt Showroom.
+    *   *Giữ lại tái đầu tư (Ký quỹ)*: Tiền vốn vẫn nằm trong quỹ Showroom làm hạn mức mua xe tiếp theo.
 
 ### 2.2 Công thức Toán học
 
@@ -137,10 +141,10 @@ if (isCoinvested && totalInvestment > 0) {
 
 ```
 [ĐẦU VÀO]
-  Giá nhập xe:     567.000.000 đ
+  Giá nhập xe:     567.000.000 đ (Showroom chi trả 100% cho chủ xe)
   Chi phí Spa/Dọn:   6.220.000 đ
-  Vốn đối tác góp: 143.000.000 đ (coinvest_amount)
-  Giá bán xe:      640.000.000 đ (sale_price)
+  Vốn đối tác góp: 143.000.000 đ (coinvest_amount - Đối tác nộp vào quỹ Showroom)
+  Giá bán xe:      640.000.000 đ (sale_price - Khách thanh toán 100% vào quỹ Showroom)
   Hoa hồng bán:     10.000.000 đ (commission)
 
 [TÍNH TOÁN]
@@ -150,7 +154,7 @@ if (isCoinvested && totalInvestment > 0) {
   4. Tỷ lệ Đối tác = 143.000.000 / 573.220.000 = 24.9471%
   5. Tỷ lệ Showroom= 1 - 24.9471% = 75.0529%
   
-  6. LN Đối tác nhận = 56.780.000 * 24.9471% = 14.164.981 đ ✅
+  6. LN Đối tác nhận = 56.780.000 * 24.9471% = 14.164.981 đ ✅ (Chi qua Bảng lương tháng)
   7. LN Showroom nhận= 56.780.000 * 75.0529% = 42.615.019 đ ✅
 ```
 
@@ -275,9 +279,10 @@ export const calcCompanyMonthlyNetProfit = (
 ```
 Số dư Tiền mặt = Vốn Điều lệ Ban đầu (totalCapital)
                 + Tổng Tiền bán xe thực thu từ khách (All-time Sale Payments)
+                + Tổng Tiền vốn góp đối tác nộp vào quỹ (All-time Co-investment Inflows)
                 - Tổng Tiền thực chi mua xe cho chủ cũ (All-time Purchase Payments)
                 - Tổng Tiền thực chi Spa/Dọn xe (All-time Car Costs)
-                - Tổng Chi phí Vận hành & Lương đã chi trả (All-time Operating Expenses)
+                - Tổng Chi phí Vận hành, Lương & Hoàn vốn Đối tác đã chi (All-time Operating Expenses)
 ```
 
 ```typescript
@@ -287,16 +292,24 @@ static calculateTotalCashBalance(
   vehicles: Vehicle[],
   allExpenses: Expense[]
 ): number {
-  const totalIncomes = vehicles.reduce((acc, v) => {
+  const totalSaleIncomes = vehicles.reduce((acc, v) => {
     return acc + (v.sale_payment_history || []).reduce((sum, p) => sum + (p.amount || 0), 0);
   }, 0);
+
+  const totalCoinvestInflows = vehicles
+    .filter(v => v.is_coinvested)
+    .reduce((acc, v) => acc + (v.coinvest_amount || 0), 0);
+
+  const totalIncomes = totalSaleIncomes + totalCoinvestInflows;
 
   const totalPurchaseOutflow = vehicles.reduce((acc, v) => {
     return acc + (v.purchase_payment_history || []).reduce((sum, p) => sum + (p.amount || 0), 0);
   }, 0);
 
   const totalCarCosts = vehicles.reduce((acc, v) => {
-    return acc + (v.cost_history || []).reduce((sum, c) => sum + (c.amount || 0), 0);
+    return acc + (v.cost_history || [])
+      .filter(c => !c.staff_id)
+      .reduce((sum, c) => sum + (c.amount || 0), 0);
   }, 0);
 
   const totalOpExpenses = allExpenses.reduce((acc, e) => acc + (e.amount || 0), 0);

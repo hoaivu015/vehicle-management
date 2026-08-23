@@ -1,4 +1,3 @@
-// @ts-expect-error - file-saver import without type definitions
 import { saveAs } from 'file-saver';
 
 export const exportToExcel = async (data: unknown[] | Record<string, unknown[]>, fileName: string) => {

@@ -192,14 +192,14 @@ export const MetricDrillDownModal: React.FC<MetricDrillDownModalProps> = ({
                     <div className="flex items-center justify-between sm:justify-end gap-6 pt-2 sm:pt-0 border-t sm:border-t-0 border-hairline-soft shrink-0">
                       <div className="text-left sm:text-right">
                         <span className="text-[9px] font-black uppercase tracking-wider text-sub-label block">
-                          {type === 'gross_profit' ? 'Lợi nhuận gộp' : type === 'sold_vehicles' ? 'Giá chốt bán' : 'Tổng giá vốn'}
+                          {type === 'gross_profit' ? 'Lợi nhuận Showroom' : type === 'sold_vehicles' ? 'Giá chốt bán' : 'Tổng giá vốn'}
                         </span>
                         <span className={cn(
                           "text-sm sm:text-base font-black tracking-tight",
                           type === 'gross_profit' ? "text-emerald-600" : "text-kraft-ink"
                         )}>
                           {type === 'gross_profit' 
-                            ? formatCurrency(fin.grossProfit) 
+                            ? formatCurrency(fin.showroomProfitShare) 
                             : type === 'sold_vehicles' 
                             ? formatCurrency(v.sale_price || 0)
                             : formatCurrency(fin.totalInvestment)

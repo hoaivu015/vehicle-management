@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateVehicleFinancials } from '../vehicle_calculations';
+import { calculateVehicleFinancials, calcVehicleReceivableDebt, calcVehiclePayableDebt } from '../vehicle_calculations';
 import { VehicleStatus } from '../../domain/constants';
 import { createMockVehicle } from './mock_data';
 
@@ -23,7 +23,7 @@ describe('Vehicle Calculations', () => {
     expect(financials.netProfit).toBe(300); // 400 - (50 + 20 + 30)
   });
 
-  it('should handle co-investment shares correctly', () => {
+  it('should handle co-investment shares correctly based on total investment', () => {
     const vehicle = createMockVehicle({
       purchase_price: 1000,
       total_cost: 100,
@@ -33,22 +33,22 @@ describe('Vehicle Calculations', () => {
       sale_price: 1500,
       status: VehicleStatus.SOLD,
       is_coinvested: true,
-      coinvest_amount: 220, // 20% of 1100 (1000+100)
+      coinvest_amount: 200, // 200 of 1100 total investment (purchase_price + total_cost)
     });
 
     const financials = calculateVehicleFinancials(vehicle);
     
     // Total capital needed = 1000 + 100 = 1100
-    // Coinvest = 220 (20%)
-    // Showroom = 880 (80%)
-    expect(financials.showroomCapital).toBe(880);
+    // Coinvest = 200
+    // Showroom capital = 1100 - 200 = 900
+    expect(financials.showroomCapital).toBe(900);
     expect(financials.isCoinvested).toBe(true);
     
-    // Net profit = 300
-    // Showroom share = 300 * 0.8 = 240
-    // Partner share = 300 - 240 = 60
-    expect(financials.showroomProfitShare).toBe(240);
-    expect(financials.partnerProfitShare).toBe(60);
+    // Net profit = 1500 - 1100 - 100 = 300
+    // Partner share = Math.round(300 * (200 / 1100)) = 55
+    // Showroom share = 300 - 55 = 245
+    expect(financials.partnerProfitShare).toBe(55);
+    expect(financials.showroomProfitShare).toBe(245);
   });
 
   it('should mark as estimated if not SOLD', () => {
@@ -81,5 +81,45 @@ describe('Vehicle Calculations', () => {
     });
     const financials = calculateVehicleFinancials(vehicle);
     expect(financials.netProfit).toBe(200);
+  });
+
+  it('should calculate receivable debt consistently across sale phases', () => {
+    // In-stock vehicle should have 0 receivable debt
+    const stockVehicle = createMockVehicle({
+      status: VehicleStatus.IN_STOCK,
+      sale_price: 1000,
+      received_amount: 0
+    });
+    expect(calcVehicleReceivableDebt(stockVehicle)).toBe(0);
+
+    // Deposit sale vehicle with partial payment
+    const depositVehicle = createMockVehicle({
+      status: VehicleStatus.DEPOSIT_SALE,
+      sale_price: 1000,
+      received_amount: 200
+    });
+    expect(calcVehicleReceivableDebt(depositVehicle)).toBe(800);
+
+    // Sold vehicle with outstanding customer debt
+    const soldVehicle = createMockVehicle({
+      status: VehicleStatus.SOLD,
+      sale_price: 1500,
+      received_amount: 1000
+    });
+    expect(calcVehicleReceivableDebt(soldVehicle)).toBe(500);
+  });
+
+  it('should calculate payable debt accurately for suppliers/sellers', () => {
+    const unpaidCar = createMockVehicle({
+      purchase_price: 1000,
+      purchase_paid_amount: 300
+    });
+    expect(calcVehiclePayableDebt(unpaidCar)).toBe(700);
+
+    const fullyPaidCar = createMockVehicle({
+      purchase_price: 1000,
+      purchase_paid_amount: 1000
+    });
+    expect(calcVehiclePayableDebt(fullyPaidCar)).toBe(0);
   });
 });

@@ -45,13 +45,14 @@ export const InfoItem = ({ icon: Icon, label, value }: InfoItemProps) => (
 interface StatCardProps {
   label: string;
   value: string | number;
+  subValue?: string;
   icon: LucideIcon;
   color?: 'emerald' | 'amber' | 'blue' | 'kraft';
   progress?: number;
   delay?: number;
 }
 
-export const StatCard = ({ icon: Icon, label, value, color, progress, delay = 0 }: StatCardProps) => (
+export const StatCard = ({ icon: Icon, label, value, subValue, color, progress, delay = 0 }: StatCardProps) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.95 }}
     animate={{ opacity: 1, scale: 1 }}
@@ -70,6 +71,9 @@ export const StatCard = ({ icon: Icon, label, value, color, progress, delay = 0 
     <div className="w-full flex flex-col justify-start">
       <p className="text-[10px] font-black uppercase tracking-widest text-sub-label opacity-60 mb-1">{label}</p>
       <p className="text-xl sm:text-2xl font-black text-kraft-ink tracking-tight leading-tight">{value}</p>
+      {subValue && (
+        <p className="text-[11px] font-bold text-emerald-600 mt-1 leading-none">{subValue}</p>
+      )}
     </div>
     {progress !== undefined && (
       <div className="w-full mt-4 space-y-2">

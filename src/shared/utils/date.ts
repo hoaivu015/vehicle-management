@@ -32,3 +32,23 @@ export const calculateAging = (purchaseDate: string, saleDate?: string): number 
   return diffCalendarDays(purchaseDate, saleDate);
 };
 
+/**
+ * Returns YYYY-MM-DD string in local timezone (GMT+7 safe)
+ */
+export const getTodayDateString = (date: Date = new Date()): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+/**
+ * Returns YYYY-MM string in local timezone (GMT+7 safe)
+ */
+export const getTodayMonthString = (date: Date = new Date()): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+};
+
+

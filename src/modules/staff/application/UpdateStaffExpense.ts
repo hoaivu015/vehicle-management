@@ -1,12 +1,15 @@
 import { Staff, StaffExpense } from '../../../shared/domain/types';
 import { StaffRepository } from '../domain/StaffRepository';
 import { VehicleRepository } from '../../inventory/domain/VehicleRepository';
+import { ExpenseRepository } from '../../finance/domain/ExpenseRepository';
+import { StaffSalaryService } from '../domain/StaffSalaryService';
 import { UpdateStaffExpenseSchema, UpdateStaffExpenseInput } from '../domain/StaffValidation';
 
 export class UpdateStaffExpense {
   constructor(
     private readonly repository: StaffRepository,
-    private readonly vehicleRepository: VehicleRepository
+    private readonly vehicleRepository: VehicleRepository,
+    private readonly expenseRepository?: ExpenseRepository
   ) { }
 
   async execute(staffId: string | number, expenseId: string, input: UpdateStaffExpenseInput): Promise<Staff> {
@@ -22,6 +25,32 @@ export class UpdateStaffExpense {
     }
 
     const existingExpense = (staff.expenses || []).find(exp => exp.id === expenseId);
+
+    // 0. Sync salary advance with operating_expenses
+    if (existingExpense && StaffSalaryService.isSalaryAdvance(existingExpense) && this.expenseRepository) {
+      const oldAdvanceName = `Tạm ứng lương: ${existingExpense.note} (${staff.name} - ${staff.code})`;
+      await this.expenseRepository.deleteByNameAndCategory(oldAdvanceName, 'Tạm ứng lương');
+
+      const isStillAdvance = updateData.category === 'Tạm ứng lương' || 
+        updateData.type === 'advance' || 
+        (updateData.note || '').toLowerCase().includes('tạm ứng') || 
+        (updateData.note || '').toLowerCase().includes('ứng lương') ||
+        existingExpense.category === 'Tạm ứng lương';
+
+      if (isStillAdvance) {
+        const newNote = updateData.note !== undefined ? updateData.note : existingExpense.note;
+        const newAmount = updateData.amount !== undefined ? updateData.amount : existingExpense.amount;
+        const newDate = updateData.date || existingExpense.date || new Date().toISOString().split('T')[0];
+        
+        await this.expenseRepository.add({
+          name: `Tạm ứng lương: ${newNote} (${staff.name} - ${staff.code})`,
+          amount: newAmount,
+          category: 'Tạm ứng lương',
+          date: newDate,
+          created_at: new Date().toISOString()
+        });
+      }
+    }
 
     // 1. If vehicle changed or type switched to operating, remove from old vehicle
     if (existingExpense?.type === 'vehicle' && existingExpense.vehicleId &&

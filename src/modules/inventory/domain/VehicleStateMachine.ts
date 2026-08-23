@@ -40,8 +40,7 @@ export class VehicleStateMachine {
       seller: undefined,
       customer_name: undefined, 
       commission: undefined,
-      received_amount: 0,
-      sale_payment_history: []
+      received_amount: 0
     };
 
     // Khi về kho (IN_STOCK) hoặc các trạng thái trước đó, cần xóa trắng thông tin lượt bán cũ

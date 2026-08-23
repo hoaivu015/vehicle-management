@@ -15,3 +15,7 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+declare module 'file-saver' {
+  export function saveAs(data: Blob | string, filename?: string, options?: unknown): void;
+}

@@ -100,8 +100,13 @@ export class GetFinancialOverview {
     ]);
     const totalCapital = settings.total_capital || 0;
 
-    const inventoryVehicles = vehicles.filter(v => v.status !== VehicleStatus.SOLD);
-    const inventoryValue = inventoryVehicles.reduce((acc, v) => acc + ((v.purchase_price || 0) - (v.coinvest_amount || 0)) + (v.total_cost || 0), 0);
+    const inventoryVehicles = vehicles.filter(v => 
+      v.status !== VehicleStatus.SOLD && v.status !== VehicleStatus.DEPOSIT_BUY
+    );
+    const inventoryValue = inventoryVehicles.reduce((acc, v) => {
+      const fin = calculateVehicleFinancials(v);
+      return acc + fin.purchasePrice + fin.totalCost;
+    }, 0);
     
     // Correct Cash Balance Calculation
     const availableCash = FinanceService.calculateTotalCashBalance(
@@ -110,24 +115,23 @@ export class GetFinancialOverview {
       allOpExpenses
     );
 
-    const monthlyRevenue = FinanceService.calculateMonthlyRevenue(vehicles, month);
+    const monthLedger = FinanceService.buildUnifiedLedger(vehicles, allOpExpenses, month);
+    const monthlyRevenue = monthLedger.filter(e => e.scope === 'sale').reduce((sum, e) => sum + e.amount, 0);
+    const otherInflows = monthLedger.filter(e => e.type === 'inflow' && e.scope === 'other_income').reduce((sum, e) => sum + e.amount, 0);
     const monthlySalesProfit = FinanceService.calculateMonthlySalesProfit(vehicles, month);
     
-    // Helper to exclude payroll expenses from operational expenses to prevent double-deduction
-    const isPayrollExpense = (e: Expense) => 
-      e.category === 'Lương nhân sự' || (e.name || '').startsWith('Chi lương tháng');
-
-    // Operating Expenses for the Month (excluding salary expenses)
-    const monthlyOpExpenses = allOpExpenses.filter(e => e.date?.startsWith(month) && !isPayrollExpense(e));
-    const opExpensesTotal = monthlyOpExpenses.reduce((acc, e) => acc + (e.amount || 0), 0);
+    // Operating Expenses for P&L (excluding salary, advance, partner payouts & car costs already in COGS)
+    const opExpensesTotal = monthLedger
+      .filter(e => e.scope === 'operating' && e.category !== 'Chi phí xe')
+      .reduce((acc, e) => acc + e.amount, 0);
     
-    // Staff Salaries for the Month (Total Compensation including Commissions)
+    // Staff Salaries for the Month (Regular Compensation excluding Co-invest Profit Shares already deducted in Sales Profit)
     const salaryCalculations = FinanceService.calculateMonthlySalaries(staff, vehicles, month);
-    const totalSalariesTotal = salaryCalculations.reduce((acc, s) => acc + (s.totalIncome || 0), 0);
+    const totalRegularSalaries = salaryCalculations.reduce((acc, s) => acc + (s.regularIncome ?? (s.totalIncome - (s.coinvestProfitShare || 0))), 0);
     
     const grossProfit = monthlySalesProfit;
-    const netProfit = grossProfit - opExpensesTotal;
-    const finalNetProfit = calcCompanyMonthlyNetProfit(monthlySalesProfit, opExpensesTotal, totalSalariesTotal);
+    const netProfit = grossProfit + otherInflows - opExpensesTotal;
+    const finalNetProfit = calcCompanyMonthlyNetProfit(monthlySalesProfit, opExpensesTotal, totalRegularSalaries, otherInflows);
 
     // Counts
     const soldVehiclesInMonth = vehicles.filter(v => v.status === VehicleStatus.SOLD && v.sale_date?.startsWith(month));
@@ -199,13 +203,15 @@ export class GetFinancialOverview {
     const monthlyTrend12M: MonthlyTrendPoint[] = [];
     for (let i = 11; i >= 0; i--) {
       const mStr = this.subtractMonths(month, i);
-      const mRevenue = FinanceService.calculateMonthlyRevenue(vehicles, mStr);
+      const mLedger = FinanceService.buildUnifiedLedger(vehicles, allOpExpenses, mStr);
+      const mRevenue = mLedger.filter(e => e.scope === 'sale').reduce((sum, e) => sum + e.amount, 0);
+      const mOtherInflows = mLedger.filter(e => e.type === 'inflow' && e.scope === 'other_income').reduce((sum, e) => sum + e.amount, 0);
       const mSalesProfit = FinanceService.calculateMonthlySalesProfit(vehicles, mStr);
-      const mOpExpenses = allOpExpenses
-        .filter(e => e.date?.startsWith(mStr) && !isPayrollExpense(e))
-        .reduce((sum, e) => sum + (e.amount || 0), 0);
-      const mSalaries = FinanceService.calculateMonthlySalaries(staff, vehicles, mStr).reduce((sum, s) => sum + (s.totalIncome || 0), 0);
-      const mFinalNet = calcCompanyMonthlyNetProfit(mSalesProfit, mOpExpenses, mSalaries);
+      const mOpExpenses = mLedger
+        .filter(e => e.scope === 'operating' && e.category !== 'Chi phí xe')
+        .reduce((sum, e) => sum + e.amount, 0);
+      const mSalaries = FinanceService.calculateMonthlySalaries(staff, vehicles, mStr).reduce((sum, s) => sum + (s.regularIncome ?? (s.totalIncome - (s.coinvestProfitShare || 0))), 0);
+      const mFinalNet = calcCompanyMonthlyNetProfit(mSalesProfit, mOpExpenses, mSalaries, mOtherInflows);
       const mSoldCount = vehicles.filter(v => v.status === VehicleStatus.SOLD && v.sale_date?.startsWith(mStr)).length;
       const mBoughtCount = vehicles.filter(v => v.purchase_date?.startsWith(mStr)).length;
 
@@ -215,7 +221,7 @@ export class GetFinancialOverview {
         label: `T${m}`,
         revenue: mRevenue,
         grossProfit: mSalesProfit,
-        netProfit: mSalesProfit - mOpExpenses,
+        netProfit: mSalesProfit + mOtherInflows - mOpExpenses,
         finalNetProfit: mFinalNet,
         soldCount: mSoldCount,
         boughtCount: mBoughtCount
@@ -223,8 +229,8 @@ export class GetFinancialOverview {
     }
 
     // Expense Breakdown for the Month
-    const monthlyCarCosts = FinanceService.calculateMonthlyCarCosts(vehicles, month);
-    const monthlyCommissions = salaryCalculations.reduce((acc, s) => acc + (s.salesCommission || 0) + (s.buyingCommission || 0), 0);
+    const monthlyCarCosts = FinanceService.calculateMonthlyCarCosts(vehicles, month, true);
+    const monthlyCommissions = salaryCalculations.reduce((acc, s) => acc + (s.salesCommission || 0) + (s.buyingCommission || 0) + (s.buyingBonus || 0), 0);
     const monthlyBaseSalaries = salaryCalculations.reduce((acc, s) => acc + (s.baseSalary || 0), 0);
     const totalOutflowExpenses = monthlyCarCosts + monthlyCommissions + opExpensesTotal + monthlyBaseSalaries;
 
@@ -262,11 +268,11 @@ export class GetFinancialOverview {
     // Sales Leaderboard for the Month
     const salesLeaderboard: SalesLeaderboardItem[] = staff
       .map(s => {
-        const staffSoldCars = vehicles.filter(v => 
-          v.status === VehicleStatus.SOLD && 
-          v.sale_date?.startsWith(month) && 
-          (v.seller === s.code || v.seller === s.name)
-        );
+        const staffSoldCars = vehicles.filter(v => {
+          if (v.status !== VehicleStatus.SOLD || !v.sale_date?.startsWith(month) || !v.seller) return false;
+          const sellerLower = v.seller.trim().toLowerCase();
+          return (s.code && sellerLower === s.code.trim().toLowerCase()) || (s.name && sellerLower === s.name.trim().toLowerCase());
+        });
         const staffRevenue = staffSoldCars.reduce((acc, v) => acc + (v.sale_price || 0), 0);
         const staffProfit = staffSoldCars.reduce((acc, v) => {
           const fin = calculateVehicleFinancials(v);
@@ -281,7 +287,7 @@ export class GetFinancialOverview {
           soldCount: staffSoldCars.length,
           totalRevenue: staffRevenue,
           grossProfitContribution: staffProfit,
-          commission: (sCal?.salesCommission || 0) + (sCal?.buyingCommission || 0)
+          commission: sCal?.salesCommission || 0
         };
       })
       .filter(item => item.soldCount > 0 || item.commission > 0)
@@ -295,7 +301,10 @@ export class GetFinancialOverview {
           return acc + activeDays;
         }, 0) / inventoryVehicles.length)
       : 0;
-    const profitMarginPercent = monthlyRevenue > 0 ? Math.round((grossProfit / monthlyRevenue) * 100) : 0;
+    const contractualRevenue = FinanceService.calculateMonthlyContractRevenue(vehicles, month);
+    const profitMarginPercent = contractualRevenue > 0 
+      ? Math.round((grossProfit / contractualRevenue) * 100) 
+      : (monthlyRevenue > 0 ? Math.round((grossProfit / monthlyRevenue) * 100) : 0);
 
     return {
       monthlyRevenue,
@@ -332,14 +341,15 @@ export class GetFinancialOverview {
     staff: import('../../../shared/domain/types').Staff[]
   ): number {
     const monthlySalesProfit = FinanceService.calculateMonthlySalesProfit(vehicles, month);
-    const isPayrollExpense = (e: import('../domain/FinanceService').Expense) => 
-      e.category === 'Lương nhân sự' || (e.name || '').startsWith('Chi lương tháng');
-    const monthlyOpExpenses = allOpExpenses.filter(e => e.date?.startsWith(month) && !isPayrollExpense(e));
-    const opExpensesTotal = monthlyOpExpenses.reduce((acc, e) => acc + (e.amount || 0), 0);
+    const mLedger = FinanceService.buildUnifiedLedger(vehicles, allOpExpenses, month);
+    const mOtherInflows = mLedger.filter(e => e.type === 'inflow' && e.scope === 'other_income').reduce((sum, e) => sum + e.amount, 0);
+    const opExpensesTotal = mLedger
+      .filter(e => e.scope === 'operating' && e.category !== 'Chi phí xe')
+      .reduce((acc, e) => acc + e.amount, 0);
     const salaryCalculations = FinanceService.calculateMonthlySalaries(staff, vehicles, month);
-    const totalSalariesTotal = salaryCalculations.reduce((acc, s) => acc + (s.totalIncome || 0), 0);
+    const totalRegularSalaries = salaryCalculations.reduce((acc, s) => acc + (s.regularIncome ?? (s.totalIncome - (s.coinvestProfitShare || 0))), 0);
     
-    return calcCompanyMonthlyNetProfit(monthlySalesProfit, opExpensesTotal, totalSalariesTotal);
+    return calcCompanyMonthlyNetProfit(monthlySalesProfit, opExpensesTotal, totalRegularSalaries, mOtherInflows);
   }
 
   private subtractMonths(monthStr: string, months: number): string {

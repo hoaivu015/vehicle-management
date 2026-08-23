@@ -108,12 +108,24 @@ export const CarTable: React.FC<CarTableProps> = ({ cars, onUpdateVehicle, userR
               {car._type === 'collaboration' && (
                 <div className="flex items-center justify-between p-3 bg-surface-soft rounded-2xl border border-hairline-soft">
                   <span className="text-[10px] font-black text-sub-label uppercase tracking-widest opacity-60">Trạng thái vốn</span>
-                  <span className={cn(
-                    "text-[10px] font-black uppercase px-2.5 py-1 rounded-full border tracking-widest shadow-sm",
-                    car.partner_capital_repaid ? "text-income bg-income/5 border-income/10" : "text-warning bg-warning/5 border-warning/10"
-                  )}>
-                    {car.partner_capital_repaid ? 'Đã hoàn' : 'Chờ hoàn'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={cn(
+                      "text-[10px] font-black uppercase px-2.5 py-1 rounded-full border tracking-widest shadow-sm",
+                      car.partner_capital_repaid 
+                        ? "text-income bg-income/5 border-income/20" 
+                        : "text-blue-600 bg-blue-50 border-blue-200"
+                    )}>
+                      {car.partner_capital_repaid ? 'Đã hoàn trả' : 'Đang giữ ký quỹ'}
+                    </span>
+                    {onUpdateVehicle && canApprovePayout && !car.partner_capital_repaid && (
+                      <button
+                        onClick={() => onUpdateVehicle(car.id, { partner_capital_repaid: true })}
+                        className="px-2.5 py-1 bg-blue-600 text-white rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-blue-700 transition-colors shadow-sm"
+                      >
+                        Trả vốn
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -191,13 +203,25 @@ export const CarTable: React.FC<CarTableProps> = ({ cars, onUpdateVehicle, userR
                         </div>
                       )}
 
-                      {car._type === 'collaboration' && !car.partner_profit_shared && income > 0 && onUpdateVehicle && canApprovePayout && (
-                        <button 
-                          onClick={() => onUpdateVehicle(car.id, { partner_profit_shared: true })}
-                          className="px-3 py-1 bg-warning text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-warning/80 transition-all shadow-kraft-deep active:scale-95"
-                        >
-                          Chi lợi nhuận
-                        </button>
+                      {car._type === 'collaboration' && (
+                        <div className="flex items-center gap-2 flex-wrap justify-end">
+                          {onUpdateVehicle && !car.partner_capital_repaid && canApprovePayout && (
+                            <button 
+                              onClick={() => onUpdateVehicle(car.id, { partner_capital_repaid: true })}
+                              className="px-3 py-1 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-kraft-deep active:scale-95"
+                            >
+                              Trả vốn
+                            </button>
+                          )}
+                          {!car.partner_profit_shared && income > 0 && onUpdateVehicle && canApprovePayout && (
+                            <button 
+                              onClick={() => onUpdateVehicle(car.id, { partner_profit_shared: true })}
+                              className="px-3 py-1 bg-warning text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-warning/80 transition-all shadow-kraft-deep active:scale-95"
+                            >
+                              Chi lợi nhuận
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   </td>

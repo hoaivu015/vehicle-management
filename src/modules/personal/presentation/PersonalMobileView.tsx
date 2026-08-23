@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useMemo } from 'react';
 import { Calendar, LogOut, Key, UserCircle, DollarSign, Clock, CheckCircle2, Car, Settings, Edit2, Trash2, ShoppingBag, ArrowUpRight, Award, Share2, ReceiptText, ChevronRight } from 'lucide-react';
 import { StaffSalaryService, SalaryDetails } from '@/src/modules/staff/domain/StaffSalaryService';
 import { UserRole, VehicleStatus } from '@/src/shared/domain/constants';
@@ -162,6 +162,22 @@ export const PersonalMobileView: React.FC<PersonalMobileViewProps> = ({
     });
   }, [staffRepo]);
 
+  // Lấy toàn bộ xe người này đang góp vốn (cả đang trong kho lẫn đã bán)
+  const userCode = user?.code || '';
+  const allMyCoinvestedCars = useMemo(() => {
+    if (!userCode) return [];
+    return allVehicles.filter((v: Vehicle) => 
+      v.is_coinvested && 
+      (v.coinvestor_code || '').trim().toLowerCase() === userCode.trim().toLowerCase()
+    );
+  }, [allVehicles, userCode]);
+
+  const totalHeldCapital = useMemo(() => {
+    return allMyCoinvestedCars
+      .filter((v: Vehicle) => !v.partner_capital_repaid)
+      .reduce((sum: number, v: Vehicle) => sum + (v.coinvest_amount || 0), 0);
+  }, [allMyCoinvestedCars]);
+
   if (isInitialLoading) {
     return <PersonalMobileSkeleton />;
   }
@@ -247,6 +263,20 @@ export const PersonalMobileView: React.FC<PersonalMobileViewProps> = ({
                 +<AnimatedNumber value={salaryDetails.totalCommission} isCurrency={true} />
               </div>
             </div>
+            {totalHeldCapital > 0 && (
+              <div className="col-span-2 pt-3 mt-1 border-t border-white/10 flex items-center justify-between">
+                <div>
+                  <div className="text-[9px] uppercase font-black opacity-40 tracking-wider">Vốn gửi Công ty (Ký quỹ)</div>
+                  <div className="font-bold text-sm text-indigo-300">{formatCurrency(totalHeldCapital)}</div>
+                </div>
+                {salaryDetails.coinvestProfitShare > 0 && (
+                  <div className="text-right">
+                    <div className="text-[9px] uppercase font-black opacity-40 tracking-wider">Lãi góp vốn tháng</div>
+                    <div className="font-bold text-sm text-emerald-400">+{formatCurrency(salaryDetails.coinvestProfitShare)}</div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -386,6 +416,8 @@ export const PersonalMobileView: React.FC<PersonalMobileViewProps> = ({
           
           <SalaryStatement 
             salaryDetails={salaryDetails} 
+            allCoinvestedCars={allMyCoinvestedCars}
+            selectedMonth={selectedMonth}
             onSelectVehicle={handleSelectCar}
           />
         </div>
@@ -510,13 +542,19 @@ interface SalaryStatementItem {
   vehicle: Vehicle;
 }
 
+interface SalaryStatementProps {
+  salaryDetails: SalaryDetails;
+  allCoinvestedCars?: Vehicle[];
+  selectedMonth?: string;
+  onSelectVehicle: (vehicle: Vehicle) => void;
+}
+
 const SalaryStatement = ({ 
   salaryDetails, 
+  allCoinvestedCars = [],
+  selectedMonth = '',
   onSelectVehicle 
-}: { 
-  salaryDetails: SalaryDetails;
-  onSelectVehicle: (vehicle: Vehicle) => void;
-}) => {
+}: SalaryStatementProps) => {
   const items: SalaryStatementItem[] = [];
 
   // 1. Xe bán
@@ -563,20 +601,25 @@ const SalaryStatement = ({
   });
 
   // 3. Góp vốn
-  salaryDetails.coinvestedCars.forEach((c: Vehicle) => {
+  const coinvestList = allCoinvestedCars.length > 0 ? allCoinvestedCars : salaryDetails.coinvestedCars;
+  coinvestList.forEach((c: Vehicle) => {
     const financials = calculateVehicleFinancials(c);
-    const amount = c.partner_profit_shared ? 0 : financials.partnerProfitShare;
-    if (amount > 0) {
-      items.push({
-        id: `coinvest-${c.id}`,
-        title: c.name,
-        subtitle: `Góp vốn: #${c.code}`,
-        amount: amount,
-        icon: Share2,
-        color: 'emerald',
-        vehicle: c
-      });
-    }
+    const isSold = c.status === VehicleStatus.SOLD;
+    const isPayableThisMonth = isSold && ((c.sale_date || '').startsWith(selectedMonth) || (!c.partner_profit_shared && (c.sale_date || '') < selectedMonth));
+    const amount = isPayableThisMonth ? (c.partner_profit_shared ? 0 : financials.partnerProfitShare) : 0;
+    const statusLabel = isSold
+      ? (c.partner_capital_repaid ? 'Đã bán • Đã hoàn vốn' : 'Đã bán • Giữ ký quỹ')
+      : 'Đang lưu kho';
+
+    items.push({
+      id: `coinvest-${c.id}`,
+      title: c.name,
+      subtitle: `Vốn: ${formatCurrency(financials.coinvestAmount)} • ${statusLabel}`,
+      amount: amount,
+      icon: Share2,
+      color: 'emerald',
+      vehicle: c
+    });
   });
 
   if (items.length === 0) {
@@ -653,7 +696,8 @@ const UnifiedExpenseList: React.FC<UnifiedExpenseListProps> = ({
   onEdit,
   onDelete
 }) => {
-  const pending = expenses.filter(e => !e.is_reimbursed).sort((a, b) => b.date.localeCompare(a.date));
+  const pendingReimbursements = expenses.filter(e => !e.is_reimbursed && !StaffSalaryService.isSalaryAdvance(e)).sort((a, b) => b.date.localeCompare(a.date));
+  const pendingAdvances = expenses.filter(e => !e.is_reimbursed && StaffSalaryService.isSalaryAdvance(e)).sort((a, b) => b.date.localeCompare(a.date));
   const reimbursed = expenses.filter(e => e.is_reimbursed && e.date.startsWith(selectedMonth)).sort((a, b) => b.date.localeCompare(a.date));
 
   if (expenses.length === 0) {
@@ -666,89 +710,107 @@ const UnifiedExpenseList: React.FC<UnifiedExpenseListProps> = ({
     );
   }
 
-  const renderCard = (exp: StaffExpense, index: number) => (
-    <motion.div 
-      key={exp.id} 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, delay: index * 0.04 }}
-      className="group relative bg-white py-3 px-4 rounded-[1.5rem] border border-black/5 shadow-sm active:scale-[0.98] transition-transform"
-    >
-      <div className="flex justify-between items-start mb-1">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className={cn(
-            "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
-            exp.type === 'vehicle' ? "bg-blue-50 text-blue-500" : "bg-kraft-accent/10 text-kraft-accent"
-          )}>
-            {exp.type === 'vehicle' ? <Car size={16} /> : <Settings size={16} />}
-          </div>
-          <div className="min-w-0">
-            <div className="text-xs font-black text-kraft-ink leading-tight truncate">{exp.note}</div>
-            <div className="text-[9px] font-bold opacity-40 uppercase tracking-wider mt-0.5">
-              {formatDate(exp.date)} {exp.vehicle_code ? `• #${exp.vehicle_code}` : ''}
+  const renderCard = (exp: StaffExpense, index: number) => {
+    const isAdvance = StaffSalaryService.isSalaryAdvance(exp);
+    return (
+      <motion.div 
+        key={exp.id} 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, delay: index * 0.04 }}
+        className="group relative bg-white py-3 px-4 rounded-[1.5rem] border border-black/5 shadow-sm active:scale-[0.98] transition-transform"
+      >
+        <div className="flex justify-between items-start mb-1">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className={cn(
+              "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
+              isAdvance ? "bg-amber-50 text-amber-600" : exp.type === 'vehicle' ? "bg-blue-50 text-blue-500" : "bg-kraft-accent/10 text-kraft-accent"
+            )}>
+              {isAdvance ? <DollarSign size={16} /> : exp.type === 'vehicle' ? <Car size={16} /> : <Settings size={16} />}
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs font-black text-kraft-ink leading-tight truncate">{exp.note}</div>
+              <div className="text-[9px] font-bold opacity-40 uppercase tracking-wider mt-0.5">
+                {formatDate(exp.date)} {exp.vehicle_code ? `• #${exp.vehicle_code}` : ''}
+              </div>
             </div>
           </div>
+          <div className={cn(
+            "text-xs font-black whitespace-nowrap pl-2",
+            isAdvance ? "text-amber-600" : "text-kraft-ink"
+          )}>
+            {isAdvance ? `-${formatCurrency(exp.amount)}` : `+${formatCurrency(exp.amount)}`}
+          </div>
         </div>
-        <div className="text-xs font-black text-kraft-ink whitespace-nowrap pl-2">
-          {formatCurrency(exp.amount)}
-        </div>
-      </div>
 
-      <div className="flex items-center justify-between mt-2 pt-1 border-t border-black/5">
-        <span className={cn(
-          "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-black text-[8px] uppercase tracking-widest",
-          exp.is_reimbursed ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
-        )}>
-          {exp.is_reimbursed ? <CheckCircle2 size={9} /> : <Clock size={9} />}
-          {exp.is_reimbursed ? 'Đã hoàn ứng' : 'Chờ duyệt chi'}
-        </span>
+        <div className="flex items-center justify-between mt-2 pt-1 border-t border-black/5">
+          <span className={cn(
+            "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-black text-[8px] uppercase tracking-widest",
+            isAdvance 
+              ? exp.is_reimbursed ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
+              : exp.is_reimbursed ? "bg-emerald-50 text-emerald-600" : "bg-blue-50 text-blue-600"
+          )}>
+            {exp.is_reimbursed ? <CheckCircle2 size={9} /> : <Clock size={9} />}
+            {isAdvance 
+              ? (exp.is_reimbursed ? 'Đã khấu trừ lương' : 'Tạm ứng • Trừ vào lương')
+              : (exp.is_reimbursed ? 'Đã hoàn ứng' : 'Chi hộ • Chờ hoàn tiền')}
+          </span>
 
-        <div className="flex items-center gap-1">
-          {!exp.is_reimbursed && (
+          <div className="flex items-center gap-1">
+            {!exp.is_reimbursed && (
+              <motion.button 
+                whileTap={{ scale: 0.9 }}
+                onClick={(e) => { e.stopPropagation(); onEdit(exp); }}
+                className="w-7 h-7 flex items-center justify-center text-kraft-ink/30 hover:text-kraft-accent active:bg-black/5 rounded-lg transition-colors"
+              >
+                <Edit2 size={13} />
+              </motion.button>
+            )}
             <motion.button 
               whileTap={{ scale: 0.9 }}
-              onClick={(e) => { e.stopPropagation(); onEdit(exp); }}
-              className="w-7 h-7 flex items-center justify-center text-kraft-ink/30 hover:text-kraft-accent active:bg-black/5 rounded-lg transition-colors"
+              onClick={(e) => { e.stopPropagation(); onDelete(exp.id); }}
+              className="w-7 h-7 flex items-center justify-center text-kraft-ink/30 hover:text-red-500 active:bg-red-50 rounded-lg transition-colors"
             >
-              <Edit2 size={13} />
+              <Trash2 size={13} />
             </motion.button>
-          )}
-          <motion.button 
-            whileTap={{ scale: 0.9 }}
-            onClick={(e) => { 
-              e.stopPropagation(); 
-              if (window.confirm('Xóa khoản chi này?')) onDelete(exp.id); 
-            }}
-            className="w-7 h-7 flex items-center justify-center text-kraft-ink/30 hover:text-red-500 active:bg-red-50 rounded-lg transition-colors"
-          >
-            <Trash2 size={13} />
-          </motion.button>
+          </div>
         </div>
-      </div>
-    </motion.div>
-  );
+      </motion.div>
+    );
+  };
 
   return (
     <div className="space-y-4">
-      {pending.length > 0 && (
-        <div className="space-y-2.5">
-          <div className="flex items-center gap-2 px-1">
-            <Clock size={11} className="text-amber-500" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-amber-600">Chờ hoàn tiền ({pending.length})</span>
-            <div className="h-px flex-1 bg-amber-500/10" />
+      {pendingReimbursements.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-[9px] font-black uppercase tracking-wider text-blue-600 px-2">
+            Khoản chi hộ chờ hoàn ({pendingReimbursements.length})
           </div>
-          {pending.map((exp, i) => renderCard(exp, i))}
+          <div className="space-y-2.5">
+            {pendingReimbursements.map((exp, i) => renderCard(exp, i))}
+          </div>
+        </div>
+      )}
+
+      {pendingAdvances.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-[9px] font-black uppercase tracking-wider text-amber-600 px-2">
+            Khoản đã tạm ứng lương ({pendingAdvances.length})
+          </div>
+          <div className="space-y-2.5">
+            {pendingAdvances.map((exp, i) => renderCard(exp, i))}
+          </div>
         </div>
       )}
 
       {reimbursed.length > 0 && (
-        <div className="space-y-2.5">
-          <div className="flex items-center gap-2 px-1">
-            <CheckCircle2 size={11} className="text-emerald-500" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">Đã chi tháng {selectedMonth.split('-')[1]} ({reimbursed.length})</span>
-            <div className="h-px flex-1 bg-emerald-500/10" />
+        <div className="space-y-2">
+          <div className="text-[9px] font-black uppercase tracking-wider text-emerald-600 px-2">
+            Đã quyết toán tháng {selectedMonth.split('-')[1]} ({reimbursed.length})
           </div>
-          {reimbursed.map((exp, i) => renderCard(exp, i))}
+          <div className="space-y-2.5">
+            {reimbursed.map((exp, i) => renderCard(exp, i))}
+          </div>
         </div>
       )}
     </div>

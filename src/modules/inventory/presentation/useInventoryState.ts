@@ -182,8 +182,10 @@ export const useInventoryState = ({
   const handleAddSalePayment = (id: number, amount: number, note: string, receiver: string, nextStatus: VehicleStatus, seller: string, buyerName?: string, salePrice?: number, commission?: number, buyingBonus?: number) => 
     executeAction(() => presenter.addSalePayment(id, amount, note, receiver, nextStatus, seller, buyerName, salePrice, commission, buyingBonus, userRole), { successMessage: 'Giao dịch thành công!' });
 
-  const handleCancelSale = (id: number, userCode: string) => 
-    executeAction(() => presenter.cancelSale(id, userCode, userRole), { successMessage: 'Đã hủy giao dịch!' });
+  const handleCancelSale = (id: number, userCode: string, cancelType?: 'REFUND' | 'FORFEIT') => 
+    executeAction(() => presenter.cancelSale(id, userCode, cancelType, userRole), { 
+      successMessage: cancelType === 'FORFEIT' ? 'Đã hủy giao dịch và tịch thu tiền cọc!' : 'Đã hủy giao dịch và hoàn tiền cọc!' 
+    });
 
   return {
     availableCars,

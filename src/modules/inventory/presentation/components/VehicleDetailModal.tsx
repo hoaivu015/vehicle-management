@@ -28,7 +28,7 @@ interface VehicleDetailModalProps {
    onPin: (id: number, isPinned: boolean) => Promise<void>;
    onAddPurchasePayment: (id: number, amount: number, note: string, receiver: string) => Promise<void>;
    onAddSalePayment: (id: number, amount: number, note: string, receiver: string, nextStatus: VehicleStatus, seller: string, buyerName?: string, salePrice?: number, commission?: number, buyingBonus?: number) => Promise<void>;
-   onCancelSale: (id: number, userCode: string) => Promise<void>;
+   onCancelSale: (id: number, userCode: string, cancelType?: 'REFUND' | 'FORFEIT') => Promise<void>;
    staffList: Staff[];
    userRole: string;
    userCode: string;
@@ -41,7 +41,7 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = (props) => 
       editForm, setEditForm, paymentForm, setPaymentForm,
       transitionStatus, setTransitionStatus,
       isSubmitting, showDeleteConfirm, setShowDeleteConfirm,
-      isUploadingImage, handleUpdateStatus, handleDeleteVehicle, handleAddCost,
+      isUploadingImage, handleUpdateStatus, handleDeleteVehicle, handleUpdateVehicle, handleAddCost,
       handleDeleteCost, handlePin, handleAddPurchasePayment, handleAddSalePayment, handleCancelSale,
       handleStartEdit, handleSaveEdit, handleImageUpload, financials
    } = useVehicleDetail(vehicle, userCode, props);
@@ -91,7 +91,8 @@ export const VehicleDetailModal: React.FC<VehicleDetailModalProps> = (props) => 
                   onDeleteCost: handleDeleteCost,
                   onAddPurchasePayment: handleAddPurchasePayment,
                   onAddSalePayment: handleAddSalePayment,
-                  onCancelSale: handleCancelSale
+                  onCancelSale: handleCancelSale,
+                  onUpdateVehicle: handleUpdateVehicle
                }}
             />
          );

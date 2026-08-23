@@ -4,8 +4,7 @@ import { motion } from 'motion/react';
 import { UserRole, USER_ROLE_LABELS } from '@/src/shared/domain/constants';
 import { useUserManagement } from '../hooks/useUserManagement';
 import { BaseModal } from '@/src/shared/design-system';
-
-import { UserProfile } from '@/src/modules/user/domain/UserRepository';
+import { UserProfile } from '../../domain/UserRepository';
 
 export const UserManagement = () => {
   const { uniqueUsers, showAddModal, setShowAddModal, editingId, setEditingId, formData, setFormData, handleSubmit, handleUpdate, presenter } = useUserManagement();
@@ -64,7 +63,7 @@ export const UserManagement = () => {
   );
 };
 
-interface UserCardProps {
+const UserCard = ({ user, isEditing, onEdit, onCancel, onUpdate, onDelete, formData, setFormData }: {
   user: UserProfile;
   isEditing: boolean;
   onEdit: () => void;
@@ -73,60 +72,67 @@ interface UserCardProps {
   onDelete: () => void;
   formData: { name: string; email: string; role: UserRole; password: string };
   setFormData: React.Dispatch<React.SetStateAction<{ name: string; email: string; role: UserRole; password: string }>>;
-}
-
-const UserCard = ({ user, isEditing, onEdit, onCancel, onUpdate, onDelete, formData, setFormData }: UserCardProps) => (
-  <motion.div layout className="highlight-card p-4 md:p-8 group relative overflow-hidden">
-    <div className="flex items-start justify-between mb-4 md:mb-8">
-      <div className="flex items-center gap-3 md:gap-4">
-        <div className="w-10 h-10 md:w-16 md:h-16 rounded-lg md:rounded-2xl bg-kraft-accent/10 flex items-center justify-center text-kraft-accent font-black text-base md:text-2xl">{user.name?.charAt(0) || 'U'}</div>
-        <div className="min-w-0">
-          <h3 className="font-black text-kraft-ink uppercase text-[12px] md:text-base truncate">{user.name}</h3>
-          <div className="flex items-center gap-1 text-kraft-accent opacity-60"><Mail size={12} /><span className="text-[10px] md:text-[11px] font-bold">{user.email}</span></div>
-        </div>
+}) => (
+  <motion.div layout className="liquid-card p-6 md:p-8 space-y-6">
+    <div className="flex justify-between items-start">
+      <div className="space-y-1">
+        <h4 className="text-lg md:text-2xl font-black text-kraft-ink uppercase">{user.name || 'Người dùng'}</h4>
+        <div className="flex items-center gap-2 text-sub-label text-xs"><Mail size={12} /><span>{user.email}</span></div>
       </div>
-      <div className="flex items-center gap-1.5">
-        {isEditing ? (
-          <><button onClick={onUpdate} className="p-1.5 md:p-2 bg-kraft-green/10 text-kraft-green rounded-lg"><Check size={12} /></button><button onClick={onCancel} className="p-1.5 md:p-2 bg-kraft-red/10 text-kraft-red rounded-lg"><X size={12} /></button></>
-        ) : (
-          <><button onClick={onEdit} className="p-1.5 md:p-2 bg-kraft-accent/10 text-kraft-accent rounded-lg md:opacity-0 group-hover:opacity-100"><Edit2 size={12} /></button><button onClick={onDelete} className="p-1.5 md:p-2 bg-kraft-red/10 text-kraft-red rounded-lg md:opacity-0 group-hover:opacity-100"><Trash2 size={12} /></button></>
-        )}
+      <div className="flex items-center gap-2">
+        <button onClick={onEdit} className="p-2 hover:bg-black/5 rounded-xl transition-all"><Edit2 size={16} /></button>
+        <button onClick={() => { if(confirm('Xóa tài khoản này?')) onDelete(); }} className="p-2 hover:bg-rose-50 text-rose-500 rounded-xl transition-all"><Trash2 size={16} /></button>
       </div>
     </div>
-    <div className="space-y-3">
-      <div className="flex items-center justify-between p-4 bg-kraft-bg rounded-t3 border border-kraft-accent/5">
-        <span className="text-liquid-label opacity-40">Quyền hạn</span>
-        {isEditing ? (
-          <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })} className="bg-white border rounded-xl px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+
+    {isEditing ? (
+      <div className="space-y-4 pt-4 border-t border-black/5">
+        <div className="space-y-2">
+          <label className="text-liquid-label text-[10px]">Cập nhật vai trò</label>
+          <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })} className="liquid-input h-12 px-4 text-xs font-black uppercase tracking-widest">
             {Object.values(UserRole).filter(r => r !== UserRole.ADMIN).map(role => (
               <option key={role} value={role}>{USER_ROLE_LABELS[role] || role}</option>
             ))}
           </select>
-        ) : <span className="px-3 py-1 bg-kraft-accent text-white text-[10px] font-black rounded-lg uppercase tracking-widest">{USER_ROLE_LABELS[user.role as UserRole] || user.role}</span>}
-      </div>
-      {isEditing ? (
-        <div className="space-y-1"><label className="text-liquid-label ml-2">Mật khẩu mới</label><input type="text" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="liquid-input h-14 px-6 text-sm" placeholder="Nhập mật khẩu..." /></div>
-      ) : (
-        <div className="flex items-center justify-between p-4 bg-kraft-accent/5 rounded-t3 border border-kraft-accent/10">
-          <div className="flex items-center gap-1.5"><Key size={14} className="text-kraft-accent" /><span className="text-[10px] md:text-[12px] font-black tracking-tight">{user.password ? <>Mật khẩu: <span className="font-mono text-kraft-accent">{user.password}</span></> : <span className="opacity-40 italic">Chưa đặt mật khẩu</span>}</span></div>
-          {user.password && <button onClick={() => navigator.clipboard.writeText(user.password || '')} className="p-2 hover:bg-kraft-accent/10 rounded-xl transition-colors text-kraft-accent"><Copy size={14} /></button>}
         </div>
-      )}
-    </div>
+        <div className="space-y-2">
+          <label className="text-liquid-label text-[10px]">Đổi mật khẩu</label>
+          <input type="text" value={formData.password || ''} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="Để trống nếu không đổi" className="liquid-input h-12 px-4 text-xs" />
+        </div>
+        <div className="flex gap-2 pt-2">
+          <button onClick={onCancel} className="flex-1 h-12 rounded-xl border font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-1"><X size={14} /><span>Hủy</span></button>
+          <button onClick={onUpdate} className="flex-1 liquid-button-primary h-12 font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-1"><Check size={14} /><span>Lưu</span></button>
+        </div>
+      </div>
+    ) : (
+      <div className="space-y-4 pt-4 border-t border-black/5">
+        <div className="flex justify-between items-center">
+          <span className="text-[10px] font-black uppercase tracking-widest text-sub-label">Vai trò</span>
+          <span className="px-3 py-1 bg-black/5 rounded-full text-[10px] font-black uppercase tracking-wider">{USER_ROLE_LABELS[user.role as UserRole] || user.role}</span>
+        </div>
+        {user.password && (
+          <div className="flex justify-between items-center bg-black/[0.02] p-3 rounded-xl">
+            <span className="text-[10px] font-black uppercase tracking-widest text-sub-label flex items-center gap-1.5"><Key size={12} />Mật khẩu</span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs font-bold text-kraft-ink">{user.password}</span>
+              <button onClick={() => { navigator.clipboard.writeText(user.password || ''); alert('Đã sao chép mật khẩu'); }} className="p-1 hover:bg-black/5 rounded text-sub-label"><Copy size={12} /></button>
+            </div>
+          </div>
+        )}
+      </div>
+    )}
   </motion.div>
 );
 
-interface InputGroupProps {
+const InputGroup = ({ label, value, onChange, placeholder, type = 'text' }: {
   label: string;
-  type?: string;
   value: string;
   onChange: (val: string) => void;
-  placeholder: string;
-}
-
-const InputGroup = ({ label, type = "text", value, onChange, placeholder }: InputGroupProps) => (
+  placeholder?: string;
+  type?: string;
+}) => (
   <div className="space-y-2">
     <label className="text-liquid-label ml-2">{label}</label>
-    <input type={type} required value={value} onChange={(e) => onChange(e.target.value)} className="liquid-input h-14 px-6 text-sm" placeholder={placeholder} />
+    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="liquid-input h-14 px-6 text-sm font-bold" />
   </div>
 );

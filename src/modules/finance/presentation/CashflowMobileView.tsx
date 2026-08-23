@@ -14,6 +14,7 @@ import { SmartAmountInput } from '@/src/shared/design-system/SmartAmountInput';
 import { BaseModal as Modal, ModalBody, ModalFooter } from '@/src/shared/design-system/BaseModal';
 import { ReceivableDebtsList } from './components/ReceivableDebtsList';
 import { PayableDebtsList } from './components/PayableDebtsList';
+import { HeldPartnerCapitalList } from './components/HeldPartnerCapitalList';
 import { Skeleton } from '@/src/shared/design-system/Skeleton';
 
 const ShowroomExpenseModal = React.lazy(() => 
@@ -86,6 +87,8 @@ export const CashflowMobileView: React.FC<CashflowMobileViewProps> = ({
     totalReceivables,
     payableDebts,
     totalPayables,
+    heldPartnerCapitals,
+    totalHeldPartnerCapital,
     vehicles,
     allJournalTransactions,
     filteredTransactions,
@@ -344,29 +347,38 @@ export const CashflowMobileView: React.FC<CashflowMobileViewProps> = ({
           </div>
         )}
 
-        {/* Tab 3: Báo cáo Công Nợ (Debts) */}
+        {/* Tab 3: Báo cáo Công Nợ & Vốn Góp (Debts & Coinvest) */}
         {activeMobileTab === 'debts' && (
-          <div className="space-y-6">
-            <ReceivableDebtsList
-              debts={receivableDebts}
-              total={totalReceivables}
-              isCompact={true}
-              onVehicleClick={vehicleId => {
-                const v = vehicles.find(x => x.id === vehicleId);
-                if (v) onNavigate('inventory', v.code, 'ALL', 'view_vehicle');
-              }}
-            />
-            <PayableDebtsList
-              debts={payableDebts}
-              total={totalPayables}
-              isCompact={true}
-              onVehicleClick={vehicleId => {
-                const v = vehicles.find(x => x.id === vehicleId);
-                if (v) onNavigate('inventory', v.code, 'ALL', 'view_vehicle');
-              }}
-            />
-          </div>
-        )}
+           <div className="space-y-6">
+             <ReceivableDebtsList
+               debts={receivableDebts}
+               total={totalReceivables}
+               isCompact={true}
+               onVehicleClick={vehicleId => {
+                 const v = vehicles.find(x => x.id === vehicleId);
+                 if (v) onNavigate('inventory', v.code, 'ALL', 'view_vehicle');
+               }}
+             />
+             <PayableDebtsList
+               debts={payableDebts}
+               total={totalPayables}
+               isCompact={true}
+               onVehicleClick={vehicleId => {
+                 const v = vehicles.find(x => x.id === vehicleId);
+                 if (v) onNavigate('inventory', v.code, 'ALL', 'view_vehicle');
+               }}
+             />
+             <HeldPartnerCapitalList
+               items={heldPartnerCapitals}
+               total={totalHeldPartnerCapital}
+               isCompact={true}
+               onVehicleClick={vehicleId => {
+                 const v = vehicles.find(x => x.id === vehicleId);
+                 if (v) onNavigate('inventory', v.code, 'ALL', 'view_vehicle');
+               }}
+             />
+           </div>
+         )}
 
         {/* Tab 4: Cấu trúc chi (Breakdown) */}
         {activeMobileTab === 'breakdown' && (
@@ -380,7 +392,7 @@ export const CashflowMobileView: React.FC<CashflowMobileViewProps> = ({
               <MobileBreakdownItem label="Chi phí xe" value={data?.carCosts || 0} total={totalOutflow} color="bg-amber-400" />
               <MobileBreakdownItem label="Vận hành" value={data?.operatingExpenses || 0} total={totalOutflow} color="bg-rose-400" />
               <MobileBreakdownItem label="Đối tác" value={data?.partnerPayouts || 0} total={totalOutflow} color="bg-cyan-400" />
-              <MobileBreakdownItem label="Lương nhân sự" value={data?.salaries || 0} total={totalOutflow} color="bg-emerald-400" />
+              <MobileBreakdownItem label="Lương nhân sự" value={data?.paidPayrollOutflow || 0} total={totalOutflow} color="bg-emerald-400" />
             </div>
           </div>
         )}

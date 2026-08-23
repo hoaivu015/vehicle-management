@@ -34,7 +34,7 @@ export interface UseVehicleFinancialsProps {
     commission?: number,
     buyingBonus?: number
   ) => Promise<void>;
-  onCancelSale: (id: number, userCode: string) => Promise<void>;
+  onCancelSale: (id: number, userCode: string, cancelType?: 'REFUND' | 'FORFEIT') => Promise<void>;
 }
 
 export const useVehicleFinancials = ({
@@ -174,10 +174,10 @@ export const useVehicleFinancials = ({
     }
   };
 
-  const handleCancelSale = async (id: number, code: string) => {
+  const handleCancelSale = async (id: number, code: string, cancelType?: 'REFUND' | 'FORFEIT') => {
     setIsSubmitting(true);
     try {
-      await onCancelSale(id, code);
+      await onCancelSale(id, code, cancelType);
       haptics.success();
       resetPaymentForm();
     } finally {

@@ -22,7 +22,6 @@ import { AddSalePayment } from '../../modules/inventory/application/AddSalePayme
 import { CancelSale } from '../../modules/inventory/application/CancelSale';
 import { UpdateVehicle } from '../../modules/inventory/application/UpdateVehicle';
 import { DeleteVehicleCost } from '../../modules/inventory/application/DeleteVehicleCost';
-import { VehicleService } from '../../modules/inventory/application/VehicleService';
 
 // Application (Staff)
 import { GetStaffList } from '../../modules/staff/application/GetStaffList';
@@ -57,8 +56,15 @@ import { StaffExpensePresenter } from '../../modules/staff/presentation/StaffExp
 import { PayrollPresenter } from '../../modules/staff/presentation/PayrollPresenter';
 import { FinancePresenter } from '../../modules/finance/presentation/FinancePresenter';
 import { UserManagementPresenter } from '../../modules/user/presentation/UserManagementPresenter';
-import { PersonalPresenter } from '../../modules/user/presentation/PersonalPresenter';
+import { PersonalPresenter } from '../../modules/personal/presentation/PersonalPresenter';
 import { PermissionsPresenter } from '../../modules/auth/presentation/PermissionsPresenter';
+import { GetPersonalOverview } from '../../modules/personal/application/GetPersonalOverview';
+import { GetUserList } from '../../modules/user/application/GetUserList';
+import { CreateUser } from '../../modules/user/application/CreateUser';
+import { UpdateUserRole } from '../../modules/user/application/UpdateUserRole';
+import { DeleteUser } from '../../modules/user/application/DeleteUser';
+import { GetPermissions } from '../../modules/auth/application/GetPermissions';
+import { UpdatePermissions } from '../../modules/auth/application/UpdatePermissions';
 
 // Domain Ports (Interfaces)
 import { VehicleRepository } from '../../modules/inventory/domain/VehicleRepository';
@@ -97,7 +103,6 @@ export interface Dependencies {
     cancelSale: CancelSale;
     updateVehicle: UpdateVehicle;
     deleteCost: DeleteVehicleCost;
-    service: VehicleService;
   };
 
   // Staff Use Cases
@@ -123,6 +128,29 @@ export interface Dependencies {
     getMonthly: GetMonthlyFinance;
     getOverview: GetFinancialOverview;
     recordExpense: RecordExpense;
+  };
+
+  // Personal Use Cases
+  personal: {
+    getOverview: GetPersonalOverview;
+  };
+
+  // User Use Cases
+  user: {
+    getUserList: GetUserList;
+    createUser: CreateUser;
+    updateUserRole: UpdateUserRole;
+    deleteUser: DeleteUser;
+  };
+
+  // Auth Use Cases
+  auth: {
+    getPermissions: GetPermissions;
+    updatePermissions: UpdatePermissions;
+    getUserList: GetUserList;
+    createUser: CreateUser;
+    updateUserRole: UpdateUserRole;
+    deleteUser: DeleteUser;
   };
 
   // Presenters (Factories)
@@ -153,15 +181,14 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const inventory: Dependencies['inventory'] = {
       getList: new GetInventoryList(vehicleRepo),
       updateStatus: new UpdateVehicleStatus(vehicleRepo),
-      deleteVehicle: new DeleteVehicle(vehicleRepo, storageRepo),
+      deleteVehicle: new DeleteVehicle(vehicleRepo, storageRepo, staffRepo),
       addVehicle: new AddVehicle(vehicleRepo, vehicleCodeGenerator),
       getNextCode: new GetNextVehicleCode(vehicleCodeGenerator),
       addPurchasePayment: new AddPurchasePayment(vehicleRepo),
       addSalePayment: new AddSalePayment(vehicleRepo),
-      cancelSale: new CancelSale(vehicleRepo),
+      cancelSale: new CancelSale(vehicleRepo, expenseRepo, staffRepo),
       updateVehicle: new UpdateVehicle(vehicleRepo, expenseRepo, staffRepo),
       deleteCost: new DeleteVehicleCost(vehicleRepo, staffRepo),
-      service: new VehicleService(vehicleRepo, vehicleStaffRepo),
     };
 
     const staff: Dependencies['staff'] = {
@@ -169,10 +196,10 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       add: new AddStaff(staffRepo),
       update: new UpdateStaff(staffRepo),
       delete: new DeleteStaff(staffRepo),
-      toggleReimbursement: new ToggleStaffExpenseReimbursement(staffRepo),
-      deleteExpense: new DeleteStaffExpense(staffRepo, vehicleRepo),
-      updateExpense: new UpdateStaffExpense(staffRepo, vehicleRepo),
-      reimburseExpenses: new ReimburseStaffExpenses(staffRepo),
+      toggleReimbursement: new ToggleStaffExpenseReimbursement(staffRepo, expenseRepo),
+      deleteExpense: new DeleteStaffExpense(staffRepo, vehicleRepo, expenseRepo),
+      updateExpense: new UpdateStaffExpense(staffRepo, vehicleRepo, expenseRepo),
+      reimburseExpenses: new ReimburseStaffExpenses(staffRepo, expenseRepo),
     };
 
     const payroll: Dependencies['payroll'] = {
@@ -184,6 +211,26 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       getMonthly: new GetMonthlyFinance(expenseRepo, vehicleRepo, staffRepo),
       getOverview: new GetFinancialOverview(expenseRepo, vehicleRepo, staffRepo),
       recordExpense: new RecordExpense(staffRepo, vehicleRepo, expenseRepo),
+    };
+
+    const personal: Dependencies['personal'] = {
+      getOverview: new GetPersonalOverview(staffRepo, vehicleRepo),
+    };
+
+    const user: Dependencies['user'] = {
+      getUserList: new GetUserList(userRepo),
+      createUser: new CreateUser(userRepo),
+      updateUserRole: new UpdateUserRole(userRepo),
+      deleteUser: new DeleteUser(userRepo),
+    };
+
+    const auth: Dependencies['auth'] = {
+      getPermissions: new GetPermissions(permissionRepo),
+      updatePermissions: new UpdatePermissions(permissionRepo),
+      getUserList: user.getUserList,
+      createUser: user.createUser,
+      updateUserRole: user.updateUserRole,
+      deleteUser: user.deleteUser,
     };
 
     // 3. Presenter Factories
@@ -243,11 +290,20 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       );
     };
 
-    const createUserManagementPresenter = () => new UserManagementPresenter(userRepo);
+    const createUserManagementPresenter = () => new UserManagementPresenter(
+      user.getUserList,
+      user.createUser,
+      user.updateUserRole,
+      user.deleteUser
+    );
 
-    const createPersonalPresenter = () => new PersonalPresenter(vehicleRepo);
+    const createPersonalPresenter = () => new PersonalPresenter(vehicleRepo, personal.getOverview);
 
-    const createPermissionsPresenter = () => new PermissionsPresenter(permissionRepo, notificationService);
+    const createPermissionsPresenter = () => new PermissionsPresenter(
+      auth.getPermissions,
+      auth.updatePermissions,
+      notificationService
+    );
 
     return {
       vehicleRepo,
@@ -262,6 +318,9 @@ export const DependencyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       staff,
       payroll,
       finance,
+      personal,
+      user,
+      auth,
       createInventoryPresenter,
       createStaffPresenter,
       createFinancePresenter,

@@ -64,4 +64,51 @@ describe('FinanceService', () => {
     const openingBalanceApril = FinanceService.calculateOpeningCashBalance(1_000_000, pastVehicles, pastExpenses, '2024-04');
     expect(openingBalanceApril).toBe(1_020_000);
   });
+
+  it('should correctly account for co-investment capital inflow in total cash balance', () => {
+    const coinvestedVehicle = createMockVehicle({
+      id: 20,
+      code: 'CAR-COINVEST',
+      name: 'Co-invested Car',
+      purchase_price: 500000000,
+      purchase_date: '2026-05-01',
+      is_coinvested: true,
+      coinvestor_code: 'NV01',
+      coinvest_amount: 200000000, // Partner contributes 200M
+      purchase_payment_history: [
+        { amount: 500000000, date: '2026-05-01', receiver: 'Seller', staff_id: '', staff_expense_id: '', note: 'Chi 100% mua xe' }
+      ],
+      cost_history: [
+        { amount: 10000000, date: '2026-05-02', staff_id: '', staff_expense_id: '', note: 'Spa xe' } // 10M spa paid directly by showroom
+      ]
+    });
+
+    const expenses: import('../ExpenseRepository').Expense[] = [];
+
+    // Total Capital (1,000,000,000) + Coinvest Inflow (200,000,000) - Purchase Outflow (500,000,000) - Spa Cost (10,000,000)
+    // = 690,000,000 (Company spent net 310,000,000 from own capital)
+    const cashBalance = FinanceService.calculateTotalCashBalance(1_000_000_000, [coinvestedVehicle], expenses);
+    expect(cashBalance).toBe(690_000_000);
+  });
+
+  it('should include co-investment capital inflow in weekly cashflow thu', () => {
+    const coinvestedVehicle = createMockVehicle({
+      id: 21,
+      code: 'CAR-COINVEST-WEEK',
+      name: 'Weekly Co-invested Car',
+      purchase_price: 500000000,
+      purchase_date: '2026-05-03', // Week 1 (Day 3)
+      is_coinvested: true,
+      coinvestor_code: 'NV01',
+      coinvest_amount: 200000000,
+      purchase_payment_history: [
+        { amount: 500000000, date: '2026-05-03', receiver: 'Seller', staff_id: '', staff_expense_id: '', note: '' }
+      ],
+      cost_history: []
+    });
+
+    const weekly = FinanceService.calculateWeeklyCashflow([coinvestedVehicle], '2026-05', []);
+    expect(weekly[0].thu).toBe(200000000); // Week 1 thu 200M
+    expect(weekly[0].chi).toBe(500000000); // Week 1 chi 500M
+  });
 });

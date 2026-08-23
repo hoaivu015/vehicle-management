@@ -1,11 +1,14 @@
 import { Staff } from '../../../shared/domain/types';
 import { StaffRepository } from '../domain/StaffRepository';
 import { VehicleRepository } from '../../inventory/domain/VehicleRepository';
+import { ExpenseRepository } from '../../finance/domain/ExpenseRepository';
+import { StaffSalaryService } from '../domain/StaffSalaryService';
 
 export class DeleteStaffExpense {
   constructor(
     private readonly repository: StaffRepository,
-    private readonly vehicleRepository: VehicleRepository
+    private readonly vehicleRepository: VehicleRepository,
+    private readonly expenseRepository?: ExpenseRepository
   ) {}
 
   async execute(staffId: string | number, expenseId: string): Promise<Staff> {
@@ -13,6 +16,12 @@ export class DeleteStaffExpense {
     if (!staff) throw new Error('Staff member not found');
 
     const expenseToDelete = (staff.expenses || []).find(exp => exp.id === expenseId);
+    
+    // If it's a salary advance, delete the corresponding operating expense
+    if (expenseToDelete && StaffSalaryService.isSalaryAdvance(expenseToDelete) && this.expenseRepository) {
+      const advanceName = `Tạm ứng lương: ${expenseToDelete.note} (${staff.name} - ${staff.code})`;
+      await this.expenseRepository.deleteByNameAndCategory(advanceName, 'Tạm ứng lương');
+    }
     
     // If it's a vehicle expense, sync with vehicle record
     if (expenseToDelete?.type === 'vehicle' && expenseToDelete.vehicleId) {

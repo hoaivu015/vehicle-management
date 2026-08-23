@@ -3,13 +3,18 @@ import { Staff, Account } from '../../../shared/domain/types';
 import { StaffRepository } from '../domain/StaffRepository';
 import { createValidatedRepository } from '../../../shared/infrastructure/RepositoryFactory';
 import { StaffSchema, StaffDTO } from '../domain/StaffSchema';
+import { staffMapper } from './mappers/StaffMapper';
 
 export class SupabaseStaffRepository implements StaffRepository {
   private readonly tableName = 'employees';
-  private readonly baseRepo = createValidatedRepository<Staff, StaffDTO>(this.tableName, StaffSchema);
+  private readonly baseRepo = createValidatedRepository<Staff, StaffDTO>(
+    this.tableName, 
+    StaffSchema,
+    staffMapper
+  );
 
   private _sanitize(data: unknown): Staff {
-    return StaffSchema.parse(data) as unknown as Staff;
+    return staffMapper.toDomain(StaffSchema.parse(data));
   }
 
   async getAll(): Promise<Staff[]> {

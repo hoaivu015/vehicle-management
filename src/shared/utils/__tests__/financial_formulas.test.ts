@@ -5,6 +5,7 @@ import {
   calcGrossProfit, 
   calcNetProfit, 
   calcProfitShare,
+  calcRefundablePartnerCapital,
   calcKPICompletion,
   calcKPIMultiplier,
   calcTotalSalary,
@@ -42,8 +43,8 @@ describe('Financial Formulas', () => {
   });
 
   describe('calcProfitShare', () => {
-    it('should return full profit if total needed is 0', () => {
-      expect(calcProfitShare(1000, 500, 0)).toBe(1000);
+    it('should return 0 profit if base price is 0', () => {
+      expect(calcProfitShare(1000, 500, 0)).toBe(0);
     });
 
     it('should distribute profit based on capital ratio', () => {
@@ -57,6 +58,25 @@ describe('Financial Formulas', () => {
 
     it('should handle zero capital correctly', () => {
       expect(calcProfitShare(1000, 0, 1000)).toBe(0);
+    });
+  });
+
+  describe('calcRefundablePartnerCapital', () => {
+    it('should return full capital when not sold', () => {
+      expect(calcRefundablePartnerCapital(500_000_000, -50_000_000, false)).toBe(500_000_000);
+    });
+
+    it('should return full capital when sold with profit', () => {
+      expect(calcRefundablePartnerCapital(500_000_000, 100_000_000, true)).toBe(500_000_000);
+    });
+
+    it('should deduct loss from capital when sold with loss', () => {
+      // 500M capital - 50M loss share = 450M refundable
+      expect(calcRefundablePartnerCapital(500_000_000, -50_000_000, true)).toBe(450_000_000);
+    });
+
+    it('should not return negative capital if loss exceeds capital', () => {
+      expect(calcRefundablePartnerCapital(100_000_000, -150_000_000, true)).toBe(0);
     });
   });
 
@@ -87,6 +107,10 @@ describe('Financial Formulas', () => {
   describe('Company Finance Math', () => {
     it('should calculate monthly net profit correctly', () => {
       expect(calcCompanyMonthlyNetProfit(5000, 1000, 2000)).toBe(2000);
+    });
+
+    it('should include otherInflows (forfeited deposits, extra income) into net profit', () => {
+      expect(calcCompanyMonthlyNetProfit(5000, 1000, 2000, 500)).toBe(2500);
     });
   });
 });

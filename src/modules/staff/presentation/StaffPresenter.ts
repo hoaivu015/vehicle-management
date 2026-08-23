@@ -43,29 +43,14 @@ export class StaffPresenter extends BasePresenter<StaffView> implements IUnified
     this.payrollPresenter.attachView(view);
   }
 
-  private debouncedLoadStaff(monthStr: string): void {
-    if (this.debounceTimer) {
-      clearTimeout(this.debounceTimer);
-    }
-    this.debounceTimer = setTimeout(() => {
-      this.loadStaff(monthStr);
-    }, 300);
-  }
-
   detachView(): void {
     super.detachView();
     this.listPresenter.detachView();
     this.actionPresenter.detachView();
     this.expensePresenter.detachView();
     this.payrollPresenter.detachView();
-    if (this.debounceTimer) {
-      clearTimeout(this.debounceTimer);
-      this.debounceTimer = null;
-    }
-    if (this.subscription) {
-      supabase.removeChannel(this.subscription);
-      this.subscription = null;
-    }
+    if (this.debounceTimer) clearTimeout(this.debounceTimer);
+    if (this.subscription) supabase.removeChannel(this.subscription);
   }
 
   async subscribeToChanges(monthStr: string): Promise<void> {
@@ -73,23 +58,18 @@ export class StaffPresenter extends BasePresenter<StaffView> implements IUnified
     this.currentMonth = monthStr;
     this.subscription = supabase.channel('staff_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'employees' }, () => {
-        this.debouncedLoadStaff(this.currentMonth);
+        if (this.debounceTimer) clearTimeout(this.debounceTimer);
+        this.debounceTimer = setTimeout(() => this.loadStaff(this.currentMonth), 300);
       })
       .subscribe();
   }
 
-  private checkPermission(role?: string, message?: string): void {
-    if (role && role !== 'ADMIN' && role !== 'ACCOUNTANT') {
-      throw new Error(message || 'Bạn không có quyền thực hiện thao tác này.');
-    }
+  private checkPermission(role?: string, msg = 'Bạn không có quyền thực hiện thao tác này.'): void {
+    if (role && role !== 'ADMIN' && role !== 'ACCOUNTANT') throw new Error(msg);
   }
 
-  // Delegation
-  async loadStaff(monthStr: string): Promise<void> { 
-    this.currentMonth = monthStr;
-    await this.listPresenter.loadStaff(monthStr); 
-  }
-  
+  // Delegation methods
+  async loadStaff(month: string): Promise<void> { this.currentMonth = month; await this.listPresenter.loadStaff(month); }
   async loadVehicles(): Promise<void> { await this.listPresenter.loadVehicles(); }
   filterStaff(query: string): void { this.listPresenter.filterStaff(query); }
 

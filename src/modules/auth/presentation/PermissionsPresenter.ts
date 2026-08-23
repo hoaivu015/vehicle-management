@@ -1,7 +1,8 @@
 import { BasePresenter, BaseView } from '../../../shared/presentation/BasePresenter';
-import { PermissionRepository } from '../domain/PermissionRepository';
-import { PermissionService, RolePermission } from '../domain/PermissionService';
+import { RolePermission } from '../domain/PermissionService';
 import { NotificationService } from '../../../shared/domain/NotificationService';
+import { GetPermissions } from '../application/GetPermissions';
+import { UpdatePermissions } from '../application/UpdatePermissions';
 
 export interface PermissionsView extends BaseView {
   setPermissions(permissions: RolePermission[]): void;
@@ -10,7 +11,8 @@ export interface PermissionsView extends BaseView {
 
 export class PermissionsPresenter extends BasePresenter<PermissionsView> {
   constructor(
-    private readonly permissionRepo: PermissionRepository,
+    private readonly getPermissionsUseCase: GetPermissions,
+    private readonly updatePermissionsUseCase: UpdatePermissions,
     private readonly notification: NotificationService
   ) {
     super();
@@ -18,13 +20,11 @@ export class PermissionsPresenter extends BasePresenter<PermissionsView> {
 
   async loadPermissions(): Promise<void> {
     await this.perform(
-      () => this.permissionRepo.getAllPermissions(),
+      () => this.getPermissionsUseCase.execute(),
       (data) => {
         if (this.view) {
           this.view.setPermissions(data);
         }
-        // Update PermissionService cache
-        PermissionService.setDynamicPermissions(data);
       },
       'Không thể tải dữ liệu phân quyền'
     );
@@ -34,15 +34,7 @@ export class PermissionsPresenter extends BasePresenter<PermissionsView> {
     if (!this.view) return;
     this.view.setSaving(true);
     try {
-      // Filter out permissions for the target role to update
-      const rolePerms = perms.filter(p => p.role === role);
-      
-      const cleanPerms = rolePerms.map((perm) => {
-        const { id: _id, updated_at: _updated_at, ...cleanRest } = perm as RolePermission & { id?: string; updated_at?: string };
-        return cleanRest;
-      });
-
-      await this.permissionRepo.upsertPermissions(cleanPerms);
+      await this.updatePermissionsUseCase.execute(role, perms);
       this.notification.success(`Đã cập nhật quyền thành công`);
       await this.loadPermissions();
     } catch (err: unknown) {

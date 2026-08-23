@@ -108,9 +108,12 @@ export class SupabaseVehicleRepository implements VehicleRepository {
     const car = await this.getById(id);
     if (!car) throw new EntityNotFoundError('Vehicle', id);
 
+    const updatedPaymentHistory = [...(car.sale_payment_history || []), payment];
+    const totalCollected = updatedPaymentHistory.reduce((sum, p) => sum + (p.amount || 0), 0);
+
     const updates: Partial<VehicleDTO> = {
-      received_amount: (car.received_amount || 0) + payment.amount,
-      sale_payment_history: [...(car.sale_payment_history || []), payment],
+      received_amount: totalCollected,
+      sale_payment_history: updatedPaymentHistory,
       seller
     };
     if (salePrice !== undefined && salePrice >= 0) updates.sale_price = salePrice;
@@ -123,22 +126,33 @@ export class SupabaseVehicleRepository implements VehicleRepository {
 
     if (nextStatus === VehicleStatus.SOLD) {
       updates.sale_date = payment.date;
-      updates.received_amount = (salePrice && salePrice > 0) ? salePrice : (car.sale_price || 0);
-      if (updates.received_amount > 0) updates.sale_price = updates.received_amount;
+      if (salePrice && salePrice > 0) updates.sale_price = salePrice;
     }
 
     await this._applyStatusTransition(id, nextStatus, updates, { date: payment.date, status: nextStatus, user: seller, note: `Thanh toán: ${payment.amount.toLocaleString('vi-VN', { maximumFractionDigits: 3 })}đ. ${payment.note || ''}` });
   }
 
-  async cancelSale(id: number, history: VehicleHistoryEntry): Promise<void> {
+  async cancelSale(id: number, history: VehicleHistoryEntry, cancelType?: 'REFUND' | 'FORFEIT'): Promise<void> {
     const car = await this.getById(id);
     if (!car) throw new EntityNotFoundError('Vehicle', id);
 
     const updatedHistory = [...(car.sale_payment_history || [])];
-    if ((car.received_amount || 0) > 0) {
-      updatedHistory.push({ amount: -(car.received_amount || 0), note: 'Hoàn tiền cọc - Hủy giao dịch', date: history.date, receiver: history.user, staff_id: '', staff_expense_id: '' });
+    const actualCollected = updatedHistory.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const isForfeit = cancelType === 'FORFEIT';
+    if (actualCollected > 0) {
+      updatedHistory.push({ 
+        amount: -actualCollected, 
+        note: isForfeit ? 'Tịch thu tiền cọc - Chuyển sang thu nhập khác' : 'Hoàn tiền cọc - Hủy giao dịch', 
+        date: history.date, 
+        receiver: history.user, 
+        staff_id: '', 
+        staff_expense_id: '' 
+      });
     }
-    await this._applyStatusTransition(id, VehicleStatus.IN_STOCK, { sale_payment_history: updatedHistory }, history);
+    await this._applyStatusTransition(id, VehicleStatus.IN_STOCK, { 
+      sale_payment_history: updatedHistory,
+      received_amount: 0
+    }, history);
   }
 
   private _sanitize(data: Partial<Vehicle>): Record<string, unknown> {

@@ -6,18 +6,11 @@ export const StaffExpenseSchema = z.object({
   amount: zNumber,
   note: zString,
   date: zString,
-  type: z.enum(['vehicle', 'operating']),
-  vehicleId: z.union([z.string(), z.number()]).transform(v => v ? Number(v) : v).optional().nullable(),
-  vehicle_code: zString,
-  category: zString,
+  type: z.enum(['vehicle', 'operating', 'advance']).or(z.string()),
+  vehicleId: z.union([z.string(), z.number()]).transform(v => v ? Number(v) : undefined).optional().nullable(),
+  vehicle_code: zString.optional(),
+  category: zString.optional(),
   is_reimbursed: z.boolean().default(false),
-}).passthrough().transform((data: Record<string, unknown>) => {
-  // Backward compatibility: If vehicle_id exists but vehicleId doesn't, map it
-  const vehicleId = data.vehicleId ?? (data.vehicle_id ? Number(data.vehicle_id) : undefined);
-  return {
-    ...data,
-    vehicleId: vehicleId as number | string | null | undefined,
-  };
 });
 
 export const StaffSchema = z.object({

@@ -72,12 +72,12 @@ export class VehicleTransactionPresenter extends BasePresenter<VehicleTransactio
     );
   }
 
-  async cancelSale(id: number, userCode: string, role?: string): Promise<void> {
+  async cancelSale(id: number, userCode: string, cancelType?: 'REFUND' | 'FORFEIT', role?: string): Promise<void> {
     if (role && !PermissionService.canManageVehicle(role)) {
       throw new Error('Bạn không có quyền hủy giao dịch bán xe.');
     }
     await this.perform(
-      () => this.cancelSaleUseCase.execute({ vehicleId: id, userCode }), 
+      () => this.cancelSaleUseCase.execute({ vehicleId: id, userCode, cancelType }), 
       () => this.view?.onStatusUpdated()
     );
   }

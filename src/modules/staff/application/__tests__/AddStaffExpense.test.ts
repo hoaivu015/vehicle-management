@@ -63,22 +63,65 @@ describe('RecordExpense Use Case', () => {
     }));
   });
 
-  it('should sync with global expenses if type is operating', async () => {
+  it('should record staff advance without premature cash deduction when staffId is provided for operating expense', async () => {
     mockStaffRepo.getById.mockResolvedValue({ id: 's1', name: 'NV A', expenses: [] });
     
     await useCase.execute({
       staffId: 's1',
       amount: 200,
-      name: 'Office',
+      name: 'Office Supplies',
       date: '2023-01-01',
       type: 'operating',
       category: 'Office'
     });
 
-    // Verify global expense added
+    // 1. Verify staff updated with unreimbursed advance
+    expect(mockStaffRepo.update).toHaveBeenCalledWith('s1', expect.objectContaining({
+      expenses: expect.arrayContaining([
+        expect.objectContaining({
+          amount: 200,
+          type: 'operating',
+          is_reimbursed: false
+        })
+      ])
+    }));
+
+    // 2. Verify global cash expense repo NOT called prematurely (to prevent double cash deduction)
+    expect(mockExpenseRepo.add).not.toHaveBeenCalled();
+  });
+
+  it('should record direct company operating expense when staffId is undefined', async () => {
+    await useCase.execute({
+      amount: 500000,
+      name: 'Tiền điện showroom',
+      date: '2026-08-01',
+      type: 'operating',
+      category: 'Vận hành'
+    });
+
+    // Verify global expense added immediately
     expect(mockExpenseRepo.add).toHaveBeenCalledWith(expect.objectContaining({
-      amount: 200,
-      name: expect.stringContaining('Office')
+      amount: 500000,
+      name: 'Tiền điện showroom',
+      category: 'Vận hành'
+    }));
+  });
+
+  it('should record other cash inflow when flowType is inflow', async () => {
+    await useCase.execute({
+      amount: 2000000,
+      name: 'Thu tiền hoa hồng bảo hiểm',
+      date: '2026-08-10',
+      type: 'operating',
+      flowType: 'inflow',
+      category: 'Thu khác'
+    });
+
+    // Verify inflow added with proper prefix and category
+    expect(mockExpenseRepo.add).toHaveBeenCalledWith(expect.objectContaining({
+      amount: 2000000,
+      name: '[Thu] Thu tiền hoa hồng bảo hiểm',
+      category: 'Thu khác'
     }));
   });
 

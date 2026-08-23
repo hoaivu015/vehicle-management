@@ -10,6 +10,7 @@ interface CashflowMetricRibbonProps {
   totalOutflow: number;
   closingBalance: number;
   netCashflow: number;
+  heldPartnerCapital?: number;
   onShowCapital?: () => void;
   canEditCapital?: boolean;
 }
@@ -20,6 +21,7 @@ export const CashflowMetricRibbon: React.FC<CashflowMetricRibbonProps> = ({
   totalOutflow,
   closingBalance,
   netCashflow,
+  heldPartnerCapital = 0,
   onShowCapital,
   canEditCapital = false
 }) => {
@@ -120,22 +122,31 @@ export const CashflowMetricRibbon: React.FC<CashflowMetricRibbonProps> = ({
               )}
             </div>
 
-            {/* Value */}
-            <div className="mt-5 pt-3 border-t border-hairline-soft flex items-baseline justify-between">
-              <span
-                className={cn(
-                  "text-2xl sm:text-3xl font-black tracking-tighter leading-none",
-                  isAccent
-                    ? "text-kraft-ink"
-                    : isEmerald
-                    ? "text-emerald-600"
-                    : isRose
-                    ? "text-rose-600"
-                    : "text-kraft-ink"
-                )}
-              >
-                {card.value}
-              </span>
+            {/* Value & Breakdown */}
+            <div className="mt-5 pt-3 border-t border-hairline-soft flex flex-col gap-1.5">
+              <div className="flex items-baseline justify-between">
+                <span
+                  className={cn(
+                    "text-2xl sm:text-3xl font-black tracking-tighter leading-none",
+                    isAccent
+                      ? "text-kraft-ink"
+                      : isEmerald
+                      ? "text-emerald-600"
+                      : isRose
+                      ? "text-rose-600"
+                      : "text-kraft-ink"
+                  )}
+                >
+                  {card.value}
+                </span>
+              </div>
+
+              {isAccent && heldPartnerCapital > 0 && (
+                <div className="flex items-center justify-between text-[10px] font-bold text-sub-label/90 pt-1.5 border-t border-black/5 flex-wrap gap-1">
+                  <span>🤝 Vốn đối tác ký gửi trong kho:</span>
+                  <strong className="text-indigo-600 font-black">{formatCurrency(heldPartnerCapital)}</strong>
+                </div>
+              )}
             </div>
 
             {/* Subtle glow effect for accent card */}

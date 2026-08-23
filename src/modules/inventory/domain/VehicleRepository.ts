@@ -12,7 +12,7 @@ export interface VehicleRepository extends Repository<Vehicle> {
   // New transaction methods
   addPurchasePayment(id: number, payment: PaymentItem): Promise<void>;
   addSalePayment(id: number, payment: PaymentItem, nextStatus: VehicleStatus, seller: string, buyerName?: string, salePrice?: number, commission?: number, buyingBonus?: number): Promise<void>;
-  cancelSale(id: number, historyEntry: VehicleHistoryEntry): Promise<void>;
+  cancelSale(id: number, historyEntry: VehicleHistoryEntry, cancelType?: 'REFUND' | 'FORFEIT'): Promise<void>;
   
   // Filtering methods for personal/department views
   getVehiclesByStaff(staffCode: string): Promise<Vehicle[]>;

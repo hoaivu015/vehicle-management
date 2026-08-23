@@ -7,7 +7,7 @@
 type TabKey = 'dashboard' | 'inventory' | 'staff' | 'cashflow' | 'personal' | 'users' | 'permissions';
 
 const tabLoaders: Record<string, () => Promise<unknown>> = {
-  dashboard: () => import('@/src/modules/finance/presentation/DashboardPage'),
+  dashboard: () => import('@/src/modules/dashboard/presentation/DashboardPage'),
   inventory: () => import('@/src/modules/inventory/presentation/InventoryPage'),
   staff: () => import('@/src/modules/staff/presentation/StaffPage'),
   cashflow: () => import('@/src/modules/finance/presentation/CashflowPage'),

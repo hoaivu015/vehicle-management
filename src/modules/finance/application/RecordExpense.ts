@@ -18,14 +18,31 @@ export class RecordExpense {
   ) {}
 
   async execute(dto: UnifiedExpenseCommand): Promise<void> {
-    // 1. Dữ liệu đã được định kiểu chặt chẽ từ Presenter (Contract-First)
+    // 1. Xử lý Dòng Tiền Vào (Inflow - Thu nhập khác, thu phạt cọc, thu hoa hồng...)
+    if (dto.flowType === 'inflow') {
+      const inflowCategory = dto.category === 'Vận hành' ? 'Thu nhập khác' : (dto.category || 'Thu nhập khác');
+      const inflowName = dto.name.startsWith('[Thu]') ? dto.name : `[Thu] ${dto.name}`;
+      
+      await this.expenseRepository.add({
+        name: inflowName,
+        amount: dto.amount,
+        category: inflowCategory,
+        date: dto.date,
+        created_at: new Date().toISOString()
+      });
+      return;
+    }
 
-    // 2. Nếu là nhân viên ứng tiền, chuẩn bị bản ghi StaffExpense
+    // 2. Dòng Tiền Ra (Outflow) - Xử lý tạm ứng lương hoặc nhân viên ứng tiền chi hộ
     let staffExpenseId: string | undefined;
     if (dto.staffId) {
       staffExpenseId = generateUUID();
       const staff = await this.staffRepository.getById(dto.staffId);
       if (!staff) throw new Error('Không tìm thấy nhân viên');
+
+      const isAdvance = dto.category === 'Tạm ứng lương' || 
+        (dto.name || '').toLowerCase().includes('ứng lương') || 
+        (dto.name || '').toLowerCase().startsWith('tạm ứng');
 
       const staffExpense: StaffExpense = {
         id: staffExpenseId,
@@ -36,12 +53,24 @@ export class RecordExpense {
         vehicleId: dto.vehicleId ? Number(dto.vehicleId) : undefined,
         vehicle_code: dto.type === 'vehicle' && dto.vehicleId ? 
           (await this.vehicleRepository.getById(dto.vehicleId.toString()))?.code : undefined,
-        category: dto.category,
+        category: isAdvance ? 'Tạm ứng lương' : dto.category,
         is_reimbursed: false
       };
 
       const updatedExpenses = [...(staff.expenses || []), staffExpense];
       await this.staffRepository.update(dto.staffId, { expenses: updatedExpenses });
+
+      // Nếu là Tạm ứng lương (Showroom xuất quỹ tiền mặt cho nhân viên ứng trước):
+      // Ghi nhận ngay phiếu chi vào operating_expenses để trừ quỹ tiền mặt tại ngày tạm ứng
+      if (isAdvance) {
+        await this.expenseRepository.add({
+          name: `Tạm ứng lương: ${dto.name} (${staff.name} - ${staff.code})`,
+          amount: dto.amount,
+          category: 'Tạm ứng lương',
+          date: dto.date,
+          created_at: new Date().toISOString()
+        });
+      }
     }
 
     // 3. Nếu chi cho Xe, cập nhật cost_history của xe
@@ -66,10 +95,10 @@ export class RecordExpense {
       });
     }
 
-    // 4. Nếu là chi phí vận hành Showroom, ghi nhận vào bảng operating_expenses
-    if (dto.type === 'operating') {
+    // 4. Nếu là chi phí vận hành do Showroom trực tiếp chi tiền mặt (không phải NV ứng tiền túi), ghi nhận vào bảng operating_expenses
+    if (dto.type === 'operating' && !dto.staffId) {
       await this.expenseRepository.add({
-        name: dto.staffId ? `[NV ứng] ${dto.name}` : dto.name,
+        name: dto.name,
         amount: dto.amount,
         category: dto.category || 'Vận hành',
         date: dto.date,

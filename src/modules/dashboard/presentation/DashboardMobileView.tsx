@@ -8,24 +8,24 @@ import {
   Calendar,
 } from 'lucide-react';
 import { formatCurrency } from '@/src/shared/utils/currency';
-import { FinancePresenter } from './FinancePresenter';
+import { FinancePresenter } from '@/src/modules/finance/presentation/FinancePresenter';
 import { useDashboardState, DashboardState } from './useDashboardState';
 import { NativePage, NativeHeader } from '@/src/shared/design-system/native/NativePage';
 import { LargeTitle, SecondaryLabel } from '@/src/shared/design-system/native/NativeTypography';
 import { cn } from '@/src/shared/utils/cn';
 import { Skeleton } from '@/src/shared/design-system/Skeleton';
 import { AnimatedNumber } from '@/src/shared/design-system/AnimatedNumber';
-import { MetricDrillDownModal, DrillDownType } from './components/MetricDrillDownModal';
+import { MetricDrillDownModal, DrillDownType } from '@/src/modules/finance/presentation/components/MetricDrillDownModal';
 import { haptics } from '@/src/shared/utils/haptics';
 
 const ReceivableDebtsList = React.lazy(() =>
-  import('./components/ReceivableDebtsList').then(module => ({
+  import('@/src/modules/finance/presentation/components/ReceivableDebtsList').then(module => ({
     default: module.ReceivableDebtsList
   }))
 );
 
 const PayableDebtsList = React.lazy(() =>
-  import('./components/PayableDebtsList').then(module => ({
+  import('@/src/modules/finance/presentation/components/PayableDebtsList').then(module => ({
     default: module.PayableDebtsList
   }))
 );
@@ -69,7 +69,7 @@ const DashboardMobileSkeleton = () => (
             <Skeleton glassmorphism variant="rectangle" width={40} height={40} className="rounded-xl opacity-20" />
             <div className="space-y-1.5">
               <Skeleton glassmorphism variant="text" width={100} height={14} className="opacity-20" />
-              <Skeleton glassmorphism variant="text" width="60%" height={10} className="opacity-20" />
+              <Skeleton glassmorphism variant="text" width={60} height={10} className="opacity-20" />
             </div>
           </div>
           <Skeleton glassmorphism variant="text" width={70} height={16} className="opacity-35" />

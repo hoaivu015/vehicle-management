@@ -219,8 +219,7 @@ export const ModalBody = ({ children, className, noPadding = false }: { children
 
 interface ModalFooterProps {
   onCancel?: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSubmit?: (e?: any) => void | Promise<void>;
+  onSubmit?: ((e: React.FormEvent) => void | Promise<void>) | ((e: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>) | (() => void | Promise<void>);
   onDelete?: () => void;
   submitLabel?: string;
   cancelLabel?: string;
@@ -281,7 +280,9 @@ export const ModalFooter = ({
         {onSubmit && (
           <motion.button
             whileTap={{ scale: 0.95 }}
-            type="button" onClick={onSubmit} disabled={isSubmitting}
+            type="button" 
+            onClick={(e) => (onSubmit as (ev: unknown) => void)(e)} 
+            disabled={isSubmitting}
             className={cn(
               "h-11 px-g4 flex-1 sm:flex-none liquid-button-primary min-w-[140px] text-xs",
               isDestructive && "bg-expense"

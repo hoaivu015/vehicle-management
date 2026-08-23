@@ -15,6 +15,7 @@ import { CashflowSkeleton } from '@/src/modules/finance/presentation/components/
 import { BaseInput } from '@/src/shared/design-system/FormElements';
 import { ReceivableDebtsList } from './components/ReceivableDebtsList';
 import { PayableDebtsList } from './components/PayableDebtsList';
+import { HeldPartnerCapitalList } from './components/HeldPartnerCapitalList';
 import { PillButton } from '@/src/shared/design-system/Buttons';
 import { CashflowMetricRibbon } from './components/CashflowMetricRibbon';
 import { SmartFinancialEntryDock } from './components/SmartFinancialEntryDock';
@@ -64,6 +65,8 @@ export const CashflowWebView: React.FC<CashflowWebViewProps> = ({
     totalReceivables,
     payableDebts,
     totalPayables,
+    heldPartnerCapitals,
+    totalHeldPartnerCapital,
     vehicles,
     staff,
     allJournalTransactions,
@@ -119,6 +122,7 @@ export const CashflowWebView: React.FC<CashflowWebViewProps> = ({
             totalOutflow={totalOutflow}
             closingBalance={closingBalance}
             netCashflow={netCashflow}
+            heldPartnerCapital={totalHeldPartnerCapital}
             onShowCapital={() => {
               setIsEditingCapital(true);
               setShowCapitalModal(true);
@@ -169,7 +173,7 @@ export const CashflowWebView: React.FC<CashflowWebViewProps> = ({
           </div>
 
           {/* 3. Expected Upcoming Cash Movements (Accounts Receivable & Payable) */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-10">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mt-10">
             <ReceivableDebtsList
               debts={receivableDebts}
               total={totalReceivables}
@@ -181,6 +185,14 @@ export const CashflowWebView: React.FC<CashflowWebViewProps> = ({
             <PayableDebtsList
               debts={payableDebts}
               total={totalPayables}
+              onVehicleClick={(vehicleId) => {
+                const v = vehicles.find(x => x.id === vehicleId);
+                if (v) onNavigate('inventory', v.code, 'ALL', 'view_vehicle');
+              }}
+            />
+            <HeldPartnerCapitalList
+              items={heldPartnerCapitals}
+              total={totalHeldPartnerCapital}
               onVehicleClick={(vehicleId) => {
                 const v = vehicles.find(x => x.id === vehicleId);
                 if (v) onNavigate('inventory', v.code, 'ALL', 'view_vehicle');
@@ -332,7 +344,10 @@ const BreakdownCard: React.FC<BreakdownCardProps> = ({ data, total }) => (
       <BreakdownRow label="Chi phí làm đẹp & hoàn thiện xe" value={data?.carCosts || 0} total={total} color="bg-amber-500" />
       <BreakdownRow label="Vận hành Showroom" value={data?.operatingExpenses || 0} total={total} color="bg-rose-500" />
       <BreakdownRow label="Vốn & Lợi nhuận đối tác" value={data?.partnerPayouts || 0} total={total} color="bg-cyan-500" />
-      <BreakdownRow label="Lương nhân sự" value={data?.salaries || 0} total={total} color="bg-emerald-500" />
+      <BreakdownRow label="Lương & Tạm ứng nhân sự (Thực chi)" value={data?.paidPayrollOutflow || 0} total={total} color="bg-emerald-500" />
+      {(data?.depositRefundsOutflow || 0) > 0 && (
+        <BreakdownRow label="Hoàn tiền cọc bán xe" value={data?.depositRefundsOutflow || 0} total={total} color="bg-orange-500" />
+      )}
     </div>
   </section>
 );

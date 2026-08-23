@@ -246,6 +246,10 @@ export const UnifiedCashJournal: React.FC<UnifiedCashJournalProps> = ({
                           "px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider inline-block",
                           t.category === 'Bán xe'
                             ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : t.category === 'Hoàn cọc'
+                            ? "bg-rose-50 text-rose-700 border border-rose-200"
+                            : t.category === 'Góp vốn'
+                            ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
                             : t.category === 'Mua xe'
                             ? "bg-blue-50 text-blue-700 border border-blue-200"
                             : t.category === 'Chi phí xe'

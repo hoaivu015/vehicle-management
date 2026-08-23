@@ -11,7 +11,7 @@ import { PageTransition } from '@/src/shared/design-system/PageTransition';
 import { cn } from '@/src/shared/utils/cn';
 
 // Lazy load tab components
-const DashboardPage = React.lazy(() => import('@/src/modules/finance/presentation/DashboardPage').then(m => ({ default: m.DashboardPage })));
+const DashboardPage = React.lazy(() => import('@/src/modules/dashboard/presentation/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const InventoryPage = React.lazy(() => import('@/src/modules/inventory/presentation/InventoryPage').then(m => ({ default: m.InventoryPage })));
 const StaffPage = React.lazy(() => import('@/src/modules/staff/presentation/StaffPage').then(m => ({ default: m.StaffPage })));
 const CashflowPage = React.lazy(() => import('@/src/modules/finance/presentation/CashflowPage').then(m => ({ default: m.CashflowPage })));

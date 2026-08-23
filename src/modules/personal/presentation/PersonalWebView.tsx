@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useMemo } from 'react';
 import { User, Calendar } from 'lucide-react';
 import { StaffSalaryService } from '@/src/modules/staff/domain/StaffSalaryService';
 import { UserRole, VehicleStatus } from '@/src/shared/domain/constants';
@@ -12,7 +12,7 @@ import { SalaryBreakdownCard } from './components/SalaryBreakdownCard';
 import { PersonalAdvancesCard } from './components/PersonalAdvancesCard';
 import { PersonalVehiclesSection } from './components/PersonalVehiclesSection';
 import { motion, AnimatePresence } from 'motion/react';
-import { Staff } from '@/src/shared/domain/types';
+import { Staff, Vehicle } from '@/src/shared/domain/types';
 import { cn } from '@/src/shared/utils/cn';
 import { PersonalSkeleton } from './components/PersonalSkeleton';
 
@@ -82,6 +82,22 @@ export const PersonalWebView: React.FC<PersonalWebViewProps> = ({
   const isInitialLoading = loading && !staffData;
   const isSubsequentLoading = loading && !!staffData;
 
+  // Lấy toàn bộ xe người này đang góp vốn (cả đang trong kho lẫn đã bán)
+  const userCode = user?.code || '';
+  const allMyCoinvestedCars = useMemo(() => {
+    if (!userCode) return [];
+    return allVehicles.filter((v: Vehicle) => 
+      v.is_coinvested && 
+      (v.coinvestor_code || '').trim().toLowerCase() === userCode.trim().toLowerCase()
+    );
+  }, [allVehicles, userCode]);
+
+  const totalHeldCapital = useMemo(() => {
+    return allMyCoinvestedCars
+      .filter((v: Vehicle) => !v.partner_capital_repaid)
+      .reduce((sum: number, v: Vehicle) => sum + (v.coinvest_amount || 0), 0);
+  }, [allMyCoinvestedCars]);
+
   if (isInitialLoading) {
     return <PersonalSkeleton />;
   }
@@ -89,10 +105,10 @@ export const PersonalWebView: React.FC<PersonalWebViewProps> = ({
   if (!user) return null;
 
   const salaryDetails = staffData?.salaryDetails || StaffSalaryService.calculateMonthlySalary(user, allVehicles, selectedMonth);
-  const { soldCars, boughtCars, coinvestedCars } = salaryDetails;
+  const { soldCars, boughtCars } = salaryDetails;
 
   const unreimbursedAmount = (staffData?.expenses || [])
-    .filter(e => !e.is_reimbursed)
+    .filter(e => !e.is_reimbursed && !StaffSalaryService.isSalaryAdvance(e))
     .reduce((sum, e) => sum + e.amount, 0);
 
   return (
@@ -159,6 +175,7 @@ export const PersonalWebView: React.FC<PersonalWebViewProps> = ({
               <SalaryBreakdownCard 
                 salaryDetails={salaryDetails} 
                 selectedMonth={selectedMonth} 
+                totalHeldCapital={totalHeldCapital}
               />
               <PersonalAdvancesCard 
                 expenses={staffData?.expenses || []} 
@@ -174,7 +191,7 @@ export const PersonalWebView: React.FC<PersonalWebViewProps> = ({
           <PersonalVehiclesSection 
             soldCars={soldCars} 
             boughtCars={boughtCars} 
-            coinvestedCars={coinvestedCars} 
+            coinvestedCars={allMyCoinvestedCars} 
             selectedMonth={selectedMonth} 
             user={user}
             onSelectVehicle={(v) => {

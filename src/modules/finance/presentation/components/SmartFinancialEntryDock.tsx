@@ -129,6 +129,7 @@ export const SmartFinancialEntryDock: React.FC<SmartFinancialEntryDockProps> = (
       date: date,
       type: expenseScope,
       category: category,
+      flowType: transactionType,
       vehicleId: selectedVehicleId ? selectedVehicleId : undefined,
       staffId: selectedStaffId ? selectedStaffId : undefined
     };

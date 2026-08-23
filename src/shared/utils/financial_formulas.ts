@@ -32,10 +32,23 @@ export const calcNetProfit = (grossProfit: number, buyingComm: number, buyingBon
   return Math.round(grossProfit - (buyingComm + buyingBonus + sellingComm));
 };
 
-export const calcProfitShare = (netProfit: number, capital: number, totalNeeded: number): number => {
-  if (totalNeeded <= 0) return Math.round(netProfit);
-  const ratio = capital / totalNeeded;
+export const calcProfitShare = (netProfit: number, capital: number, basePrice: number): number => {
+  if (basePrice <= 0) return 0;
+  const ratio = Math.min(1, Math.max(0, capital / basePrice));
   return Math.round(netProfit * ratio);
+};
+
+export const calcRefundablePartnerCapital = (
+  coinvestAmount: number,
+  partnerProfitShare: number,
+  isSold: boolean = false
+): number => {
+  if (!isSold) return Math.round(coinvestAmount);
+  // Nếu bán lỗ (partnerProfitShare < 0), khấu trừ phần lỗ của đối tác vào số vốn hoàn trả
+  if (partnerProfitShare < 0) {
+    return Math.max(0, Math.round(coinvestAmount + partnerProfitShare));
+  }
+  return Math.round(coinvestAmount);
 };
 
 /**
@@ -90,7 +103,32 @@ export const calcNetSalaryWithAdvances = (
 export const calcCompanyMonthlyNetProfit = (
   monthlySalesProfit: number, 
   operationalExpenses: number, 
-  totalStaffSalaries: number
+  totalStaffSalaries: number,
+  otherInflows: number = 0
 ): number => {
-  return Math.round(monthlySalesProfit - operationalExpenses - totalStaffSalaries);
+  return Math.round(monthlySalesProfit + otherInflows - operationalExpenses - totalStaffSalaries);
 };
+
+export const isMonthLocked = (monthStr: string, lockedMonths?: string[]): boolean => {
+  if (!lockedMonths || lockedMonths.length === 0) return false;
+  return lockedMonths.includes(monthStr);
+};
+
+/**
+ * Tính Dòng tiền thuần trực tiếp (Direct Cashflow Method)
+ */
+export const calcNetCashflowDirect = (totalInflows: number, totalOutflows: number): number => {
+  return Math.round(totalInflows - totalOutflows);
+};
+
+/**
+ * Kiểm tra và đối soát số dư dòng tiền (Reconciliation Invariant Check)
+ */
+export const reconcileCashBalance = (
+  openingBalance: number,
+  netCashflow: number,
+  closingBalance: number
+): boolean => {
+  return Math.round(openingBalance + netCashflow) === Math.round(closingBalance);
+};
+

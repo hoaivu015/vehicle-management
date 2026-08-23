@@ -83,17 +83,22 @@ export const PersonalVehiclesSection: React.FC<PersonalVehiclesSectionProps> = (
       }, []),
       ...coinvestedCars.map(car => {
         const financials = calculateVehicleFinancials(car);
-        const isSoldInSelectedMonth = car.status === VehicleStatus.SOLD && car.sale_date?.startsWith(selectedMonth);
+        const isSold = car.status === VehicleStatus.SOLD;
+        const isPayableThisMonth = isSold && ((car.sale_date || '').startsWith(selectedMonth) || (!car.partner_profit_shared && (car.sale_date || '') < selectedMonth));
+        const statusLabel = isSold 
+          ? (car.partner_capital_repaid ? 'Đã bán • Đã hoàn vốn' : 'Đã bán • Giữ vốn ký quỹ')
+          : 'Đang lưu kho';
+
         return {
           ...car,
           txType: 'coinvest' as const,
           label: 'Góp vốn',
           txDate: car.purchase_date,
           txAmount: financials.coinvestAmount,
-          txCommission: isSoldInSelectedMonth ? financials.partnerProfitShare : 0,
+          txCommission: isPayableThisMonth ? (car.partner_profit_shared ? 0 : financials.partnerProfitShare) : 0,
           color: 'indigo' as const,
-          statusLabel: car.status === VehicleStatus.SOLD ? 'Đã thanh toán' : 'Đang vận hành',
-          isSoldInSelectedMonth
+          statusLabel,
+          isSoldInSelectedMonth: isPayableThisMonth
         };
       })
     ].sort((a, b) => (b.txDate || '').localeCompare(a.txDate || ''));

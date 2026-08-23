@@ -7,6 +7,7 @@ interface PersonalStatsGridProps {
   totalSalary: number;
   totalCommission: number;
   coinvestProfitShare: number;
+  totalHeldCapital?: number;
   soldCarsCount: number;
   target: number;
   completionRate: number;
@@ -17,12 +18,14 @@ export const PersonalStatsGrid: React.FC<PersonalStatsGridProps> = ({
   totalSalary,
   totalCommission,
   coinvestProfitShare,
+  totalHeldCapital = 0,
   soldCarsCount,
   target,
   completionRate,
   selectedMonth
 }) => {
   const monthNum = selectedMonth.split('-')[1];
+  const hasHeldCapital = totalHeldCapital > 0;
 
   return (
     <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-8">
@@ -43,8 +46,9 @@ export const PersonalStatsGrid: React.FC<PersonalStatsGridProps> = ({
       <StatCard 
         delay={0.4}
         icon={TrendingUp} 
-        label={`Tài sản góp vốn`} 
-        value={formatCurrency(coinvestProfitShare)} 
+        label={hasHeldCapital ? "Vốn gửi Công ty" : "Tài sản góp vốn"} 
+        value={formatCurrency(hasHeldCapital ? totalHeldCapital : coinvestProfitShare)} 
+        subValue={hasHeldCapital && coinvestProfitShare > 0 ? `Lãi tháng: +${formatCurrency(coinvestProfitShare)}` : undefined}
         color="blue" 
       />
       <StatCard 

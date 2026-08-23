@@ -15,7 +15,7 @@ interface VehicleDetailActions {
   onPin: (id: number, isPinned: boolean) => Promise<void>;
   onAddPurchasePayment: (id: number, amount: number, note: string, receiver: string) => Promise<void>;
   onAddSalePayment: (id: number, amount: number, note: string, receiver: string, nextStatus: VehicleStatus, seller: string, buyerName?: string, salePrice?: number, commission?: number, buyingBonus?: number) => Promise<void>;
-  onCancelSale: (id: number, code: string) => Promise<void>;
+  onCancelSale: (id: number, code: string, cancelType?: 'REFUND' | 'FORFEIT') => Promise<void>;
 }
 
 export type { PaymentFormState };

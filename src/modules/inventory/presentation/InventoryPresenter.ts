@@ -120,7 +120,9 @@ export class InventoryPresenter extends BasePresenter<InventoryView> implements 
   async addSalePayment(id: number, amt: number, note: string, rec: string, status: VehicleStatus, seller: string, buyer?: string, price?: number, comm?: number, bonus?: number, role?: string): Promise<void> {
     await this.transactionPresenter.addSalePayment(id, amt, note, rec, status, seller, buyer, price, comm, bonus, role);
   }
-  async cancelSale(id: number, code: string, role?: string): Promise<void> { await this.transactionPresenter.cancelSale(id, code, role); }
+  async cancelSale(id: number, code: string, cancelType?: 'REFUND' | 'FORFEIT', role?: string): Promise<void> { 
+    await this.transactionPresenter.cancelSale(id, code, cancelType, role); 
+  }
 
   async recordExpense(command: UnifiedExpenseCommand): Promise<void> {
     if (!command.vehicleId) {

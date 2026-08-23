@@ -1,6 +1,6 @@
 import React from 'react';
-import { FinancePresenter } from './FinancePresenter';
-import { useFinance } from './useFinance';
+import { FinancePresenter } from '@/src/modules/finance/presentation/FinancePresenter';
+import { useFinance } from '@/src/modules/finance/presentation/useFinance';
 import { useIsMobile } from '@/src/shared/presentation/hooks/useIsMobile';
 import { useDashboardState } from './useDashboardState';
 import { DashboardWebView } from './DashboardWebView';

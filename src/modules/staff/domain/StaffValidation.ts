@@ -23,7 +23,7 @@ export const AddStaffExpenseSchema = z.object({
   amount: z.coerce.number().min(1000, 'Số tiền phải lớn hơn 1,000đ'),
   note: z.string().min(3, 'Ghi chú phải có ít nhất 3 ký tự'),
   date: zString,
-  type: z.enum(['vehicle', 'operating']),
+  type: z.enum(['vehicle', 'operating', 'advance']).or(z.string()),
   vehicleId: z.union([z.string(), z.number()]).optional(),
   vehicle_code: zString.optional(),
   category: zString,

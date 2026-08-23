@@ -44,6 +44,7 @@ export const VehicleSchema = z.object({
   buying_commission: zNumber,
   buying_bonus: zNumber,
   buying_bonus_paid: zBoolean,
+  buying_commission_paid: zBoolean,
   
   total_cost: zNumber,
   cost_history: zArray(CostItemSchema),
@@ -51,6 +52,7 @@ export const VehicleSchema = z.object({
   is_coinvested: zBoolean,
   coinvestor_code: zString,
   coinvest_amount: zNumber,
+  coinvest_date: zString.optional(),
   
   image_url: zString,
   images: zArray(z.string()),
@@ -96,6 +98,7 @@ export const CreateVehicleSchema = z.object({
   is_coinvested: zBoolean.default(false),
   coinvestor_code: zString.default(''),
   coinvest_amount: zNumber.default(0),
+  coinvest_date: zString.optional(),
   notes: zString.default(''),
   buying_commission: zNumber.default(3000000),
 });

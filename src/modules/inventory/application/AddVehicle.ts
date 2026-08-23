@@ -57,6 +57,7 @@ export class AddVehicle {
           commission: 0,
           buying_bonus: 0,
           buying_bonus_paid: false,
+          buying_commission_paid: false,
           images: [],
           received_amount: 0,
           sale_payment_history: [],

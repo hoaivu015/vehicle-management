@@ -8,6 +8,7 @@ const CACHE_KEY_USER = 'AUTO28_CACHED_USER';
 const CACHE_KEY_PERMS = 'AUTO28_CACHED_PERMISSIONS';
 
 import { StaffSchema } from '@/src/modules/staff/domain/StaffSchema';
+import { staffMapper } from '@/src/modules/staff/infrastructure/mappers/StaffMapper';
 
 const getInitialCachedUser = (): Staff | null => {
   if (typeof window === 'undefined') return null;
@@ -20,7 +21,7 @@ const getInitialCachedUser = (): Staff | null => {
       localStorage.removeItem(CACHE_KEY_USER);
       return null;
     }
-    return validation.data as unknown as Staff;
+    return staffMapper.toDomain(validation.data);
   } catch {
     return null;
   }
