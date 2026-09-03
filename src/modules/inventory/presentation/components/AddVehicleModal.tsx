@@ -19,7 +19,7 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({ isOpen, onClos
       onClose={onClose} 
       maxWidth="6xl" 
       title="Thêm xe mới"
-      subtitle="Hệ thống quản lý phương tiện"
+      subtitle="Nhập thông tin xe và chi phí thu mua vào kho"
       className="h-[88dvh] lg:h-auto max-h-[88dvh] md:max-h-[860px]"
     >
       <AddVehicleForm 

@@ -44,14 +44,14 @@ export const useAddVehicleForm = (
     e?.preventDefault();
     setFormError(null);
 
-    if (!formData.name) return setFormError('Vui lòng nhập tên xe');
-    if (!formData.buyer) return setFormError('Vui lòng chọn nhân viên mua');
+    if (!formData.name) return setFormError('Vui lòng nhập tên xe và phiên bản');
+    if (!formData.buyer) return setFormError('Vui lòng chọn nhân viên thu mua phụ trách');
     
     if (formData.is_coinvested) {
-      if (!formData.coinvestor_code) return setFormError('Vui lòng chọn nhà đầu tư');
-      if ((formData.coinvest_amount || 0) === 0) return setFormError('Vui lòng nhập số tiền góp vốn');
+      if (!formData.coinvestor_code) return setFormError('Vui lòng chọn đối tác góp vốn');
+      if ((formData.coinvest_amount || 0) === 0) return setFormError('Vui lòng nhập số tiền góp vốn hợp lệ');
       if ((formData.coinvest_amount || 0) > formData.purchase_price) {
-        return setFormError('Số tiền góp không được lớn hơn giá nhập');
+        return setFormError('Số tiền góp vốn không được vượt quá giá nhập xe. Vui lòng kiểm tra lại.');
       }
     }
 
@@ -61,7 +61,7 @@ export const useAddVehicleForm = (
       onClose();
     } catch (err: unknown) {
       console.error('[AddVehicleForm] Submit error:', err);
-      const message = err instanceof Error ? err.message : 'Lỗi khi lưu thông tin. Vui lòng kiểm tra lại.';
+      const message = err instanceof Error ? err.message : 'Không thể khởi tạo hồ sơ xe. Vui lòng kiểm tra lại kết nối và thử lại.';
       setFormError(message);
     } finally {
       setLoading(false);
@@ -78,13 +78,58 @@ export const useAddVehicleForm = (
       const publicUrl = await storageRepo.uploadImage(file);
       setFormData(prev => ({ ...prev, image_url: publicUrl }));
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Lỗi khi tải ảnh lên';
+      const message = error instanceof Error ? error.message : 'Không thể tải ảnh xe lên máy chủ. Vui lòng kiểm tra lại tệp ảnh và thử lại.';
       setFormError(message);
     } finally {
       setIsUploading(false);
       // Reset value to allow selecting the same file again
       e.target.value = '';
     }
+  };
+
+  const handleToggleCoInvest = (isCoinvested: boolean) => {
+    setFormData(prev => {
+      if (isCoinvested) {
+        // Khi bật Góp vốn:
+        // 1. Lương mua = 0 đ
+        // 2. Nhân viên thu mua là nhân viên góp vốn: đồng bộ coinvestor_code và buyer
+        const syncedStaff = prev.buyer || prev.coinvestor_code || '';
+        return {
+          ...prev,
+          is_coinvested: true,
+          buying_commission: 0,
+          buyer: syncedStaff,
+          coinvestor_code: syncedStaff
+        };
+      } else {
+        // Khi quay về Showroom:
+        // 1. Khôi phục lương mua 3.000.000 đ
+        // 2. Xóa dữ liệu góp vốn
+        return {
+          ...prev,
+          is_coinvested: false,
+          buying_commission: 3000000,
+          coinvestor_code: '',
+          coinvest_amount: 0
+        };
+      }
+    });
+  };
+
+  const handleBuyerChange = (buyerCode: string) => {
+    setFormData(prev => ({
+      ...prev,
+      buyer: buyerCode,
+      ...(prev.is_coinvested ? { coinvestor_code: buyerCode } : {})
+    }));
+  };
+
+  const handleCoinvestorChange = (coinvestorCode: string) => {
+    setFormData(prev => ({
+      ...prev,
+      coinvestor_code: coinvestorCode,
+      ...(prev.is_coinvested ? { buyer: coinvestorCode } : {})
+    }));
   };
 
   return {
@@ -94,6 +139,9 @@ export const useAddVehicleForm = (
     isUploading,
     formError,
     handleSubmit,
-    handleFileUpload
+    handleFileUpload,
+    handleToggleCoInvest,
+    handleBuyerChange,
+    handleCoinvestorChange
   };
 };

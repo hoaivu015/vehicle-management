@@ -11,14 +11,57 @@ interface CoInvestModuleProps {
   formData: AddVehicleRequest;
   setFormData: React.Dispatch<React.SetStateAction<AddVehicleRequest>>;
   staffList: Staff[];
+  onToggleCoInvest?: (isCoinvested: boolean) => void;
+  onCoinvestorChange?: (investorCode: string) => void;
 }
 
 export const CoInvestModule: React.FC<CoInvestModuleProps> = ({ 
   formData, 
   setFormData, 
-  staffList 
+  staffList,
+  onToggleCoInvest,
+  onCoinvestorChange
 }) => {
   const isActive = formData.is_coinvested;
+
+  const handleToggle = (coinvest: boolean) => {
+    if (onToggleCoInvest) {
+      onToggleCoInvest(coinvest);
+    } else {
+      setFormData(prev => {
+        if (coinvest) {
+          const syncedStaff = prev.buyer || prev.coinvestor_code || '';
+          return {
+            ...prev,
+            is_coinvested: true,
+            buying_commission: 0,
+            buyer: syncedStaff,
+            coinvestor_code: syncedStaff
+          };
+        } else {
+          return {
+            ...prev,
+            is_coinvested: false,
+            buying_commission: 3000000,
+            coinvestor_code: '',
+            coinvest_amount: 0
+          };
+        }
+      });
+    }
+  };
+
+  const handleInvestorSelect = (code: string) => {
+    if (onCoinvestorChange) {
+      onCoinvestorChange(code);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        coinvestor_code: code,
+        ...(prev.is_coinvested ? { buyer: code } : {})
+      }));
+    }
+  };
 
   return (
     <div className={cn(
@@ -40,7 +83,7 @@ export const CoInvestModule: React.FC<CoInvestModuleProps> = ({
         <div className="flex items-center bg-black/[0.04] p-1 rounded-full border border-black/[0.04] relative shrink-0 self-start sm:self-auto">
           <button
             type="button"
-            onClick={() => setFormData(prev => ({ ...prev, is_coinvested: false }))}
+            onClick={() => handleToggle(false)}
             className={cn(
               "relative px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-all duration-200 z-10 whitespace-nowrap cursor-pointer",
               !isActive ? "text-kraft-ink" : "text-sub-label hover:text-kraft-ink"
@@ -58,7 +101,7 @@ export const CoInvestModule: React.FC<CoInvestModuleProps> = ({
 
           <button
             type="button"
-            onClick={() => setFormData(prev => ({ ...prev, is_coinvested: true }))}
+            onClick={() => handleToggle(true)}
             className={cn(
               "relative px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-all duration-200 z-10 whitespace-nowrap cursor-pointer",
               isActive ? "text-white" : "text-sub-label hover:text-kraft-ink"
@@ -83,25 +126,32 @@ export const CoInvestModule: React.FC<CoInvestModuleProps> = ({
             animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
             exit={{ opacity: 0, height: 0, marginTop: 0 }}
             transition={{ duration: 0.25 }}
-            className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-hidden pt-4 border-t border-hairline-soft"
+            className="space-y-3 overflow-hidden pt-4 border-t border-hairline-soft"
           >
-            <BaseSelect 
-              label="Nhà đầu tư"
-              value={formData.coinvestor_code}
-              onChange={(e) => setFormData(prev => ({ ...prev, coinvestor_code: e.target.value }))}
-              variant="dense"
-            >
-              <option value="">Chọn nhà đầu tư...</option>
-              {staffList.map((s) => (
-                <option key={s.id} value={s.code}>{s.name} ({s.code})</option>
-              ))}
-            </BaseSelect>
-            <SmartAmountInput
-              label="Số tiền góp"
-              value={formData.coinvest_amount || 0}
-              onChange={(amount) => setFormData(prev => ({ ...prev, coinvest_amount: amount }))}
-              variant="dense"
-            />
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50/80 border border-blue-200/60 text-[10.5px] font-bold text-blue-700">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
+              <span>Xe góp vốn: Hoa hồng thu mua = 0 ₫ • Nhân viên thu mua đồng thời là đối tác góp vốn</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <BaseSelect 
+                label="Nhà đầu tư (Nhân viên thu mua)"
+                value={formData.coinvestor_code}
+                onChange={(e) => handleInvestorSelect(e.target.value)}
+                variant="dense"
+              >
+                <option value="">Chọn nhà đầu tư...</option>
+                {staffList.map((s) => (
+                  <option key={s.id} value={s.code}>{s.name} ({s.code})</option>
+                ))}
+              </BaseSelect>
+              <SmartAmountInput
+                label="Số tiền góp vốn"
+                value={formData.coinvest_amount || 0}
+                onChange={(amount) => setFormData(prev => ({ ...prev, coinvest_amount: amount }))}
+                variant="dense"
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

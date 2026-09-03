@@ -16,9 +16,9 @@ export const VehicleProfile: React.FC<VehicleProfileProps> = ({
   return (
     <div className="space-y-2.5">
       <BaseInput 
-        label="Tên sản phẩm / Model"
+        label="Tên xe & Phiên bản"
         required
-        placeholder="VD: Mercedes C300 AMG 2021"
+        placeholder="VD: Mercedes-Benz C300 AMG"
         value={formData.name}
         onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
         icon={Car}
@@ -43,13 +43,13 @@ export const VehicleProfile: React.FC<VehicleProfileProps> = ({
           variant="dense"
         />
         <SmartAmountInput
-          label="Số ODO (km)"
+          label="Số ODO"
           value={formData.odo || 0}
           onChange={(v) => setFormData(prev => ({ ...prev, odo: v }))}
           suffix=" km"
           icon={Gauge}
           showTextPreview={false}
-          placeholder="VD: 5k, 12k..."
+          placeholder="VD: 15.000, 45.000..."
           variant="dense"
         />
       </div>

@@ -25,6 +25,7 @@ interface SmartAmountInputProps {
   showTextPreview?: boolean;
   error?: string;
   variant?: 'standard' | 'dense';
+  disabled?: boolean;
 }
 
 export const SmartAmountInput: React.FC<SmartAmountInputProps> = ({
@@ -41,7 +42,8 @@ export const SmartAmountInput: React.FC<SmartAmountInputProps> = ({
   icon: Icon = DollarSign,
   showTextPreview = true,
   error,
-  variant = 'standard'
+  variant = 'standard',
+  disabled = false
 }) => {
   const isDense = variant === 'dense';
   const [inputValue, setInputValue] = useState<string>(value > 0 ? value.toLocaleString('vi-VN', { maximumFractionDigits: 3 }) : '');
@@ -121,11 +123,13 @@ export const SmartAmountInput: React.FC<SmartAmountInputProps> = ({
           onBlur={handleBlur}
           placeholder={placeholder}
           required={required}
+          disabled={disabled}
           className={cn(
             "block w-full text-right font-bold bg-transparent border-b border-transparent",
             "hover:border-kraft-accent/10 focus:border-kraft-accent focus:outline-none transition-all",
             "text-kraft-ink tracking-tight",
             isDense && "text-[11px]",
+            disabled && "opacity-50 cursor-not-allowed bg-slate-50/50",
             error && "border-red-500"
           )}
         />
@@ -174,18 +178,18 @@ export const SmartAmountInput: React.FC<SmartAmountInputProps> = ({
           onBlur={handleBlur}
           placeholder={placeholder}
           required={required}
+          disabled={disabled}
           className={cn(
             "w-full bg-white border rounded-t2 px-g3 pl-14 pr-12 font-black transition-all placeholder:text-sub-label/20 placeholder:font-medium",
             isDense ? "h-12 text-xs" : "h-14 text-sm",
-            isFocused 
-              ? "border-kraft-accent focus:ring-4 focus:ring-kraft-accent/5 shadow-kraft-deep/10" 
-              : error 
-                ? "border-expense bg-expense-light/30 focus:ring-expense/5 animate-micro-shake" 
-                : "border-hairline-soft"
+            disabled && "bg-slate-50/80 text-sub-label/70 border-hairline-soft cursor-not-allowed",
+            !disabled && isFocused && "border-kraft-accent focus:ring-4 focus:ring-kraft-accent/5 shadow-kraft-deep/10",
+            !disabled && error && "border-expense bg-expense-light/30 focus:ring-expense/5 animate-micro-shake",
+            !disabled && !isFocused && !error && "border-hairline-soft"
           )}
         />
         
-        {inputValue && (
+        {!disabled && inputValue && (
           <button 
             type="button"
             onClick={clearInput}

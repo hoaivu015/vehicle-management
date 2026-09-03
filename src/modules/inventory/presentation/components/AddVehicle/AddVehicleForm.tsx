@@ -33,7 +33,10 @@ export const AddVehicleForm: React.FC<AddVehicleFormProps> = ({
     isUploading,
     formError,
     handleSubmit,
-    handleFileUpload
+    handleFileUpload,
+    handleToggleCoInvest,
+    handleBuyerChange,
+    handleCoinvestorChange
   } = useAddVehicleForm(isOpen, onSubmit, onClose, storageRepo);
 
   return (
@@ -69,13 +72,14 @@ export const AddVehicleForm: React.FC<AddVehicleFormProps> = ({
                 <div className="w-7 h-7 rounded-full bg-income/10 flex items-center justify-center text-income">
                   <BarChart3 size={14} strokeWidth={2.5} />
                 </div>
-                <h3 className="text-xs font-black uppercase tracking-wider text-kraft-ink">Kinh tế thu mua</h3>
+                <h3 className="text-xs font-black uppercase tracking-wider text-kraft-ink">Thông tin thu mua</h3>
               </div>
 
               <EconomicSection 
                 formData={formData} 
                 setFormData={setFormData} 
                 staffList={staffList} 
+                onBuyerChange={handleBuyerChange}
               />
             </div>
 
@@ -89,7 +93,7 @@ export const AddVehicleForm: React.FC<AddVehicleFormProps> = ({
               </div>
 
               <BaseTextArea 
-                placeholder="Nhập ghi chú chi tiết về xe, thỏa thuận cọc, lịch hẹn bảo dưỡng..."
+                placeholder="Nhập ghi chú chi tiết về tình trạng xe, thỏa thuận đặt cọc, kế hoạch làm đẹp hoàn thiện..."
                 value={formData.notes || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
                 className="min-h-[52px] h-13 text-xs"
@@ -128,6 +132,8 @@ export const AddVehicleForm: React.FC<AddVehicleFormProps> = ({
               formData={formData} 
               setFormData={setFormData} 
               staffList={staffList} 
+              onToggleCoInvest={handleToggleCoInvest}
+              onCoinvestorChange={handleCoinvestorChange}
             />
 
             {/* Form Error Alert */}
@@ -171,7 +177,7 @@ export const AddVehicleForm: React.FC<AddVehicleFormProps> = ({
           )}
         >
           {loading || isUploading ? <RefreshCw className="animate-spin" size={15} /> : <ChevronRight size={15} strokeWidth={3} />}
-          <span>{loading ? 'Đang tạo...' : 'Tạo hồ sơ'}</span>
+          <span>{loading ? 'Đang lưu...' : 'Thêm xe mới'}</span>
         </motion.button>
       </div>
     </form>
